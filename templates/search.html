@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>Search Course</title>
+</head>
+<body>
+<h1>Search</h1>
+
+
+<div>
+    <form method="post" action="/">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="inputEmail4">Class Title</label>
+                <input type="text" name="class_title" class="form-control" id="inputTitle" placeholder="Class Title">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="inputPassword4">Class Number</label>
+                <input type="text" name="class_number" class="form-control" id="inputNumber" placeholder="Class Number">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="inputAddress">Class Section</label>
+                <input type="text" name="class_section" class="form-control" id="inputSection"
+                       placeholder="Class Section">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="inputAddress2">Class Instructor</label>
+                <input type="text" name="class_instructor" class="form-control" id="inputInstructor"
+                       placeholder="Class Instructor">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="inputState">Class Day</label>
+                <select id="inputState" name="class_day" class="form-control">
+                    <option></option>
+                    <option>Monday & Wednesday</option>
+                    <option>Tuesday & Thursday</option>
+                    <option>Friday</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="start time">Class Start Time</label>
+                <select name="class_start_time" class="form-control" id="startTime">
+                    <option></option>
+                    <option>8:30am</option>
+                    <option>9:00am</option>
+                    <option>10:00am</option>
+                    <option>11:00am</option>
+                    <option>11:30am</option>
+                    <option>12:00pm</option>
+                    <option>1:00pm</option>
+                    <option>2:00pm</option>
+                    <option>2:30pm</option>
+                    <option>3:00pm</option>
+                    <option>4:00pm</option>
+                    <option>5:00pm</option>
+                    <option>5:30pm</option>
+                    <option>7:00pm</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="end Time">Class End Time</label>
+                <select name="class_end_time" class="form-control" id="endTime">
+                    <option></option>
+                    <option>9:45am</option>
+                    <option>10:15am</option>
+                    <option>11:15am</option>
+                    <option>12:15am</option>
+                    <option>12:45am</option>
+                    <option>13:15pm</option>
+                    <option>2:15pm</option>
+                    <option>3:15pm</option>
+                    <option>3:45pm</option>
+                    <option>4:15pm</option>
+                    <option>5:15pm</option>
+                    <option>6:15pm</option>
+                    <option>6:45pm</option>
+                    <option>8:15pm</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="inputZip">Location</label>
+                <input type="text" name="class_location" class="form-control" id="inputLocation">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-check">
+                <input class="form-check-input" name="fuzzyquery" type="checkbox" id="gridCheck" value="1">
+                <label class="form-check-label" for="gridCheck">
+                    模糊查询
+                </label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+</div>
+
+
+<div class="row table-responsive">
+    <table class="table table-sm table-hover">
+        <tbody>
+        {% if data %}
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">class title</th>
+                <th scope="col">class number</th>
+                <th scope="col">class section</th>
+                <th scope="col">class instructor</th>
+                <th scope="col">class day</th>
+                <th scope="col">class time</th>
+                <th scope="col">class location</th>
+                <th scope="col">class isFull</th>
+            </tr>
+            </thead>
+            {% for course in data %}
+                <tr>
+                    <th scope="row">1</th>
+                    <td>{{ course['class_title'] }}</td>
+                    <td>{{ course['class_number'] }}</td>
+                    <td>{{ course['class_section'] }}</td>
+                    <td>{{ course['class_instructor'] }}</td>
+                    <td>{{ course['class_day'] }}</td>
+                    <td>{{ course['class_time'] }}</td>
+                    <td>{{ course['class_location'] }}</td>
+                    <td>{{ course['class_isFull'] }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+</body>
+</html>
