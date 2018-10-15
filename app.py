@@ -19,6 +19,7 @@ app = Flask(__name__)
 
 # TODO 修改课程结束时间
 # TODO 查询条件不消失
+# TODO 拆分class_day
 
 @app.route('/', methods=['GET', 'POST'])
 def hello_world():
@@ -43,6 +44,9 @@ def hello_world():
             if "class_instructor" in item_dict.keys():
                 if fuzzyquery:
                     item_dict['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
+            if "class_day" in item_dict.keys():
+                if fuzzyquery:
+                    item_dict['class_day'] = re.compile(str(item_dict.get("class_day")), re.I)
             if "class_location" in item_dict.keys():
                 if fuzzyquery:
                     item_dict['class_location'] = re.compile(str(item_dict.get("class_location")), re.I)
@@ -50,6 +54,12 @@ def hello_world():
             courses_list = list(collection.find(item_dict))
             return render_template('search.html', data=courses_list)
         if 'nowclass' in request.form:
+            if "class_location" in item_dict.keys():
+                if fuzzyquery:
+                    item_dict['class_location'] = re.compile(str(item_dict.get("class_location")), re.I)
+            if "class_instructor" in item_dict.keys():
+                if fuzzyquery:
+                    item_dict['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
             week_now = time.strftime("%A", time.localtime(time.time()))
             time_now = datetime.datetime.now().strftime('%H:%M')
             item_dict['class_day'] = re.compile(week_now, re.I)
