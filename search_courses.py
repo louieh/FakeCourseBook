@@ -29,6 +29,11 @@ def get_prefix():
             print(profix)
 
 
+def update_datebase(code):
+    collection.drop()
+    for each_code in code:
+        insert_course(each_code)
+
 def insert_course(code):
     base_uri = "https://coursebook.utdallas.edu/%s/term_18f" % code
     try:
@@ -180,8 +185,7 @@ def search_class_location(class_location):
 
 if __name__ == "__main__":
     a = ['cs', 'ce', 'ee', 'se']
-    for each in a:
-        insert_course(each)
+    update_datebase(a)
     # wb = xlrd.open_workbook('classnumbers.xlsx')
     # sh = wb.sheet_by_index(0)
     #
