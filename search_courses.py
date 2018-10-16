@@ -18,8 +18,19 @@ collection = db.courses
 # todo 目前哪些教室有人在上课，哪些没有
 # todo 查询某个教室当天课表，下一节什么课
 
+def get_prefix():
+    base_url = "https://coursebook.utdallas.edu/guidedsearch"
+    resp = requests.get(base_url)
+    resp_selector = html.etree.HTML(resp.text)
+    profix_list = resp_selector.xpath('''.//select[@id='combobox_cp']/option/text()''')
+    for each_profix in profix_list:
+        if '-' in each_profix:
+            profix = each_profix.split('-')[0].strip()
+            print(profix)
+
+
 def insert_course(code):
-    base_uri = "https://coursebook.utdallas.edu/%s/term_18f?" % code
+    base_uri = "https://coursebook.utdallas.edu/%s/term_18f" % code
     try:
         resp = requests.get(base_uri)
         resp_selector = html.etree.HTML(resp.text)
@@ -100,9 +111,9 @@ def insert_course(code):
             # pprint.pprint(each_course_dict)
             try:
                 collection.insert(each_course_dict)
-                print (1)
+                print(1)
             except:
-                print (0)
+                print(0)
 
 
 # search
@@ -146,7 +157,7 @@ def search_instructor(class_instructor):
 def course_now():
     # 查找目前正在进行的课程
     week_now = time.strftime("%A", time.localtime(time.time()))
-    time_now = (datetime.datetime.utcnow()-datetime.timedelta(hours=5)).strftime('%H:%M')
+    time_now = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%H:%M')
     search_information['class_day'] = re.compile(week_now, re.I)
     search_information['class_start_time'] = {"$lte": time_now}
     search_information['class_end_time'] = {"$gte": time_now}
@@ -159,6 +170,7 @@ def search_isFull(class_isFull):
     search_information['class_isFull'] = class_isFull
     courses_list = list(collection.find(search_information))
 
+
 # class_location
 def search_class_location(class_location):
     search_information['class_location'] = class_location
@@ -167,7 +179,9 @@ def search_class_location(class_location):
 
 
 if __name__ == "__main__":
-    course_now()
+    a = ['cs', 'ce', 'ee', 'se']
+    for each in a:
+        insert_course(each)
     # wb = xlrd.open_workbook('classnumbers.xlsx')
     # sh = wb.sheet_by_index(0)
     #
