@@ -29,7 +29,7 @@ def get_prefix():
             print(profix)
 
 
-def update_datebase(code):
+def update_database(code):
     collection.drop()
     for each_code in code:
         insert_course(each_code)
