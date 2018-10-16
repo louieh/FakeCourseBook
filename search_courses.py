@@ -146,7 +146,7 @@ def search_instructor(class_instructor):
 def course_now():
     # 查找目前正在进行的课程
     week_now = time.strftime("%A", time.localtime(time.time()))
-    time_now = datetime.datetime.now().strftime('%H:%M')
+    time_now = (datetime.datetime.utcnow()-datetime.timedelta(hours=5)).strftime('%H:%M')
     search_information['class_day'] = re.compile(week_now, re.I)
     search_information['class_start_time'] = {"$lte": time_now}
     search_information['class_end_time'] = {"$gte": time_now}
@@ -167,6 +167,7 @@ def search_class_location(class_location):
 
 
 if __name__ == "__main__":
+    course_now()
     # wb = xlrd.open_workbook('classnumbers.xlsx')
     # sh = wb.sheet_by_index(0)
     #
@@ -177,7 +178,3 @@ if __name__ == "__main__":
     #     else:
     #         code = each_number
     #     insert_course(code)
-    courses_list = search_class_location('ECSS 2.201')
-    for each_course in courses_list:
-        pprint.pprint(each_course)
-        print ("####################")

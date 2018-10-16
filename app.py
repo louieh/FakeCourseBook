@@ -17,9 +17,6 @@ collection = db.courses
 app = Flask(__name__)
 
 
-# TODO 修改课程结束时间
-# TODO 查询条件不消失
-# TODO 拆分class_day
 
 @app.route('/', methods=['GET', 'POST'])
 def hello_world():
@@ -61,7 +58,7 @@ def hello_world():
                 if fuzzyquery:
                     item_dict['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
             week_now = time.strftime("%A", time.localtime(time.time()))
-            time_now = datetime.datetime.now().strftime('%H:%M')
+            time_now = (datetime.datetime.utcnow()-datetime.timedelta(hours=5)).strftime('%H:%M')
             item_dict['class_day'] = re.compile(week_now, re.I)
             item_dict['class_start_time'] = {"$lte": time_now}
             item_dict['class_end_time'] = {"$gte": time_now}
