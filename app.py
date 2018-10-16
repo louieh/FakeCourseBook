@@ -17,7 +17,6 @@ collection = db.courses
 app = Flask(__name__)
 
 
-
 @app.route('/', methods=['GET', 'POST'])
 def hello_world():
     item_list = ["class_title", "class_number", "class_section", "class_instructor", "class_day", "class_start_time",
@@ -49,7 +48,8 @@ def hello_world():
                     item_dict['class_location'] = re.compile(str(item_dict.get("class_location")), re.I)
 
             courses_list = list(collection.find(item_dict))
-            return render_template('search.html', data=courses_list)
+            count = len(courses_list)
+            return render_template('search.html', data=courses_list, count=count)
         if 'nowclass' in request.form:
             if "class_location" in item_dict.keys():
                 if fuzzyquery:
@@ -58,12 +58,13 @@ def hello_world():
                 if fuzzyquery:
                     item_dict['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
             week_now = time.strftime("%A", time.localtime(time.time()))
-            time_now = (datetime.datetime.utcnow()-datetime.timedelta(hours=5)).strftime('%H:%M')
+            time_now = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%H:%M')
             item_dict['class_day'] = re.compile(week_now, re.I)
             item_dict['class_start_time'] = {"$lte": time_now}
             item_dict['class_end_time'] = {"$gte": time_now}
             courses_list = list(collection.find(item_dict))
-            return render_template('search.html', data=courses_list)
+            count = len(courses_list)
+            return render_template('search.html', data=courses_list, count=count)
     return render_template('search.html')
 
 
