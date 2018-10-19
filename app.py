@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, url_for
 from flask import render_template
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
@@ -15,6 +15,11 @@ db = client.Coursebook
 collection = db.courses
 
 app = Flask(__name__)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    return render_template('login.html')
 
 
 @app.route('/', methods=['GET', 'POST'])
