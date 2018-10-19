@@ -7,7 +7,6 @@ from flask_bootstrap import Bootstrap
 
 from pymongo import MongoClient
 import re
-import time
 import datetime
 
 client = MongoClient("localhost", 27017)
@@ -27,6 +26,8 @@ def hello_world():
     item_list = ["class_title", "class_number", "class_section", "class_instructor", "class_day", "class_start_time",
                  "class_end_time", "class_location"]
     item_dict = {}
+    courses_list = []
+    count = 0
     if request.method == 'POST':
         for each_item in item_list:
             if request.form[each_item]:
@@ -62,15 +63,15 @@ def hello_world():
             if "class_instructor" in item_dict.keys():
                 if fuzzyquery:
                     item_dict['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
-            week_now = time.strftime("%A", time.localtime(time.time()))
-            time_now = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%H:%M')
+            time_now_all = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%A-%H:%M')
+            week_now, time_now = time_now_all.split('-')
             item_dict['class_day'] = re.compile(week_now, re.I)
             item_dict['class_start_time'] = {"$lte": time_now}
             item_dict['class_end_time'] = {"$gte": time_now}
             courses_list = list(collection.find(item_dict))
             count = len(courses_list)
             return render_template('search.html', data=courses_list, count=count)
-    return render_template('search.html')
+    return render_template('search.html', data=courses_list, count=count)
 
 
 if __name__ == '__main__':
