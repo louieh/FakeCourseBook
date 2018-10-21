@@ -1,2 +1,2 @@
-[Course Search](http://course.luyihan.com)
+[Course Search](http://course.luyihan.me)
 
