@@ -35,12 +35,19 @@ def search():
         if session.get('fuzzyquery'):
             for eachKey in item_dict.keys():
                 item_dict_result[eachKey] = re.compile(str(item_dict.get(eachKey)), re.I)
+        else:
+            item_dict_result = item_dict
     elif item_dict and session.get('button') == 'nowclass':
-        if session.get('fuzzyquery'):
-            if "class_location" in item_dict.keys():
+        if "class_location" in item_dict.keys():
+            if session.get('fuzzyquery'):
                 item_dict_result['class_location'] = re.compile(str(item_dict.get("class_location")), re.I)
-            if "class_instructor" in item_dict.keys():
+            else:
+                item_dict_result['class_location'] = item_dict.get('class_location')
+        if "class_instructor" in item_dict.keys():
+            if session.get('fuzzyquery'):
                 item_dict_result['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
+            else:
+                item_dict_result['class_instructor'] = item_dict.get('class_instructor')
         time_now_all = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%A-%H:%M')
         week_now, time_now = time_now_all.split('-')
         item_dict_result['class_day'] = re.compile(week_now, re.I)
