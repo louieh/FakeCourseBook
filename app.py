@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session
+from flask import Flask, request, redirect, url_for, session, escape
 from flask import render_template
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
@@ -30,8 +30,24 @@ def search():
     item_dict = session.get('item_dict')
     if not item_dict:
         item_dict = {}
+    item_dict_result = {}
+    if item_dict and session.get('button') == 'search':
+        if session.get('fuzzyquery'):
+            for eachKey in item_dict.keys():
+                item_dict_result[eachKey] = re.compile(str(item_dict.get(eachKey)), re.I)
+    elif item_dict and session.get('button') == 'nowclass':
+        if session.get('fuzzyquery'):
+            if "class_location" in item_dict.keys():
+                item_dict_result['class_location'] = re.compile(str(item_dict.get("class_location")), re.I)
+            if "class_instructor" in item_dict.keys():
+                item_dict_result['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
+        time_now_all = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%A-%H:%M')
+        week_now, time_now = time_now_all.split('-')
+        item_dict_result['class_day'] = re.compile(week_now, re.I)
+        item_dict_result['class_start_time'] = {"$lte": time_now}
+        item_dict_result['class_end_time'] = {"$gte": time_now}
 
-    courses_list = list(collection.find(item_dict))
+    courses_list = list(collection.find(item_dict_result))
     count = len(courses_list)
 
     if request.method == 'POST':
@@ -39,39 +55,14 @@ def search():
             if request.form[each_item]:
                 item_dict[each_item] = request.form[each_item]
         fuzzyquery = 1 if "fuzzyquery" in request.form else 0
-        if 'search' in request.form:
-            if "class_section" in item_dict.keys():
-                if fuzzyquery:
-                    item_dict['class_section'] = re.compile(str(item_dict.get("class_section")), re.I)
-            if "class_number" in item_dict.keys():
-                if fuzzyquery:
-                    item_dict['class_number'] = re.compile(str(item_dict.get("class_number")), re.I)
-            if "class_title" in item_dict.keys():
-                if fuzzyquery:
-                    item_dict['class_title'] = re.compile(str(item_dict.get("class_title")), re.I)
-            if "class_instructor" in item_dict.keys():
-                if fuzzyquery:
-                    item_dict['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
-            if "class_day" in item_dict.keys():
-                if fuzzyquery:
-                    item_dict['class_day'] = re.compile(str(item_dict.get("class_day")), re.I)
-            if "class_location" in item_dict.keys():
-                if fuzzyquery:
-                    item_dict['class_location'] = re.compile(str(item_dict.get("class_location")), re.I)
-        elif 'nowclass' in request.form:
-            if "class_location" in item_dict.keys():
-                if fuzzyquery:
-                    item_dict['class_location'] = re.compile(str(item_dict.get("class_location")), re.I)
-            if "class_instructor" in item_dict.keys():
-                if fuzzyquery:
-                    item_dict['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
-            time_now_all = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%A-%H:%M')
-            week_now, time_now = time_now_all.split('-')
-            item_dict['class_day'] = re.compile(week_now, re.I)
-            item_dict['class_start_time'] = {"$lte": time_now}
-            item_dict['class_end_time'] = {"$gte": time_now}
+
         session['item_dict'] = item_dict
+        session['fuzzyquery'] = fuzzyquery
+        session['button'] = 'nowclass' if 'nowclass' in request.form else 'search'
         return redirect(url_for('search'))
+    session['item_dict'] = ''
+    session['fuzzyquery'] = ''
+    session['button'] = ''
     return render_template('search.html', data=courses_list, count=count)
 
 
