@@ -31,13 +31,25 @@ def search():
     if not item_dict:
         item_dict = {}
     item_dict_result = {}
+
+    if request.method == 'POST':
+        for each_item in item_list:
+            if request.form[each_item]:
+                item_dict[each_item] = request.form[each_item]
+        fuzzyquery = 1 if "fuzzyquery" in request.form else 0
+
+        session['item_dict'] = item_dict
+        session['fuzzyquery'] = fuzzyquery
+        session['button'] = 'nowclass' if 'nowclass' in request.form else 'search'
+        return redirect(url_for('search'))
+
     if item_dict and session.get('button') == 'search':
         if session.get('fuzzyquery'):
             for eachKey in item_dict.keys():
                 item_dict_result[eachKey] = re.compile(str(item_dict.get(eachKey)), re.I)
         else:
             item_dict_result = item_dict
-    elif item_dict and session.get('button') == 'nowclass':
+    elif session.get('button') == 'nowclass':
         if "class_location" in item_dict.keys():
             if session.get('fuzzyquery'):
                 item_dict_result['class_location'] = re.compile(str(item_dict.get("class_location")), re.I)
@@ -57,16 +69,6 @@ def search():
     courses_list = list(collection.find(item_dict_result))
     count = len(courses_list)
 
-    if request.method == 'POST':
-        for each_item in item_list:
-            if request.form[each_item]:
-                item_dict[each_item] = request.form[each_item]
-        fuzzyquery = 1 if "fuzzyquery" in request.form else 0
-
-        session['item_dict'] = item_dict
-        session['fuzzyquery'] = fuzzyquery
-        session['button'] = 'nowclass' if 'nowclass' in request.form else 'search'
-        return redirect(url_for('search'))
     session['item_dict'] = ''
     session['fuzzyquery'] = ''
     session['button'] = ''
