@@ -11,13 +11,15 @@ import datetime
 import json
 import requests
 import logging
+import os
 
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
 collection = db.courses
 
 app = Flask(__name__)
-app.secret_key = 'sjoifejsoiejfo'
+
+app.secret_key = os.urandom(24)
 
 
 def getRateId(name):
