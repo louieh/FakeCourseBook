@@ -9,6 +9,8 @@ from pymongo import MongoClient
 import re
 import datetime
 import json
+import requests
+import logging
 
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
@@ -18,9 +20,37 @@ app = Flask(__name__)
 app.secret_key = 'sjoifejsoiejfo'
 
 
+def getRateId(name):
+    rateuri = "http://search.mtvnservices.com/typeahead/suggest/?rows=20&q=" + name + "&defType=edismax&qf=teacherfirstname_t%5E2000+teacherlastname_t%5E2000+teacherfullname_t%5E2000+autosuggest&siteName=rmp&group=on&group.field=content_type_s&group.limit=50"
+
+    try:
+        resp = requests.get(rateuri)
+    except:
+        return None, 'downloadfail'
+    try:
+        resp_parse = json.loads(resp.text)
+        resp_parse_list = resp_parse.get('grouped').get('content_type_s').get('groups')[0].get('doclist').get('docs')
+        for each_resp in resp_parse_list:
+            if each_resp.get("schoolname_s") == 'University of Texas at Dallas':
+                return each_resp.get('pk_id'), 'ok'
+        return None, 'notfound'
+    except:
+        return None, 'parsefail'
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     return render_template('login.html')
+
+
+@app.route('/instructor/<name>')
+def findrate(name):
+    pk_id, reason = getRateId(name)
+    if not pk_id:
+        # logging.INFO(reason)
+        return redirect('http://www.ratemyprofessors.com/search.jsp?query=%s' % name)
+
+    return redirect('http://www.ratemyprofessors.com/ShowRatings.jsp?tid=%s' % pk_id)
 
 
 @app.route('/', methods=['GET', 'POST'])

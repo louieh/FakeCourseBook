@@ -138,7 +138,10 @@
                             <td>{{ course['class_title'] }}</td>
                             <td>{{ course['class_number'] }}</td>
                             <td>{{ course['class_section'] }}</td>
-                            <td>{{ course['class_instructor'] }}</td>
+                            <td>
+                                <a href={{ url_for('findrate', name=course['class_instructor']) }} target="_blank"
+                                   name="ratemyprofessors">{{ course['class_instructor'] }}</a>
+                            </td>
                             <td>{{ course['class_day'] }}</td>
                             <td>{{ course['class_time'] }}</td>
                             <td>{{ course['class_location'] }}</td>
