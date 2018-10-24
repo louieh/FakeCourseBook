@@ -137,11 +137,19 @@
                         <th scope="row">{{ data.index(course)+1 }}</th>
                         <td>{{ course['class_title'] }}</td>
                         <td>{{ course['class_number'] }}</td>
-                        <td>{% if 'CS' in course['class_section'] %}
-                            <a href={{ "https://catalog.utdallas.edu/2018/graduate/courses/cs%s"%course['class_section'].split(' ')[1].split('.')[0] }} target="_blank">{{ course['class_section'] }}</a>
-                        {% else %}
-                            {{ course['class_section'] }}
-                        {% endif %}
+                        <td>
+                            {% if 'CS' in course['class_section'] %}
+                                <a href={{ "https://catalog.utdallas.edu/2018/graduate/courses/cs%s"%course['class_section'].split(' ')[1].split('.')[0] }} target="_blank">{{ course['class_section'] }}</a>
+                            {% elif 'CE' in course['class_section'] %}
+                                <a href={{ "https://catalog.utdallas.edu/2018/graduate/courses/ce%s"%course['class_section'].split(' ')[1].split('.')[0] }} target="_blank">{{ course['class_section'] }}</a>
+                            {% elif 'EE' in course['class_section'] %}
+                                <a href={{ "https://catalog.utdallas.edu/2018/graduate/courses/ee%s"%course['class_section'].split(' ')[1].split('.')[0] }} target="_blank">{{ course['class_section'] }}</a>
+                            {% elif 'SE' in course['class_section'] %}
+                                <a href={{ "https://catalog.utdallas.edu/2018/graduate/courses/se%s"%course['class_section'].split(' ')[1].split('.')[0] }} target="_blank">{{ course['class_section'] }}</a>
+
+                            {% else %}
+                                {{ course['class_section'] }}
+                            {% endif %}
                         </td>
                         <td>
                             <a href={{ url_for('findrate', name=course['class_instructor']) }} target="_blank"
