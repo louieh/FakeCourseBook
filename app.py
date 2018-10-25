@@ -17,9 +17,8 @@ client = MongoClient("localhost", 27017)
 db = client.Coursebook
 collection = db.courses
 
-app = Flask(__name__)
-
-app.secret_key = os.urandom(24)
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_pyfile('config.py')
 
 
 def getRateId(name):
