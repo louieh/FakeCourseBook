@@ -12,13 +12,17 @@ import datetime
 
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
-collection = db.courses
+
+DATA_SOURCE = '19s'  # 18f/19s
+PREFIX_LIST = ['cs', 'ce', 'ee', 'se']
+
+if DATA_SOURCE == '18f':
+    collection = db.courses18fall
+elif DATA_SOURCE == '19s':
+    collection = db.courses19spring
 
 
-# todo 目前哪些教室有人在上课，哪些没有
-# todo 查询某个教室当天课表，下一节什么课
-
-def get_prefix():
+def get_prefix():  # get all prefix of courses
     base_url = "https://coursebook.utdallas.edu/guidedsearch"
     resp = requests.get(base_url)
     resp_selector = html.etree.HTML(resp.text)
@@ -34,8 +38,9 @@ def update_database(code):
     for each_code in code:
         insert_course(each_code)
 
+
 def insert_course(code):
-    base_uri = "https://coursebook.utdallas.edu/%s/term_18f" % code
+    base_uri = "https://coursebook.utdallas.edu/%s/term_%s" % (code, DATA_SOURCE)
     try:
         resp = requests.get(base_uri)
         resp_selector = html.etree.HTML(resp.text)
@@ -116,7 +121,7 @@ def insert_course(code):
             # pprint.pprint(each_course_dict)
             try:
                 collection.insert(each_course_dict)
-                print(1)
+                print('OK')
             except:
                 print(0)
 
@@ -184,8 +189,7 @@ def search_class_location(class_location):
 
 
 if __name__ == "__main__":
-    a = ['cs', 'ce', 'ee', 'se']
-    update_datebase(a)
+    update_database(PREFIX_LIST)
     # wb = xlrd.open_workbook('classnumbers.xlsx')
     # sh = wb.sheet_by_index(0)
     #
