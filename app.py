@@ -15,10 +15,16 @@ import os
 
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
-collection = db.courses
+
+DATA_SOURCE = '19s'  # 18f/19s
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('config.py')
+
+if DATA_SOURCE == '18f':
+    collection = db.courses18fall
+elif DATA_SOURCE == '19s':
+    collection = db.courses19spring
 
 
 def getRateId(name):
