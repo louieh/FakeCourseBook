@@ -101,10 +101,10 @@ def search():
     courses_list = list(collection.find(item_dict_result))
     count = len(courses_list)
 
-    session['item_dict'] = ''
-    session['fuzzyquery'] = ''
-    session['button'] = ''
-    return render_template('search.html', data=courses_list, count=count)
+    session['item_dict'] = None
+    session['fuzzyquery'] = None
+    session['button'] = None
+    return render_template('search.html', data=courses_list, count=count, Filter=item_dict)
 
 
 if __name__ == '__main__':

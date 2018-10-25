@@ -22,22 +22,34 @@
                     <div class="form-group col-md-3">
                         <label for="inputEmail4">Class Title</label>
                         <input type="text" name="class_title" class="form-control" id="inputTitle"
-                               placeholder="Class Title">
+                                {% if Filter.get('class_title') %}
+                                    placeholder={{ Filter['class_title'] }}
+                                {% endif %}
+                        >
                     </div>
                     <div class="form-group col-md-3">
                         <label for="inputPassword4">Class Number</label>
                         <input type="text" name="class_number" class="form-control" id="inputNumber"
-                               placeholder="Class Number">
+                                {% if Filter.get('class_number') %}
+                                    placeholder={{ Filter['class_number'] }}
+                                {% endif %}
+                        >
                     </div>
                     <div class="form-group col-md-3">
                         <label for="inputAddress">Class Section</label>
                         <input type="text" name="class_section" class="form-control" id="inputSection"
-                               placeholder="Class Section">
+                                {% if Filter.get('class_section') %}
+                                    placeholder={{ Filter['class_section'] }}
+                                {% endif %}
+                        >
                     </div>
                     <div class="form-group col-md-3">
                         <label for="inputAddress2">Class Instructor</label>
                         <input type="text" name="class_instructor" class="form-control" id="inputInstructor"
-                               placeholder="Class Instructor">
+                                {% if Filter.get('class_instructor') %}
+                                    placeholder={{ Filter['class_instructor'] }}
+                                {% endif %}
+                        >
                     </div>
                 </div>
                 <div class="form-row">
@@ -96,7 +108,11 @@
                     </div>
                     <div class="form-group col-md-3">
                         <label for="inputZip">Location</label>
-                        <input type="text" name="class_location" class="form-control" id="inputLocation">
+                        <input type="text" name="class_location" class="form-control" id="inputLocation"
+                                {% if Filter.get('class_location') %}
+                                    placeholder={{ Filter['class_location'] }}
+                                {% endif %}
+                        >
                     </div>
                 </div>
                 <div class="form-group">
