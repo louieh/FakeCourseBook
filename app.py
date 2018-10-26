@@ -48,9 +48,9 @@ def makesureDataSource():
     return collection
 
 
-@app.before_first_request
-def before_first_request():
-    session['DATA_SOURCE'] = '19s'  # 18f/19s
+# @app.before_first_request
+# def before_first_request():
+#    session['DATA_SOURCE'] = '19s'  # 18f/19s
 
 
 @app.route('/login', methods=['GET', 'POST'])
