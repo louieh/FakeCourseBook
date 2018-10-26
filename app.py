@@ -126,7 +126,8 @@ def search():
     session['item_dict'] = None
     session['fuzzyquery'] = None
     session['button'] = None
-    return render_template('search.html', data=courses_list, Filter=item_dict, DATA_SOURCE=session['DATA_SOURCE'])
+    return render_template('search.html', data=courses_list, Filter=item_dict,
+                           DATA_SOURCE=session.get('DATA_SOURCE', '19s'))
 
 
 if __name__ == '__main__':
