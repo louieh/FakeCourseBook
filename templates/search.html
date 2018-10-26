@@ -185,8 +185,12 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href={{ url_for('findrate', name=course['class_instructor']) }} target="_blank"
-                               name="ratemyprofessors">{{ course['class_instructor'] }}</a>
+                            {% if course['class_instructor'] != '-Staff-' %}
+                                <a href={{ url_for('findrate', name=course['class_instructor']) }} target="_blank"
+                                   name="ratemyprofessors">{{ course['class_instructor'] }}</a>
+                            {% else %}
+                                {{ course['class_instructor'] }}
+                            {% endif %}
                         </td>
                         <td>{{ course['class_day'] }}</td>
                         <td>{{ course['class_time'] }}</td>
