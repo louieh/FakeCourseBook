@@ -15,16 +15,10 @@ import os
 
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
-
-DATA_SOURCE = '19s'  # 18f/19s
+collection = db.courses19spring
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('config.py')
-
-if DATA_SOURCE == '18f':
-    collection = db.courses18fall
-elif DATA_SOURCE == '19s':
-    collection = db.courses19spring
 
 
 def getRateId(name):
@@ -45,6 +39,20 @@ def getRateId(name):
         return None, 'parsefail'
 
 
+def makesureDataSource():
+    datasource = session.get('DATA_SOURCE')
+    if datasource == '18f':
+        collection = db.courses18fall
+    elif datasource == '19s':
+        collection = db.courses19spring
+    return collection
+
+
+@app.before_first_request
+def before_first_request():
+    session['DATA_SOURCE'] = '19s'  # 18f/19s
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     return render_template('login.html')
@@ -60,8 +68,16 @@ def findrate(name):
     return redirect('http://www.ratemyprofessors.com/ShowRatings.jsp?tid=%s' % pk_id)
 
 
+@app.route('/changesource/<source>')
+def changesource(source):
+    session['DATA_SOURCE'] = source
+    return redirect('/')
+
+
 @app.route('/', methods=['GET', 'POST'])
 def search():
+    collection = makesureDataSource()  # Reacquire collection
+
     item_list = ["class_title", "class_number", "class_section", "class_instructor", "class_day", "class_start_time",
                  "class_end_time", "class_location"]
     item_dict = session.get('item_dict')
@@ -109,7 +125,7 @@ def search():
     session['item_dict'] = None
     session['fuzzyquery'] = None
     session['button'] = None
-    return render_template('search.html', data=courses_list, count=count, Filter=item_dict)
+    return render_template('search.html', data=courses_list, Filter=item_dict, DATA_SOURCE=session['DATA_SOURCE'])
 
 
 if __name__ == '__main__':

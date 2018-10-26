@@ -9,11 +9,11 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
     <title>Search Course</title>
 </head>
 <body>
 <h1>Search</h1>
-
 <div class="container">
     <div class="row">
         <div class="col-xl">
@@ -126,6 +126,16 @@
                 </div>
                 <button type="submit" name="search" class="btn btn-primary">Search</button>
                 <button type="submit" name="nowclass" class="btn btn-primary">At this moment</button>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary" id="19s" onclick="changesource('19s')">
+                        <input type="radio" id="option19s"
+                               autocomplete="off"> 19s
+                    </label>
+                    <label class="btn btn-secondary" id="18f" onclick="changesource('18f')">
+                        <input type="radio" id="option18f"
+                               autocomplete="off"> 18f
+                    </label>
+                </div>
             </form>
         </div>
     </div>
@@ -149,7 +159,6 @@
                     </tr>
                     </thead>
                     {% for course in data %}
-                        <a>
                         <th scope="row">{{ data.index(course)+1 }}</th>
                         <td>{{ course['class_title'] }}</td>
                         <td>{{ course['class_number'] }}</td>
@@ -183,6 +192,24 @@
         </div>
     </div>
 </div>
+<script>
+    var data_source = {{ DATA_SOURCE|tojson }};
+    var data_source_element = document.getElementById(data_source);
+    if (data_source == '18f') {
+        document.getElementById('18f').classList.add('active');
+        document.getElementById('19s').classList.remove('active');
+    } else {
+        document.getElementById('19s').classList.add('active');
+        document.getElementById('18f').classList.remove('active');
+    }
+
+    function changesource(click_source) {
+        if (data_source != click_source) {
+            window.location.href = '/changesource/' + click_source;
+        }
+
+    }
+</script>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
