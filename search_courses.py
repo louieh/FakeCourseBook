@@ -9,17 +9,14 @@ from lxml import html
 import re
 import time
 import datetime
+import logging
 
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
+collection = None
 
-DATA_SOURCE = '19s'  # 18f/19s
+DATA_SOURCE_LIST = ['18f', '19s']
 PREFIX_LIST = ['cs', 'ce', 'ee', 'se']
-
-if DATA_SOURCE == '18f':
-    collection = db.courses18fall
-elif DATA_SOURCE == '19s':
-    collection = db.courses19spring
 
 
 def get_prefix():  # get all prefix of courses
@@ -33,14 +30,28 @@ def get_prefix():  # get all prefix of courses
             print(profix)
 
 
-def update_database(code):
-    collection.drop()
-    for each_code in code:
-        insert_course(each_code)
+def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
+    for each_data_source in DATA_SOURCE_LIST:
+        if each_data_source == '18f':
+            collection = db.courses18fall
+            term = '18f'
+        elif each_data_source == '19s':
+            collection = db.courses19spring
+            term = '19s'
+        else:
+            # logging.DEBUG("update_database function: Nothing to do.")
+            return
+
+        collection.drop()
+
+        for each_prefix in PREFIX_LIST:
+            insert_course(each_prefix, term)
 
 
-def insert_course(code):
-    base_uri = "https://coursebook.utdallas.edu/%s/term_%s" % (code, DATA_SOURCE)
+def insert_course(code, term):
+    base_uri = "https://coursebook.utdallas.edu/%s/term_%s" % (code, term)
+    print(base_uri)
+    return 
     try:
         resp = requests.get(base_uri)
         resp_selector = html.etree.HTML(resp.text)
@@ -70,6 +81,8 @@ def insert_course(code):
             }
             each_course_selector = html.etree.HTML(each_course_text_)
             eachclass_section_number = each_course_selector.xpath('''//td[2]//text()''')
+            if eachclass_section_number[0].split(' ')[1][0] < '5':
+                continue
             each_course_dict['class_section'] = eachclass_section_number[0]
             each_course_dict['class_number'] = eachclass_section_number[-1]
             each_course_dict['_id'] = eachclass_section_number[-1]
@@ -119,11 +132,12 @@ def insert_course(code):
             if class_ifFull:
                 each_course_dict['class_isFull'] = class_ifFull[0]
             # pprint.pprint(each_course_dict)
-            try:
-                collection.insert(each_course_dict)
-                print('OK')
-            except:
-                print(0)
+
+            collection.insert(each_course_dict)
+            print('OK')
+
+            # logging.DEBUG('insert_course function: Nothing to do.')
+            # print(0)
 
 
 # search
@@ -189,7 +203,7 @@ def search_class_location(class_location):
 
 
 if __name__ == "__main__":
-    update_database(PREFIX_LIST)
+    update_database(DATA_SOURCE_LIST, PREFIX_LIST)
     # wb = xlrd.open_workbook('classnumbers.xlsx')
     # sh = wb.sheet_by_index(0)
     #
