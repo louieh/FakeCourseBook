@@ -45,13 +45,11 @@ def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
         collection.drop()
 
         for each_prefix in PREFIX_LIST:
-            insert_course(each_prefix, term)
+            insert_course(each_prefix, term, collection)
 
 
-def insert_course(code, term):
+def insert_course(code, term, collection):
     base_uri = "https://coursebook.utdallas.edu/%s/term_%s" % (code, term)
-    print(base_uri)
-    return 
     try:
         resp = requests.get(base_uri)
         resp_selector = html.etree.HTML(resp.text)
@@ -132,12 +130,12 @@ def insert_course(code, term):
             if class_ifFull:
                 each_course_dict['class_isFull'] = class_ifFull[0]
             # pprint.pprint(each_course_dict)
-
-            collection.insert(each_course_dict)
-            print('OK')
-
-            # logging.DEBUG('insert_course function: Nothing to do.')
-            # print(0)
+            try:
+                collection.insert(each_course_dict)
+                print('OK')
+            except:
+                # logging.DEBUG('insert_course function: Nothing to do.')
+                print(0)
 
 
 # search
