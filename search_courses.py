@@ -10,7 +10,9 @@ import re
 import time
 import datetime
 import logging
+import redis
 
+redis_db = redis.StrictRedis.from_url()
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
 collection = None
