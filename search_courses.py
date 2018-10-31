@@ -11,8 +11,9 @@ import time
 import datetime
 import logging
 import redis
+import log
 
-redis_db = redis.StrictRedis.from_url()
+# redis_db = redis.StrictRedis.from_url("localhost")
 data_update_time = "data_update_time"
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
@@ -21,10 +22,19 @@ collection = None
 DATA_SOURCE_LIST = ['18f', '19s']
 PREFIX_LIST = ['cs', 'ce', 'ee', 'se']
 
+FAKE_HEADER = {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,ja;q=0.6",
+    "DNT": "1",
+    "Host": "coursebook.utdallas.edu",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+}
+
 
 def get_prefix():  # get all prefix of courses
     base_url = "https://coursebook.utdallas.edu/guidedsearch"
-    resp = requests.get(base_url)
+    resp = requests.get(base_url, headers=FAKE_HEADER)
     resp_selector = html.etree.HTML(resp.text)
     profix_list = resp_selector.xpath('''.//select[@id='combobox_cp']/option/text()''')
     for each_profix in profix_list:
@@ -34,47 +44,65 @@ def get_prefix():  # get all prefix of courses
 
 
 def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
-    logging.info(
+    log.logger.info(
         "Start time: %s" % (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime("%Y-%m-%d %H:%M"))
     isSucceed_in_update_database = True
     for each_data_source in DATA_SOURCE_LIST:
         if each_data_source == '18f':
-            collection = db.courses18fall
+            collection = db.courses18fall_temp
             term = '18f'
         elif each_data_source == '19s':
-            collection = db.courses19spring
+            collection = db.courses19spring_temp
             term = '19s'
         else:
-            # logging.DEBUG("update_database function: Nothing to do.")
+            log.logger.debug("update_database function:for each_data_source in DATA_SOURCE_LIST: Nothing to do.")
             return
-
-        collection.drop()
 
         for each_prefix in PREFIX_LIST:
             if not insert_course(each_prefix, term, collection):
+                log.logger.error("insert data fail")
                 isSucceed_in_update_database = False
+            else:
+                log.logger.info("insert data OK")
     if isSucceed_in_update_database:
         timenow = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M')
-        redis_db.set(data_update_time, timenow)  # write the time to redis 'localhost' 'data_update_time'
+        # try:
+        #     redis_db.set(data_update_time, timenow)  # write the time to redis 'localhost' 'data_update_time'
+        # except:
+        #     log.logger.error("redis insert fail")
+        try:
+            db.courses18fall.drop()
+            db.courses19spring.drop()
+        except:
+            log.logger.error("try to drop courses18fall/19spring fail")
+        try:
+            db.courses18fall_temp.rename('courses18fall')
+            db.courses19spring_temp.rename('courses19spring')
+        except:
+            log.logger.error("try to rename collections fail")
     else:
-        logging.error("insert data fail")
+        db.courses18fall_temp.drop()
+        db.courses19spring_temp.drop()
+        log.logger.error("--insert data fail--")
         return
 
 
 def insert_course(code, term, collection):
-    isSucceed = True
     base_uri = "https://coursebook.utdallas.edu/%s/term_%s" % (code, term)
     try:
-        resp = requests.get(base_uri)
+        resp = requests.get(base_uri, headers=FAKE_HEADER)
         resp_selector = html.etree.HTML(resp.text)
     except requests.exceptions.ConnectionError as e:
-        # logging.error("Unable to download webpage.")
-        # logging.error("<%s>" % e)
+        log.logger.error("Unable to download webpage.")
+        log.logger.error("<%s>" % e)
         return False
 
     each_course_text_group = []
     if resp_selector is not None:
         courses = resp_selector.xpath('''.//div[@class="section-list"]//tbody/tr''')
+        if not courses:
+            log.logger.error("xpath changed? no courses")
+            return False
         for each_course in courses:
             each_course_text = html.etree.tostring(each_course, method='html')
             each_course_text_group.append(each_course_text)
@@ -147,14 +175,13 @@ def insert_course(code, term, collection):
             # pprint.pprint(each_course_dict)
             try:
                 collection.insert(each_course_dict)
-                # print('OK')
+                # log.logger.info("insert ok")
             except:
-                isSucceed = False
-                return isSucceed
-            # logging.DEBUG('insert_course function: Nothing to do.')
-            # print(0)
+                log.logger.debug('insert_course function: Nothing to do.')
+                return False
+
     else:
-        # logging.error("resp_selector is None")
+        log.logger.error("resp_selector is None")
         return False
     return True
 
