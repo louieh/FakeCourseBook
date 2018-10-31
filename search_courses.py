@@ -34,6 +34,8 @@ def get_prefix():  # get all prefix of courses
 
 
 def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
+    logging.info(
+        "Start time: %s" % (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime("%Y-%m-%d %H:%M"))
     isSucceed_in_update_database = True
     for each_data_source in DATA_SOURCE_LIST:
         if each_data_source == '18f':
@@ -54,6 +56,9 @@ def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
     if isSucceed_in_update_database:
         timenow = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M')
         redis_db.set(data_update_time, timenow)  # write the time to redis 'localhost' 'data_update_time'
+    else:
+        logging.error("insert data fail")
+        return
 
 
 def insert_course(code, term, collection):
