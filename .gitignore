@@ -3,3 +3,4 @@ __pycache__/
 classnumbers.xlsx
 app.pyc
 instance/
+log/
