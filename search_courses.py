@@ -13,6 +13,7 @@ import logging
 import redis
 
 redis_db = redis.StrictRedis.from_url()
+data_update_time = "data_update_time"
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
 collection = None
@@ -33,6 +34,7 @@ def get_prefix():  # get all prefix of courses
 
 
 def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
+    isSucceed_in_update_database = True
     for each_data_source in DATA_SOURCE_LIST:
         if each_data_source == '18f':
             collection = db.courses18fall
@@ -47,17 +49,23 @@ def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
         collection.drop()
 
         for each_prefix in PREFIX_LIST:
-            insert_course(each_prefix, term, collection)
+            if not insert_course(each_prefix, term, collection):
+                isSucceed_in_update_database = False
+    if isSucceed_in_update_database:
+        timenow = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M')
+        redis_db.set(data_update_time, timenow)  # write the time to redis 'localhost' 'data_update_time'
 
 
 def insert_course(code, term, collection):
+    isSucceed = True
     base_uri = "https://coursebook.utdallas.edu/%s/term_%s" % (code, term)
     try:
         resp = requests.get(base_uri)
         resp_selector = html.etree.HTML(resp.text)
     except requests.exceptions.ConnectionError as e:
-        print("Unable to download webpage.")
-        print("<%s>" % e)
+        # logging.error("Unable to download webpage.")
+        # logging.error("<%s>" % e)
+        return False
 
     each_course_text_group = []
     if resp_selector is not None:
@@ -134,10 +142,16 @@ def insert_course(code, term, collection):
             # pprint.pprint(each_course_dict)
             try:
                 collection.insert(each_course_dict)
-                print('OK')
+                # print('OK')
             except:
-                # logging.DEBUG('insert_course function: Nothing to do.')
-                print(0)
+                isSucceed = False
+                return isSucceed
+            # logging.DEBUG('insert_course function: Nothing to do.')
+            # print(0)
+    else:
+        # logging.error("resp_selector is None")
+        return False
+    return True
 
 
 # search
