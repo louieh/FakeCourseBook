@@ -175,7 +175,7 @@ def insert_course(code, term, collection):
                 each_course_dict['class_isFull'] = class_ifFull[0]
             # pprint.pprint(each_course_dict)
             try:
-                collection.insert(each_course_dict)
+                collection.insert_one(each_course_dict)
                 # log.logger.info("insert ok")
             except:
                 log.logger.debug('insert_course function: Nothing to do.')
