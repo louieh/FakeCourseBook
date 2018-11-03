@@ -14,6 +14,7 @@
 </head>
 <body>
 <h1>Fake CourseBook</h1>
+
 <div class="container">
     <div class="row">
         <div class="col-xl">
@@ -129,7 +130,11 @@
                         <button type="submit" name="search" class="btn btn-primary">Search</button>
                         <button type="submit" name="nowclass" class="btn btn-primary">At this moment</button>
                     </div>
-                    <div class="col-3">
+                    <div class="col-5">
+                        last update:
+                        {% if data_update_time %}
+                            {{ data_update_time }}
+                        {% endif %}
                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
                             <label class="btn btn-secondary" id="19s" onclick="changesource('19s')">
                                 <input type="radio" id="option19s"
@@ -140,6 +145,7 @@
                                        autocomplete="off"> 18f
                             </label>
                         </div>
+
                     </div>
                 </div>
 

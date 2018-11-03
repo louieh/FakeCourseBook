@@ -13,7 +13,6 @@ import logging
 import redis
 import log
 
-redis_db = redis.StrictRedis.from_url("localhost")
 data_update_time = "data_update_time"
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
@@ -65,12 +64,13 @@ def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
             else:
                 log.logger.info("insert data OK")
     if isSucceed_in_update_database:
-        timenow = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M')
+        timenow = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%Y/%m/%d %H:%M')
         try:
+            redis_db = redis.StrictRedis.from_url("localhost")
             redis_db.set(data_update_time, timenow)  # write the time to redis 'localhost' 'data_update_time'
-            log.logger.info("redis insert OK")
+            log.logger.info("redis set OK")
         except:
-            log.logger.error("redis insert fail")
+            log.logger.error("redis set fail")
         try:
             db.courses18fall.drop()
             db.courses19spring.drop()

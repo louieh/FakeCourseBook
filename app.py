@@ -12,6 +12,7 @@ import json
 import requests
 import logging
 import os
+import redis
 
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
@@ -19,6 +20,15 @@ collection = db.courses19spring
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('config.py')
+
+
+def getDataupdatetime():
+    try:
+        redis_url = redis.StrictRedis.from_url('localhost')
+        data_update_time = redis_url.get('data_update_time')
+    except:
+        return None
+    return data_update_time
 
 
 def getRateId(name):
@@ -126,8 +136,11 @@ def search():
     session['item_dict'] = None
     session['fuzzyquery'] = None
     session['button'] = None
+    data_update_time = getDataupdatetime()
+    if data_update_time:
+        data_update_time = str(data_update_time, encoding='utf-8')
     return render_template('search.html', data=courses_list, Filter=item_dict,
-                           DATA_SOURCE=session.get('DATA_SOURCE', '19s'))
+                           DATA_SOURCE=session.get('DATA_SOURCE', '19s'), data_update_time=data_update_time)
 
 
 if __name__ == '__main__':
