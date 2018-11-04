@@ -4,12 +4,14 @@
 import os
 import sys
 import logging
+from logging.handlers import TimedRotatingFileHandler
 
 logger = logging.getLogger()
 
 log_path = './log/'
 
-fp = logging.FileHandler(log_path + "datainsert.log", mode='a')
+fp = logging.handlers.RotatingFileHandler(log_path + "datainsert.log", mode='a', maxBytes=1 * 1024 * 1024,
+                                          backupCount=10)
 logger.addHandler(fp)
 
 std = logging.StreamHandler(sys.stderr)
