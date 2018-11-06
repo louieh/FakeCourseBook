@@ -9,12 +9,10 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
     <title>Fake CourseBook</title>
 </head>
 <body>
 <h1>Fake CourseBook</h1>
-
 <div class="container">
     <div class="row">
         <div class="col-xl">
@@ -127,11 +125,14 @@
                 </div>
                 <div class="row justify-content-between">
                     <div class="col-4">
-                        <button type="submit" name="search" class="btn btn-primary">Search</button>
+                        <button type="submit" name="search" class="btn btn-primary" title="123"
+                                data-toggle="tooltip" data-placement="top">Search
+                        </button>
                         <button type="submit" name="nowclass" class="btn btn-primary">At this moment</button>
+
                     </div>
                     <div class="col-5">
-                        last update:
+                        Last update:
                         {% if data_update_time %}
                             {{ data_update_time }}
                         {% endif %}
@@ -211,6 +212,7 @@
     </div>
 </div>
 <script>
+
     var data_source = {{ DATA_SOURCE|tojson }};
     var data_source_element = document.getElementById(data_source);
     if (data_source == '18f') {
