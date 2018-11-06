@@ -21,6 +21,8 @@ collection = None
 DATA_SOURCE_LIST = ['18f', '19s']
 PREFIX_LIST = ['cs', 'ce', 'ee', 'se']
 
+TIMENOW = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%Y-%m-%d %H:%M")
+
 FAKE_HEADER = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
     "Accept-Encoding": "gzip, deflate, br",
@@ -43,8 +45,7 @@ def get_prefix():  # get all prefix of courses
 
 
 def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
-    log.logger.info(
-        "Start time: %s" % (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime("%Y-%m-%d %H:%M"))
+    log.logger.info("Start time: %s" % TIMENOW)
     isSucceed_in_update_database = True
     for each_data_source in DATA_SOURCE_LIST:
         if each_data_source == '18f':
@@ -64,7 +65,7 @@ def update_database(DATA_SOURCE_LIST, PREFIX_LIST):
             else:
                 log.logger.info("insert data OK")
     if isSucceed_in_update_database:
-        timenow = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%Y/%m/%d %H:%M')
+        timenow = TIMENOW
         try:
             redis_db = redis.StrictRedis.from_url("localhost")
             redis_db.set(data_update_time, timenow)  # write the time to redis 'localhost' 'data_update_time'

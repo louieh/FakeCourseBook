@@ -17,6 +17,7 @@ import redis
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
 collection = db.courses19spring
+TIMEDELTA = 6
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('config.py')
@@ -124,7 +125,7 @@ def search():
                 item_dict_result['class_instructor'] = re.compile(str(item_dict.get("class_instructor")), re.I)
             else:
                 item_dict_result['class_instructor'] = item_dict.get('class_instructor')
-        time_now_all = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime('%A-%H:%M')
+        time_now_all = (datetime.datetime.utcnow() - datetime.timedelta(hours=TIMEDELTA)).strftime('%A-%H:%M')
         week_now, time_now = time_now_all.split('-')
         item_dict_result['class_day'] = re.compile(week_now, re.I)
         item_dict_result['class_start_time'] = {"$lte": time_now}
