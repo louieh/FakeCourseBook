@@ -4,3 +4,4 @@ classnumbers.xlsx
 app.pyc
 instance/
 log/
+update_cron.py
