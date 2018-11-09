@@ -2,17 +2,19 @@
 
 """
 Monitor the courses and push information to the telegram
+Infinite loop
 """
 
+import os
+import time
+import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
-import requests
-import datetime
-from lxml import html
 
+import requests
+from lxml import html
 import telepot
-import os
 
 FAKE_HEADER = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
@@ -72,7 +74,8 @@ def filtration(bot, each_course_text_group, professor_email_dict):
                 class_isFull = each_course_selector.xpath('''//td[6]/div/@title''')
                 if class_isFull:
                     number = int(class_isFull[0].split("%")[0])
-                    if number < 100 and class_ifopen == "Open":
+                    time_min = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%M")
+                    if (number < 100 and class_ifopen == "Open") or time_min == "00":
                         email_list = professor_email_dict.get(class_instructor[0])
                         for eachemail in email_list:
                             text = "Class_terms: %s, Class_open: %s, Class_title: %s, Class_section: %s, Class_instructor: %s, isFull: %s" % (
@@ -80,6 +83,9 @@ def filtration(bot, each_course_text_group, professor_email_dict):
                             print(text)
                             bot.sendMessage(TeleClientID, text)
                             # sendmail(eachemail, text)
+                            return True
+                    else:
+                        return False
         else:
             print("error: no instructor")
             return
@@ -114,7 +120,6 @@ def sendmail(mailaddress, text):
 
 
 if __name__ == "__main__":
-    TIMENOW = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%Y-%m-%d %H:%M")
     request_list = [
         {"section": "6375",
          "professor_email": {"Anurag Nagar": [""],
@@ -122,11 +127,20 @@ if __name__ == "__main__":
          },
     ]
     bot = initBot(TOKEN)
-    for each in request_list:
-        section = each.get("section")
-        each_course_text_group = downloader(section)
-        if not each_course_text_group:
-            print("downloader error.")
-        else:
-            professor_email_dict = each.get("professor_email")
-            filtration(bot, each_course_text_group, professor_email_dict)
+    while 1:
+        res = False
+        TIMENOW = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%Y-%m-%d %H:%M")
+        print(TIMENOW)
+        hour = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%H")
+        if hour >= 8 and hour <= 19:
+            for each in request_list:
+                section = each.get("section")
+                each_course_text_group = downloader(section)
+                if not each_course_text_group:
+                    print("downloader error.")
+                else:
+                    professor_email_dict = each.get("professor_email")
+                    res = filtration(bot, each_course_text_group, professor_email_dict)
+        if res == True:
+            break
+        time.sleep(900)
