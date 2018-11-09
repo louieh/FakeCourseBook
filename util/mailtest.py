@@ -147,4 +147,4 @@ if __name__ == "__main__":
                         break
         if res == True:
             break
-        time.sleep(900)
+        time.sleep(600)
