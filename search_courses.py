@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Update data and some search functions
+"""
+
 import xlrd
 import pprint
 from pymongo import MongoClient

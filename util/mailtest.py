@@ -1,7 +1,9 @@
 # -*- coding: UTF-8 -*-
-'''
+
+"""
 Monitor the courses and push information to the telegram
-'''
+"""
+
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
