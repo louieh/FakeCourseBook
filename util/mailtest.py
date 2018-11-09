@@ -131,7 +131,7 @@ if __name__ == "__main__":
         res = False
         TIMENOW = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%Y-%m-%d %H:%M")
         print(TIMENOW)
-        hour = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%H")
+        hour = int((datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%H"))
         if hour >= 8 and hour <= 19:
             for each in request_list:
                 section = each.get("section")
