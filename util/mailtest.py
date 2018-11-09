@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
-
+'''
+Monitor the courses and push information to the telegram
+'''
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
@@ -82,23 +84,23 @@ def filtration(bot, each_course_text_group, professor_email_dict):
 
 
 def sendmail(mailaddress, text):
-    my_sender = '815401427@qq.com'  # 发件人邮箱账号
+    my_sender = ''
     my_pass = ''
-    my_user = mailaddress  # 收件人邮箱账号
+    my_user = mailaddress
 
     def mail():
         ret = True
         try:
             msg = MIMEText(text, 'plain', 'utf-8')
-            msg['From'] = formataddr(["test", my_sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
-            msg['To'] = formataddr(["test", my_user])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
-            msg['Subject'] = "Reminder"  # 邮件的主题，也可以说是标题
+            msg['From'] = formataddr(["test", my_sender])
+            msg['To'] = formataddr(["test", my_user])
+            msg['Subject'] = "Reminder"
 
             server = smtplib.SMTP("smtp.qq.com", 25)
-            server.login(my_sender, my_pass)  # 括号中对应的是发件人邮箱账号、邮箱密码
-            server.sendmail(my_sender, [my_user, ], msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
-            server.quit()  # 关闭连接
-        except Exception:  # 如果 try 中的语句没有执行，则会执行下面的 ret=False
+            server.login(my_sender, my_pass)
+            server.sendmail(my_sender, [my_user, ], msg.as_string())
+            server.quit()
+        except Exception:
             ret = False
         return ret
 
@@ -113,8 +115,8 @@ if __name__ == "__main__":
     TIMENOW = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%Y-%m-%d %H:%M")
     request_list = [
         {"section": "6375",
-         "professor_email": {"Anurag Nagar": ["louiehan1015@gmail.com"],
-                             "Sriraam Natarajan": ["louiehan1015@gmail.com"], }
+         "professor_email": {"Anurag Nagar": [""],
+                             "Sriraam Natarajan": [""], }
          },
     ]
     bot = initBot(TOKEN)
