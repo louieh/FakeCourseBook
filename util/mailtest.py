@@ -75,7 +75,7 @@ def filtration(bot, each_course_text_group, professor_email_dict):
                 if class_isFull:
                     number = int(class_isFull[0].split("%")[0])
                     time_min = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%M")
-                    if (number < 100 and class_ifopen == "Open") or time_min == "00":
+                    if number < 100 and class_ifopen == "Open":
                         email_list = professor_email_dict.get(class_instructor[0])
                         for eachemail in email_list:
                             text = "Class_terms: %s, Class_open: %s, Class_title: %s, Class_section: %s, Class_instructor: %s, isFull: %s" % (
@@ -138,9 +138,13 @@ if __name__ == "__main__":
                 each_course_text_group = downloader(section)
                 if not each_course_text_group:
                     print("downloader error.")
+                    res = True
+                    break
                 else:
                     professor_email_dict = each.get("professor_email")
                     res = filtration(bot, each_course_text_group, professor_email_dict)
+                    if res == True:
+                        break
         if res == True:
             break
         time.sleep(900)
