@@ -32,8 +32,10 @@ FAKE_HEADER = {
 }
 
 MainTeleClientID = "763882075"  # 154165889
-TOKEN = os.environ['bot_TOKEN']
+# TOKEN = os.environ['bot_TOKEN']
 
+redis_db = redis.StrictRedis.from_url("localhost")
+TOKEN = redis_db.get("bot_TOKEN")
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
 collection = db.monit_list
