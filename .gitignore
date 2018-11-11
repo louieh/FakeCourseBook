@@ -4,5 +4,4 @@ classnumbers.xlsx
 app.pyc
 instance/
 log/
-util/
-
+util/__pycache__
