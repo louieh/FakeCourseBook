@@ -141,7 +141,7 @@ def sendmail(mailaddress, text):
 def update_insert(section, professor, TeleClientID):
     if list(collection.find({"section": section})):
         try:
-            collection.update({
+            collection.update_one({
                 "section": section}, {
                 "$addToSet": {
                     "professor_email." + professor: TeleClientID
@@ -183,7 +183,7 @@ def update_remove(section, **kw):
         return True
     elif "professor" in kw.keys() and "TeleClientID" not in kw.keys():  # section + professor
         try:
-            collection.update({"section": section}, {
+            collection.update_one({"section": section}, {
                 "$unset": {
                     "professor_email." + kw.get("professor"): 1
                 }
@@ -198,7 +198,7 @@ def update_remove(section, **kw):
         return True
     elif "professor" in kw.keys() and "TeleClientID" in kw.keys():  # section + professor + TeleClientID
         try:
-            collection.update({"section": section}, {
+            collection.update_one({"section": section}, {
                 "$pull": {
                     "professor_email." + kw.get("professor"): kw.get("TeleClientID")
                 }
