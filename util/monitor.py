@@ -36,9 +36,8 @@ class Monitor(object):
 
         self.MainTeleClientID = "763882075"  # 154165889
         # TOKEN = os.environ['bot_TOKEN']
-        # self.redis_db = redis.StrictRedis.from_url("localhost")
-        # self.TOKEN = str(self.redis_db.get("bot_TOKEN"), encoding="utf-8")
-        self.TOKEN = "722202065:AAG1DRtVNOIIJPkoAhqmRrNmNYM6LoIBi24"
+        self.redis_db = redis.StrictRedis.from_url("localhost")
+        self.TOKEN = str(self.redis_db.get("bot_TOKEN"), encoding="utf-8")
         self.client = MongoClient("localhost", 27017)
         self.db = self.client.Coursebook
         self.collection = self.db.monit_list
