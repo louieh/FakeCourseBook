@@ -108,6 +108,8 @@ class CourseBook(object):
                 each_course_text_group.append(each_course_text)
             for each_course_text_ in each_course_text_group:
                 each_course_dict = {
+                    'class_term': '',
+                    'class_status': '',
                     'class_section': '',
                     'class_number': '',
                     '_id': '',
@@ -121,7 +123,13 @@ class CourseBook(object):
                     'class_isFull': '',
                 }
                 each_course_selector = html.etree.HTML(each_course_text_)
-                eachclass_section_number = each_course_selector.xpath('''//td[2]//text()''')
+                class_term_status = each_course_selector.xpath(
+                    '''//td[1]//text()''')  # ['19S', 'Closed', '572/0.000293']
+                class_term = class_term_status[0]
+                each_course_dict['class_term'] = class_term
+                class_status = class_term_status[1]
+                each_course_dict['class_status'] = class_status
+                eachclass_section_number = each_course_selector.xpath('''//td[2]//text()''')  # ['CS 6375.004', '24869']
                 if eachclass_section_number[0].split(' ')[1][0] < '5':
                     continue
                 each_course_dict['class_section'] = eachclass_section_number[0]
@@ -130,9 +138,12 @@ class CourseBook(object):
                 class_title = each_course_selector.xpath('''//td[3]//text()''')
                 if class_title:
                     each_course_dict['class_title'] = class_title[0]
-                class_instructor = each_course_selector.xpath('''//td[4]//text()''')
+                class_instructor = each_course_selector.xpath(
+                    '''//td[4]//text()''')  # ['Don Vogel', '\n, ', 'Stephen Perkins', '\n']
                 if class_instructor:
-                    each_course_dict['class_instructor'] = class_instructor[0]
+                    for each_instructor in class_instructor:
+                        if each_instructor != '\n':
+                            each_course_dict['class_instructor'] += each_instructor
 
                 # --------------------
                 class_day = each_course_selector.xpath(
@@ -142,7 +153,7 @@ class CourseBook(object):
 
                     class_time_final = ''
                     class_time = each_course_selector.xpath(
-                        '''//td[5]/div/span[@class="clstbl__resultrow__time"]//text()''')
+                        '''//td[5]/div/span[@class="clstbl__resultrow__time"]//text()''')  # ['1:00pm - 3:45pm']
                     if class_time:
                         class_time = class_time[0]
                     for each_time in class_time.split("-"):
