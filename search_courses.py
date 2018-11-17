@@ -138,13 +138,14 @@ class CourseBook(object):
                 class_title = each_course_selector.xpath('''//td[3]//text()''')
                 if class_title:
                     each_course_dict['class_title'] = class_title[0].replace("(3 Semester Credit Hours)", "").replace(
-                        "(1 Semester Credit Hours)", "").replace("(1-9 Credits)", "")
+                        "(1 Semester Credit Hours)", "").replace("(1-9 Credits)", "").replace(
+                        "(1 Semester Credit Hour)", "")
+
                 class_instructor = each_course_selector.xpath(
                     '''//td[4]//text()''')  # ['Don Vogel', '\n, ', 'Stephen Perkins', '\n']
                 if class_instructor:
-                    for each_instructor in class_instructor:
-                        if each_instructor != '\n':
-                            each_course_dict['class_instructor'] += each_instructor
+                    class_instructor = [x for x in class_instructor if '\n' not in x]
+                    each_course_dict['class_instructor'] = class_instructor
 
                 # --------------------
                 class_day = each_course_selector.xpath(

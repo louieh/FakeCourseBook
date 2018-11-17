@@ -147,6 +147,8 @@
                         <thead class="thead-dark">
                         <tr>
                             <th scope="col">#</th>
+                            <th scope="col">class term</th>
+                            <th scope="col">class status</th>
                             <th scope="col">class title</th>
                             <th scope="col">class number</th>
                             <th scope="col">class section</th>
@@ -159,6 +161,8 @@
                         </thead>
                         {% for course in data %}
                             <th scope="row">{{ data.index(course)+1 }}</th>
+                            <td>{{ course['class_term'] }}</td>
+                            <td>{{ course['class_status'] }}</td>
                             <td>{{ course['class_title'] }}</td>
                             <td>{{ course['class_number'] }}</td>
                             <td>
@@ -176,12 +180,14 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if course['class_instructor'] != '-Staff-' %}
-                                    <a href={{ url_for('findrate', name=course['class_instructor']) }} target="_blank"
-                                       name="ratemyprofessors">{{ course['class_instructor'] }}</a>
-                                {% else %}
-                                    {{ course['class_instructor'] }}
-                                {% endif %}
+                                {% for eachinstructor in course['class_instructor'] %}
+                                    {% if eachinstructor != '-Staff-' %}
+                                        <a href={{ url_for('findrate', name=eachinstructor) }} target="_blank"
+                                           name="ratemyprofessors">{{ eachinstructor }}</a>
+                                    {% else %}
+                                        {{ eachinstructor }}
+                                    {% endif %}
+                                {% endfor %}
                             </td>
                             <td>{{ course['class_day'] }}</td>
                             <td>{{ course['class_time'] }}</td>
