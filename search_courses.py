@@ -260,16 +260,5 @@ class CourseBook(object):
         return courses_list
 
 
-if __name__ == "__main__":
-    newCourseBook = CourseBook
-    newCourseBook.update_database()
-    # wb = xlrd.open_workbook('classnumbers.xlsx')
-    # sh = wb.sheet_by_index(0)
-    #
-    # first_col = sh.col_values(0)
-    # for each_number in first_col:
-    #     if type(each_number) != str:
-    #         code = int(each_number)
-    #     else:
-    #         code = each_number
-    #     insert_course(code)
+newCourseBook = CourseBook()
+newCourseBook.update_database()
