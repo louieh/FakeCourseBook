@@ -90,7 +90,8 @@ def changesource(source):
 def search():
     collection = makesureDataSource()  # Reacquire collection
 
-    item_list = ["class_title", "class_number", "class_section", "class_instructor", "class_day", "class_start_time",
+    item_list = ["class_term", "class_status", "class_title", "class_number", "class_section", "class_instructor",
+                 "class_day", "class_start_time",
                  "class_end_time", "class_location"]
     item_dict = session.get('item_dict')
     if not item_dict:
