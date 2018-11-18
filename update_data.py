@@ -24,10 +24,15 @@ class CourseBook(object):
         self.data_update_time = "data_update_time"
         self.client = MongoClient("localhost", 27017)
         self.db = self.client.Coursebook
-        self.collection = None
+        self.collection = self.db.CourseForSearch
+        self.collectionname = "CourseForSearch"
 
-        self.TERM_LIST = ['19S', '18F']  # 18F/19S
-        self.PREFIX_LIST = ['CS', 'CE', 'EE', 'SE']  # CS/CE/EE/SE
+        # self.TERM_LIST = ['19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
+        #                   '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
+        #                   '10U', '10S']
+        # self.PREFIX_LIST = ['CS']  # CS/CE/EE/SE
+        self.TERM_LIST = ['19S', '18F']
+        self.PREFIX_LIST = ['CS', 'CE', 'EE', 'SE']
 
         self.justupdate = True
 
@@ -71,16 +76,16 @@ class CourseBook(object):
                     return
             log.logger.info("all data have inserted to temp collection")
             try:
-                self.db.CourseForSearch.drop()
+                self.collection.drop()
                 log.logger.info("the old collection has dropped")
             except:
                 log.logger.error("the old collection drop fail")
                 return
             try:
-                self.db.temp.rename("CourseForSearch")
-                log.logger.info("db.temp has rename to CourseForSearch")
+                self.db.temp.rename(self.collectionname)
+                log.logger.info("db.temp has rename to %s" % self.collectionname)
             except:
-                log.logger.error("db.temp rename CourseForSearch error!")
+                log.logger.error("db.temp rename %s error!" % self.collectionname)
                 return
             try:
                 redis_db = redis.StrictRedis.from_url("localhost")
