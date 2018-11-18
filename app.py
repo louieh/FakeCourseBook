@@ -16,7 +16,7 @@ import redis
 
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
-collection = db.courses19spring
+collection = db.CourseForSearch
 TIMEDELTA = 6
 
 app = Flask(__name__, instance_relative_config=True)
@@ -133,10 +133,6 @@ def search():
         item_dict_result['class_day'] = re.compile(week_now, re.I)
         item_dict_result['class_start_time'] = {"$lte": time_now}
         item_dict_result['class_end_time'] = {"$gte": time_now}
-
-    print("##$#$#$#$")
-    print(item_dict_result)
-    print("#@#$@#$@#$@#$")
 
     courses_list = list(collection.find(item_dict_result))
     count = len(courses_list)
