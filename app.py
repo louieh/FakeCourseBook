@@ -100,7 +100,7 @@ def search():
 
     if request.method == 'POST':
         for each_item in item_list:
-            if request.form[each_item]:
+            if each_item in request.form and request.form[each_item]:
                 item_dict[each_item] = request.form[each_item]
         fuzzyquery = 1 if "fuzzyquery" in request.form else 0
 
