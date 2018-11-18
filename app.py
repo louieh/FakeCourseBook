@@ -50,19 +50,19 @@ def getRateId(name):
         return None, 'parsefail'
 
 
-def makesureDataSource():
-    collection = db.courses19spring
-    datasource = session.get('DATA_SOURCE')
-    if datasource == '18f':
-        collection = db.courses18fall
-    elif datasource == '19s':
-        collection = db.courses19spring
-    return collection
+# def makesureDataSource():
+#     collection = db.courses19spring
+#     datasource = session.get('DATA_SOURCE')
+#     if datasource == '18f':
+#         collection = db.courses18fall
+#     elif datasource == '19s':
+#         collection = db.courses19spring
+#     return collection
 
 
 @app.before_first_request
 def before_first_request():
-    session['DATA_SOURCE'] = '19s'  # 18f/19s
+    session['DATA_SOURCE'] = '19S'  # 18F/19S
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -88,15 +88,17 @@ def changesource(source):
 
 @app.route('/', methods=['GET', 'POST'])
 def search():
-    collection = makesureDataSource()  # Reacquire collection
+    # collection = makesureDataSource()  # Reacquire collection
+    term = session.get("DATA_SOURCE", "19S")  # get term first
 
-    item_list = ["class_term", "class_status", "class_title", "class_number", "class_section", "class_instructor",
+    item_list = ["class_title", "class_number", "class_section", "class_instructor",
                  "class_day", "class_start_time",
-                 "class_end_time", "class_location"]
+                 "class_end_time", "class_location"]  # "class_term", "class_status" 非前端筛选条件
     item_dict = session.get('item_dict')
     if not item_dict:
         item_dict = {}
     item_dict_result = {}
+    item_dict_result["class_term"] = term
 
     if request.method == 'POST':
         for each_item in item_list:
@@ -132,6 +134,10 @@ def search():
         item_dict_result['class_start_time'] = {"$lte": time_now}
         item_dict_result['class_end_time'] = {"$gte": time_now}
 
+    print("##$#$#$#$")
+    print(item_dict_result)
+    print("#@#$@#$@#$@#$")
+
     courses_list = list(collection.find(item_dict_result))
     count = len(courses_list)
 
@@ -142,7 +148,7 @@ def search():
     if data_update_time:
         data_update_time = str(data_update_time, encoding='utf-8')
     return render_template('search.html', data=courses_list, Filter=item_dict,
-                           DATA_SOURCE=session.get('DATA_SOURCE', '19s'), data_update_time=data_update_time)
+                           DATA_SOURCE=session.get('DATA_SOURCE', '19S'), data_update_time=data_update_time)
 
 
 if __name__ == '__main__':

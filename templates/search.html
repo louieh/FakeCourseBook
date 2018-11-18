@@ -121,13 +121,13 @@
                                 {{ data_update_time }}
                             {% endif %}
                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-secondary" id="19s" onclick="changesource('19s')">
-                                    <input type="radio" id="option19s"
-                                           autocomplete="off"> 19s
+                                <label class="btn btn-secondary" id="19S" onclick="changesource('19S')">
+                                    <input type="radio" id="option19S"
+                                           autocomplete="off"> 19S
                                 </label>
-                                <label class="btn btn-secondary" id="18f" onclick="changesource('18f')">
-                                    <input type="radio" id="option18f"
-                                           autocomplete="off"> 18f
+                                <label class="btn btn-secondary" id="18F" onclick="changesource('18F')">
+                                    <input type="radio" id="option18F"
+                                           autocomplete="off"> 18F
                                 </label>
                             </div>
 
@@ -205,12 +205,12 @@
 
         var data_source = {{ DATA_SOURCE|tojson }};
         var data_source_element = document.getElementById(data_source);
-        if (data_source == '18f') {
-            document.getElementById('18f').classList.add('active');
-            document.getElementById('19s').classList.remove('active');
+        if (data_source == '18F') {
+            document.getElementById('18F').classList.add('active');
+            document.getElementById('19S').classList.remove('active');
         } else {
-            document.getElementById('19s').classList.add('active');
-            document.getElementById('18f').classList.remove('active');
+            document.getElementById('19S').classList.add('active');
+            document.getElementById('18F').classList.remove('active');
         }
 
         function changesource(click_source) {
