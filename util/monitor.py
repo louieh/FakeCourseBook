@@ -42,10 +42,10 @@ class Monitor(object):
         self.db = self.client.Coursebook
         self.collection = self.db.monit_list
 
-        self.time_interval = 600
+        self.time_interval = 900
         self.download_fail_try = 3
         self.start_time = 8
-        self.stop_time = 19
+        self.stop_time = 18
 
     def initBot(self, TOKEN):
         bot = telepot.Bot(TOKEN)
