@@ -26,7 +26,6 @@ class CourseBook(object):
         self.db = self.client.Coursebook
         self.collection = self.db.CourseForSearch
         self.collectionname = "CourseForSearch"
-
         # self.TERM_LIST = ['19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
         #                   '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
         #                   '10U', '10S']
@@ -34,7 +33,8 @@ class CourseBook(object):
         self.TERM_LIST = ['19S', '18F']
         self.PREFIX_LIST = ['CS', 'CE', 'EE', 'SE']
 
-        self.justupdate = True
+        self.justupdate = False
+        self.insertdirectly = False
 
         self.search_information = {}
         self.course_dict_list = []
@@ -65,15 +65,22 @@ class CourseBook(object):
                     return
             log.logger.info("term: %s download and parse ok" % each_term)
 
+        if self.insertdirectly:
+            try:
+                self.collection.insert(self.course_dict_list)
+                log.logger.info("insert directly complete")
+            except:
+                log.logger.error("insert directly error")
+            return
+
         if not self.justupdate:  # renew all data
-            for each_course_dict in self.course_dict_list:
-                try:
-                    self.db.temp.insert_one(each_course_dict)
-                except:
-                    log.logger.debug('self.collection.insert_one fail')
-                    self.db.temp.drop()
-                    log.logger.debug('db.temp.drop() nothing happened')
-                    return
+            try:
+                self.db.temp.insert(self.course_dict_list)
+            except:
+                log.logger.debug('self.collection.insert_one fail')
+                # self.db.temp.drop()
+                log.logger.debug('db.temp not drop nothing happened')
+                return
             log.logger.info("all data have inserted to temp collection")
             try:
                 self.collection.drop()
@@ -98,8 +105,10 @@ class CourseBook(object):
         else:  # just update data
             for each_course_dict in self.course_dict_list:
                 try:
-                    self.db.CourseForSearch.update_one({"_id": each_course_dict.get("_id")}, {"$set": each_course_dict},
-                                                       True)  # if not found insert
+                    self.collection.update_one({"class_term": each_course_dict.get("class_term"),
+                                                "class_number": each_course_dict.get("class_number")},
+                                               {"$set": each_course_dict},
+                                               True)  # if not found insert
                 except:
                     log.logger.error("data update fail, renew all data")
                     self.justupdate = False
@@ -148,7 +157,6 @@ class CourseBook(object):
                 'class_prefix': '',
                 'class_section': '',
                 'class_number': '',
-                '_id': '',
                 'class_title': '',
                 'class_instructor': '',
                 'class_day': '',
@@ -171,7 +179,7 @@ class CourseBook(object):
             each_course_dict['class_prefix'] = eachclass_section_number[0].split(" ")[0]
             each_course_dict['class_section'] = eachclass_section_number[0]
             each_course_dict['class_number'] = eachclass_section_number[-1]
-            each_course_dict['_id'] = eachclass_section_number[-1]
+            # each_course_dict['_id'] = eachclass_section_number[-1]
             class_title = each_course_selector.xpath('''//td[3]//text()''')
             if class_title:
                 each_course_dict['class_title'] = class_title[0].replace("(3 Semester Credit Hours)", "").replace(
