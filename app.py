@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session, escape
+from flask import Flask, request, redirect, url_for, session, escape, jsonify, abort
 from flask import render_template
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
@@ -70,7 +70,7 @@ def login():
     return render_template('login.html')
 
 
-@app.route('/instructor/<name>')
+@app.route('/findrate/<name>')
 def findrate(name):
     pk_id, reason = getRateId(name)
     if not pk_id:
@@ -145,6 +145,53 @@ def search():
         data_update_time = str(data_update_time, encoding='utf-8')
     return render_template('search.html', data=courses_list, Filter=item_dict,
                            DATA_SOURCE=session.get('DATA_SOURCE', '19S'), data_update_time=data_update_time)
+
+
+@app.route('/graph/professor/')
+@app.route('/graph/professor/<professor>')
+def graph_pro(professor=None):
+    if not professor:
+        professor_set = set()
+        professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1}))
+        for eachdict in professor_dict_list:
+            for each in eachdict.get("class_instructor"):
+                if "Staff" not in each:
+                    professor_set.add(each)
+        return render_template("graph.html", professor_set=professor_set)
+
+    if not list(db.CourseForGraph.find({"class_instructor": professor})):
+        abort(404)
+
+    terms = ['19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
+             '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
+             '10U', '10S']
+    term_list = []
+    for eachterm in terms:
+        term_temp_dict = {}
+        course_temp_list = list(db.CourseForGraph.find({"class_term": eachterm, "class_instructor": professor}))
+        course_list = []
+        if course_temp_list:
+            for eachcourse in course_temp_list:
+                course_temp_dict = {}
+                course_temp_dict["name"] = eachcourse.get("class_title")
+                course_temp_dict["value"] = eachcourse.get("class_section")
+                course_list.append(course_temp_dict)
+        term_temp_dict["name"] = eachterm
+        term_temp_dict["children"] = course_list
+        term_list.append(term_temp_dict)
+    professor_json = {"name": professor, "children": term_list}
+    return render_template('graph.html', professor_name=professor,
+                           professor_json=professor_json)
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
 
 
 if __name__ == '__main__':
