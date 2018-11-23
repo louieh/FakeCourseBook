@@ -157,7 +157,8 @@ def graph_pro(professor=None):
             for each in eachdict.get("class_instructor"):
                 if "Staff" not in each:
                     professor_set.add(each)
-        return render_template("graph.html", professor_set=professor_set)
+        professor_list = sorted(list(professor_set))
+        return render_template("graph.html", professor_set=professor_list)
 
     if not list(db.CourseForGraph.find({"class_instructor": professor})):
         abort(404)
@@ -165,21 +166,21 @@ def graph_pro(professor=None):
     terms = ['19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
              '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
              '10U', '10S']
-    term_list = []
+    term_dict_list = []
     for eachterm in terms:
-        term_temp_dict = {}
-        course_temp_list = list(db.CourseForGraph.find({"class_term": eachterm, "class_instructor": professor}))
-        course_list = []
-        if course_temp_list:
-            for eachcourse in course_temp_list:
-                course_temp_dict = {}
-                course_temp_dict["name"] = eachcourse.get("class_title")
-                course_temp_dict["value"] = eachcourse.get("class_section")
-                course_list.append(course_temp_dict)
-        term_temp_dict["name"] = eachterm
-        term_temp_dict["children"] = course_list
-        term_list.append(term_temp_dict)
-    professor_json = {"name": professor, "children": term_list}
+        term_dict = {}
+        course_dict_list = []
+        all_course_list = list(db.CourseForGraph.find({"class_term": eachterm, "class_instructor": professor}))
+        if all_course_list:
+            for eachcourse in all_course_list:
+                course_dict = {}
+                course_dict["name"] = eachcourse.get("class_title")
+                course_dict["value"] = eachcourse.get("class_section").split(" ")[-1].split(".")[0]
+                course_dict_list.append(course_dict)
+        term_dict["name"] = eachterm
+        term_dict["children"] = course_dict_list
+        term_dict_list.append(term_dict)
+    professor_json = {"name": professor, "children": term_dict_list}
     return render_template('graph.html', professor_name=professor,
                            professor_json=professor_json)
 
