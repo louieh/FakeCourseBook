@@ -38,10 +38,10 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            <li class="nav-item" id="nav-item-home">
+                <a class="nav-link" href="/">Home </a>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown" id="nav-item-graph">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Graph
@@ -72,7 +72,16 @@
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-
+<script>
+    if (self.location.href.indexOf("graph") != -1) {
+        document.getElementById("nav-item-graph").classList.add("active");
+        document.getElementById("nav-item-home").classList.remove("active");
+    }
+    else {
+        document.getElementById("nav-item-home").classList.add("active");
+        document.getElementById("nav-item-graph").classList.remove("active");
+    }
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
         integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
         crossorigin="anonymous"></script>
