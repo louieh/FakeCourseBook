@@ -48,7 +48,7 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="/graph/professor">Professor</a>
-                    <a class="dropdown-item" href="#">Course</a>
+                    <a class="dropdown-item">Course</a>
                 </div>
             </li>
             <!--
@@ -76,8 +76,7 @@
     if (self.location.href.indexOf("graph") != -1) {
         document.getElementById("nav-item-graph").classList.add("active");
         document.getElementById("nav-item-home").classList.remove("active");
-    }
-    else {
+    } else {
         document.getElementById("nav-item-home").classList.add("active");
         document.getElementById("nav-item-graph").classList.remove("active");
     }
