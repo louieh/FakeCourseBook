@@ -67,7 +67,7 @@ class CourseBook(object):
 
         if self.insertdirectly:
             try:
-                self.collection.insert(self.course_dict_list)
+                self.collection.insert_many(self.course_dict_list)  # change to insert_many from insert 11/26/2018
                 log.logger.info("insert directly complete")
             except:
                 log.logger.error("insert directly error")
@@ -75,7 +75,7 @@ class CourseBook(object):
 
         if not self.justupdate:  # renew all data
             try:
-                self.db.temp.insert(self.course_dict_list)
+                self.db.temp.insert_many(self.course_dict_list)  # change to insert_many from insert 11/26/2018
             except:
                 log.logger.debug('self.collection.insert_one fail')
                 # self.db.temp.drop()
