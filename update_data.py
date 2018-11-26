@@ -79,7 +79,7 @@ class CourseBook(object):
             except:
                 log.logger.debug('self.collection.insert_one fail')
                 # self.db.temp.drop()
-                log.logger.debug('db.temp not drop nothing happened')
+                log.logger.debug('error. db.temp is not dropped')
                 return
             log.logger.info("all data have inserted to temp collection")
             try:
