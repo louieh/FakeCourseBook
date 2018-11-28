@@ -1,19 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-    {% if professor_set %}
+    {% if professor_list_list %}
         <div class="container">
+        {% if professor_list_list|length%6!=0 %}
+            {% set rownumber = (professor_list_list|length/6)|int+1 %}
+        {% else %}
+            {% set rownumber = (professor_list_list|length/6)|int %}
+        {% endif %}
+        {% for i in range(rownumber) %}
             <div class="row">
-                <table>
-                    {% for eachprofessor in professor_set %}
-                        <tr>
-                            <td>
-                                <a href="/graph/professor/{{ eachprofessor }}">{{ eachprofessor }}</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
+                {% if professor_list_list|length >= 6 %}
+                    {% set colnumber = 6 %}
+                {% else %}
+                    {% set colnumber = professor_list_list|length %}
+                {% endif %}
+                {% for j in range(colnumber) %}
+                    <div class="col">
+                        <ul>
+                            {% for eachprofessor in professor_list_list.pop(0) %}
+                                <li><a href="/graph/professor/{{ eachprofessor }}">{{ eachprofessor }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
             </div>
-        </div>
+        {% endfor %}
     {% else %}
         <div class="container">
             <div class="row">
