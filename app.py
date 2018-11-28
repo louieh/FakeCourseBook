@@ -157,8 +157,16 @@ def graph_pro(professor=None):
             for each in eachdict.get("class_instructor"):
                 if "Staff" not in each:
                     professor_set.add(each)
-        professor_list = sorted(list(professor_set))
-        return render_template("graph.html", professor_set=professor_list)
+        professor_char_dict = {}
+        for i in range(65, 91):  # 创建key为字母的字典，键值为空列表
+            professor_char_dict[chr(i)] = []
+        for each_professor_name in professor_set:  # insert professor name to professor_char_dict based on the first letter of their name
+            professor_char_dict[each_professor_name[0]].append(each_professor_name)
+        professor_list_list = []
+        for eachkey in professor_char_dict.keys():  # insert the key_value of professor_char_dict to a new list
+            if professor_char_dict.get(eachkey):
+                professor_list_list.append(professor_char_dict.get(eachkey))
+        return render_template("graph.html", professor_list_list=professor_list_list)
 
     if not list(db.CourseForGraph.find({"class_instructor": professor})):
         abort(404)
