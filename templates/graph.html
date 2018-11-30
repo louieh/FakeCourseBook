@@ -25,7 +25,18 @@
                 {% endfor %}
             </div>
         {% endfor %}
-    {% else %}
+    {% elif cou_dict_list %}
+        <div class="container">
+            <table>
+                {% for eachdict in cou_dict_list %}
+                    <tr>
+                        <td>{{ eachdict.get("class_section") }}</td>
+                        <td>{{ eachdict.get("class_title") }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% elif professor_name %}
         <div class="container">
             <div class="row">
                 <h2>{{ professor_name }}</h2>
@@ -89,5 +100,6 @@
                 ]
             });
         </script>
+    {% elif coursename %}
     {% endif %}
 {% endblock %}

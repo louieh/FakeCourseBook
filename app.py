@@ -149,48 +149,65 @@ def search():
 
 @app.route('/graph/professor/')
 @app.route('/graph/professor/<professor>')
-def graph_pro(professor=None):
-    if not professor:
-        professor_set = set()
-        professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1}))
-        for eachdict in professor_dict_list:
-            for each in eachdict.get("class_instructor"):
-                if "Staff" not in each:
-                    professor_set.add(each)
-        professor_char_dict = {}
-        for i in range(65, 91):  # 创建key为字母的字典，键值为空列表
-            professor_char_dict[chr(i)] = []
-        for each_professor_name in professor_set:  # insert professor name to professor_char_dict based on the first letter of their name
-            professor_char_dict[each_professor_name[0]].append(each_professor_name)
-        professor_list_list = []
-        for eachkey in professor_char_dict.keys():  # insert the key_value of professor_char_dict to a new list
-            if professor_char_dict.get(eachkey):
-                professor_list_list.append(professor_char_dict.get(eachkey))
-        return render_template("graph.html", professor_list_list=professor_list_list)
+@app.route('/graph/course')
+@app.route('/graph/course/<coursename>')
+def graph_pro(professor=None, coursename=None):
+    if not professor and not coursename:
+        if "graph/professor" in request.url:
+            professor_set = set()
+            professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1}))
+            for eachdict in professor_dict_list:
+                for each in eachdict.get("class_instructor"):
+                    if "Staff" not in each:
+                        professor_set.add(each)
+            professor_char_dict = {}
+            for i in range(65, 91):  # 创建key为字母的字典，键值为空列表
+                professor_char_dict[chr(i)] = []
+            for each_professor_name in professor_set:  # insert professor name to professor_char_dict based on the first letter of their name
+                professor_char_dict[each_professor_name[0]].append(each_professor_name)
+            professor_list_list = []
+            for eachkey in professor_char_dict.keys():  # insert the key_value of professor_char_dict to a new list
+                if professor_char_dict.get(eachkey):
+                    professor_list_list.append(professor_char_dict.get(eachkey))
+            return render_template("graph.html", professor_list_list=professor_list_list)
+        elif "graph/course" in request.url:
+            cou_set = set()
+            cou_dict_list = list(db.CourseForGraph.find({}, {"class_title": 1, "class_section": 1, "_id": 0}))
+            for eachcou_dict in cou_dict_list:
+                eachcou_dict["class_section"] = eachcou_dict.get("class_section").split(".")[0]
+                cou_set.add(json.dumps(eachcou_dict))
+            cou_dict_list_temp = sorted(list(cou_set))
+            cou_dict_list_fin = []
+            for eachcou_dict in cou_dict_list_temp:
+                cou_dict_list_fin.append(json.loads(eachcou_dict))
+            return render_template("graph.html", cou_dict_list=cou_dict_list_fin)
 
-    if not list(db.CourseForGraph.find({"class_instructor": professor})):
-        abort(404)
+    if professor:
+        if not list(db.CourseForGraph.find({"class_instructor": professor})):
+            abort(404)
 
-    terms = ['19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
-             '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
-             '10U', '10S']
-    term_dict_list = []
-    for eachterm in terms:
-        term_dict = {}
-        course_dict_list = []
-        all_course_list = list(db.CourseForGraph.find({"class_term": eachterm, "class_instructor": professor}))
-        if all_course_list:
-            for eachcourse in all_course_list:
-                course_dict = {}
-                course_dict["name"] = eachcourse.get("class_title")
-                course_dict["value"] = eachcourse.get("class_section").split(" ")[-1].split(".")[0]
-                course_dict_list.append(course_dict)
-        term_dict["name"] = eachterm
-        term_dict["children"] = course_dict_list
-        term_dict_list.append(term_dict)
-    professor_json = {"name": professor, "children": term_dict_list}
-    return render_template('graph.html', professor_name=professor,
-                           professor_json=professor_json)
+        terms = ['19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
+                 '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
+                 '10U', '10S']
+        term_dict_list = []
+        for eachterm in terms:
+            term_dict = {}
+            course_dict_list = []
+            all_course_list = list(db.CourseForGraph.find({"class_term": eachterm, "class_instructor": professor}))
+            if all_course_list:
+                for eachcourse in all_course_list:
+                    course_dict = {}
+                    course_dict["name"] = eachcourse.get("class_title")
+                    course_dict["value"] = eachcourse.get("class_section").split(" ")[-1].split(".")[0]
+                    course_dict_list.append(course_dict)
+            term_dict["name"] = eachterm
+            term_dict["children"] = course_dict_list
+            term_dict_list.append(term_dict)
+        professor_json = {"name": professor, "children": term_dict_list}
+        return render_template('graph.html', professor_name=professor,
+                               professor_json=professor_json)
+    if coursename:
+        pass
 
 
 @app.errorhandler(404)
