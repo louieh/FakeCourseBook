@@ -222,7 +222,7 @@ def graph_pro(professor=None, coursesection=None):
             professorname_list = eachcourse_dict.get("class_instructor")
             term = eachcourse_dict.get("class_term")
             for eachprofessorname in professorname_list:
-                temp_professorname_dict = {"name": eachprofessorname}
+                temp_professorname_dict = {"name": eachprofessorname, "value": eachprofessorname}
                 if not temp_professorname_dict in term_dict[term]:
                     term_dict[term].append(temp_professorname_dict)
 
