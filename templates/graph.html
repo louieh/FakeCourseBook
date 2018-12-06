@@ -107,6 +107,13 @@
                     }
                 ]
             });
+            myChart.on('click', function (params) {
+                {% if professor_name %}
+                    window.open('/graph/course/CS ' + encodeURIComponent(params.value));
+                {% elif course_name %}
+                    window.open('/graph/professor/' + encodeURIComponent(params.name));
+                {% endif %}
+            });
         </script>
     {% endif %}
 {% endblock %}
