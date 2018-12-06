@@ -30,16 +30,24 @@
             <table>
                 {% for eachdict in cou_dict_list %}
                     <tr>
-                        <td>{{ eachdict.get("class_section") }}</td>
+                        <td>
+                            <a href="/graph/course/{{ eachdict.get("class_section") }}"> {{ eachdict.get("class_section") }}</a>
+                        </td>
                         <td>{{ eachdict.get("class_title") }}</td>
                     </tr>
                 {% endfor %}
             </table>
         </div>
-    {% elif professor_name %}
+    {% elif professor_name or course_name %}
         <div class="container">
             <div class="row">
-                <h2>{{ professor_name }}</h2>
+                {% if professor_name %}
+                    <h2>{{ professor_name }}</h2>
+                    {% set datasource=professor_json %}
+                {% elif course_name %}
+                    <h2>{{ course_name }}</h2>
+                    {% set datasource=course_json %}
+                {% endif %}
             </div>
             <div class="row">
                 <div class="col-md-auto" id="graph" style="width:100%;height:800px;">
@@ -49,7 +57,7 @@
         <script type="text/javascript">
             var myChart = echarts.init(document.getElementById('graph'));
             myChart.showLoading();
-            datasourse = {{ professor_json|tojson }};
+            datasource = {{ datasource|tojson }};
             myChart.hideLoading();
 
             // echarts.util.each(datasourse.children, function (datum, index) {
@@ -65,7 +73,7 @@
                     {
                         type: 'tree',
 
-                        data: [datasourse],
+                        data: [datasource],
 
                         top: '1%',
                         left: '9%',
@@ -100,6 +108,5 @@
                 ]
             });
         </script>
-    {% elif coursename %}
     {% endif %}
 {% endblock %}

@@ -150,9 +150,13 @@ def search():
 @app.route('/graph/professor/')
 @app.route('/graph/professor/<professor>')
 @app.route('/graph/course')
-@app.route('/graph/course/<coursename>')
-def graph_pro(professor=None, coursename=None):
-    if not professor and not coursename:
+@app.route('/graph/course/<coursesection>')
+def graph_pro(professor=None, coursesection=None):
+    terms = ['19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
+             '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
+             '10U', '10S']
+
+    if not professor and not coursesection:
         if "graph/professor" in request.url:
             professor_set = set()
             professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1}))
@@ -186,9 +190,6 @@ def graph_pro(professor=None, coursename=None):
         if not list(db.CourseForGraph.find({"class_instructor": professor})):
             abort(404)
 
-        terms = ['19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
-                 '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
-                 '10U', '10S']
         term_dict_list = []
         for eachterm in terms:
             term_dict = {}
@@ -206,8 +207,31 @@ def graph_pro(professor=None, coursename=None):
         professor_json = {"name": professor, "children": term_dict_list}
         return render_template('graph.html', professor_name=professor,
                                professor_json=professor_json)
-    if coursename:
-        pass
+    if coursesection:
+        all_course_list = list(db.CourseForGraph.find({"class_section": {"$regex": coursesection}}))
+        if not all_course_list:
+            abort(404)
+        else:
+            course_name = all_course_list[0].get("class_title")
+
+        term_dict = {}
+        for eachterm in terms:
+            term_dict[eachterm] = []
+
+        for eachcourse_dict in all_course_list:
+            professorname_list = eachcourse_dict.get("class_instructor")
+            term = eachcourse_dict.get("class_term")
+            for eachprofessorname in professorname_list:
+                temp_professorname_dict = {"name": eachprofessorname}
+                if not temp_professorname_dict in term_dict[term]:
+                    term_dict[term].append(temp_professorname_dict)
+
+        final_list = []
+        for eachterm in terms:
+            temp_final_dict = {"name": eachterm, "children": term_dict.get(eachterm)}
+            final_list.append(temp_final_dict)
+        final_dict = {"name": coursesection, "children": final_list}
+        return render_template('graph.html', course_name=course_name, course_json=final_dict)
 
 
 @app.errorhandler(404)
