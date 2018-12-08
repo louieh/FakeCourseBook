@@ -61,7 +61,7 @@ class CourseBook(object):
                 try:
                     self.parser(resp)
                     log.logger.info("term: %s, prefix: %s, parse OK" % (each_term, each_prefix))
-                except:
+                except Exception as e:
                     return
             log.logger.info("term: %s download and parse ok" % each_term)
 
@@ -69,38 +69,38 @@ class CourseBook(object):
             try:
                 self.collection.insert_many(self.course_dict_list)  # change to insert_many from insert 11/26/2018
                 log.logger.info("insert directly complete")
-            except:
-                log.logger.error("insert directly error")
+            except Exception as e:
+                log.logger.error("insert directly error: " + repr(e))
             return
 
         if not self.justupdate:  # renew all data
             try:
                 self.db.temp.insert_many(self.course_dict_list)  # change to insert_many from insert 11/26/2018
-            except:
-                log.logger.debug('self.collection.insert_one fail')
+            except Exception as e:
+                log.logger.debug('self.collection.insert_one fail: ' + repr(e))
                 # self.db.temp.drop()
-                log.logger.debug('error. db.temp is not dropped')
+                log.logger.debug('error. db.temp is not dropped: ' + repr(e))
                 return
             log.logger.info("all data have inserted to temp collection")
             try:
                 self.collection.drop()
                 log.logger.info("the old collection has dropped")
-            except:
-                log.logger.error("the old collection drop fail")
+            except Exception as e:
+                log.logger.error("the old collection drop fail: " + repr(e))
                 return
             try:
                 self.db.temp.rename(self.collectionname)
                 log.logger.info("db.temp has rename to %s" % self.collectionname)
-            except:
-                log.logger.error("db.temp rename %s error!" % self.collectionname)
+            except Exception as e:
+                log.logger.error("db.temp rename %s error!: %s" % (self.collectionname, repr(e)))
                 return
             try:
                 redis_db = redis.StrictRedis.from_url("localhost")
                 redis_db.set(self.data_update_time,
                              self.TIMENOW)  # write the time to redis 'localhost' 'data_update_time'
                 log.logger.info("redis set OK")
-            except:
-                log.logger.error("redis set fail")
+            except Exception as e:
+                log.logger.error("redis set fail: " + repr(e))
             return
         else:  # just update data
             for each_course_dict in self.course_dict_list:
@@ -109,8 +109,8 @@ class CourseBook(object):
                                                 "class_number": each_course_dict.get("class_number")},
                                                {"$set": each_course_dict},
                                                True)  # if not found insert
-                except:
-                    log.logger.error("data update fail, renew all data")
+                except Exception as e:
+                    log.logger.error("data update fail, renew all data: " + repr(e))
                     self.justupdate = False
                     self.update_database()
             log.logger.info("data update complete")
@@ -119,8 +119,8 @@ class CourseBook(object):
                 redis_db.set(self.data_update_time,
                              self.TIMENOW)  # write the time to redis 'localhost' 'data_update_time'
                 log.logger.info("redis set OK")
-            except:
-                log.logger.error("redis set fail")
+            except Exception as e:
+                log.logger.error("redis set fail:" + repr(e))
             return
 
     def downloader(self, perfix, term):
@@ -138,7 +138,7 @@ class CourseBook(object):
             resp_url = resp.url
             resp_selector = html.etree.HTML(resp.text)
         except Exception as e:
-            log.logger.debug("parser: etree fail: %s" % e)
+            log.logger.debug("parser: etree fail: %s" % repr(e))
             return False
 
         each_course_text_group = []
