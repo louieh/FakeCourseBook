@@ -41,6 +41,7 @@ class Monitor(object):
         self.client = MongoClient("localhost", 27017)
         self.db = self.client.Coursebook
         self.collection = self.db.monit_list
+        self.term = '19s'
 
         self.time_interval = 900
         self.download_fail_try = 3
@@ -52,7 +53,7 @@ class Monitor(object):
         return bot
 
     def downloader(self, section):
-        url = "https://coursebook.utdallas.edu/%s/term_19s" % section
+        url = "https://coursebook.utdallas.edu/%s/term_%s" % (section, self.term)
         resp = requests.get(url, headers=self.FAKE_HEADER)
         if not resp:
             print("error: cannot download the page")
@@ -72,8 +73,13 @@ class Monitor(object):
         for each_course_text_ in each_course_text_group:
             each_course_selector = html.etree.HTML(each_course_text_)
             class_open = each_course_selector.xpath('''//td[1]//text()''')
-            class_terms = class_open[0]
-            class_ifopen = class_open[1]  # Open/Closed
+            try:
+                class_terms = class_open[0]
+                class_ifopen = class_open[1]  # Open/Closed
+            except Exception as e:
+                print("class_open:%s" % class_open)
+                bot.sendMessage(self.MainTeleClientID, "error: class_open:%s" % repr(e))
+                return False
             eachclass_section_number = each_course_selector.xpath('''//td[2]//text()''')
             if eachclass_section_number:
                 class_section = eachclass_section_number[0].split(" ")[1].split(".")[0]
@@ -233,8 +239,7 @@ class Monitor(object):
     def initdata(self):
         self.collection.drop()
         request_list = [
-            {"section": "6375",
-             "_id": "6375",
+            {"section": "cs6375",
              "professor_email": {
                  "Anurag Nagar": ["763882075"],
                  "Sriraam Natarajan": ["763882075"],
@@ -242,8 +247,7 @@ class Monitor(object):
              }
              },
             {
-                "section": "6363",
-                "_id": "6363",
+                "section": "cs6363",
                 "professor_email": {
                     "Ramaswamy Chandrasekaran": ["763882075"],
                     "Sergey Bereg": ["763882075"],
