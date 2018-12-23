@@ -121,7 +121,7 @@
                                 {{ data_update_time }}
                             {% endif %}
                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-secondary" id="19S" onclick="changesource('19S')">
+                                <label class="btn btn-secondary active" id="19S" onclick="changesource('19S')">
                                     <input type="radio" id="option19S"
                                            autocomplete="off"> 19S
                                 </label>
@@ -205,6 +205,7 @@
 
         var data_source = {{ DATA_SOURCE|tojson }};
         var data_source_element = document.getElementById(data_source);
+
         if (data_source == '18F') {
             document.getElementById('18F').classList.add('active');
             document.getElementById('19S').classList.remove('active');
