@@ -134,7 +134,7 @@ def search():
         item_dict_result['class_start_time'] = {"$lte": time_now}
         item_dict_result['class_end_time'] = {"$gte": time_now}
 
-    courses_list = list(collection.find(item_dict_result))
+    courses_list = list(collection.find(item_dict_result, {"_id": 0}))
     count = len(courses_list)
 
     session['item_dict'] = None
@@ -159,7 +159,7 @@ def graph_pro(professor=None, coursesection=None):
     if not professor and not coursesection:
         if "graph/professor" in request.url:
             professor_set = set()
-            professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1}))
+            professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1, "_id": 0}))
             for eachdict in professor_dict_list:
                 for each in eachdict.get("class_instructor"):
                     if "Staff" not in each:
