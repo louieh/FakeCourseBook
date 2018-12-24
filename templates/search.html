@@ -121,11 +121,12 @@
                                 {{ data_update_time }}
                             {% endif %}
                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-secondary active" id="19S" onclick="changesource('19S')">
+                                <label class="btn btn-secondary active" id="19S"
+                                       onclick="changesource('19S',data_source)">
                                     <input type="radio" id="option19S"
                                            autocomplete="off"> 19S
                                 </label>
-                                <label class="btn btn-secondary" id="18F" onclick="changesource('18F')">
+                                <label class="btn btn-secondary" id="18F" onclick="changesource('18F',data_source)">
                                     <input type="radio" id="option18F"
                                            autocomplete="off"> 18F
                                 </label>
@@ -150,7 +151,7 @@
                             <th scope="col">class term</th>
                             <th scope="col">class status</th>
                             <th scope="col">class title</th>
-                            <th scope="col">class number</th>
+                            <th scope="col" onclick="sortBasedOn('class_number',dataSort)">class number</th>
                             <th scope="col">class section</th>
                             <th scope="col">class instructor</th>
                             <th scope="col">class day</th>
@@ -159,6 +160,7 @@
                             <th scope="col">class isFull</th>
                         </tr>
                         </thead>
+
                         {% for course in data %}
                             <th scope="row">{{ data.index(course)+1 }}</th>
                             <td>{{ course['class_term'] }}</td>
@@ -202,23 +204,8 @@
         </div>
     </div>
     <script>
-
         var data_source = {{ DATA_SOURCE|tojson }};
-        var data_source_element = document.getElementById(data_source);
-
-        if (data_source == '18F') {
-            document.getElementById('18F').classList.add('active');
-            document.getElementById('19S').classList.remove('active');
-        } else {
-            document.getElementById('19S').classList.add('active');
-            document.getElementById('18F').classList.remove('active');
-        }
-
-        function changesource(click_source) {
-            if (data_source != click_source) {
-                window.location.href = '/changesource/' + click_source;
-            }
-
-        }
+        var dataSort = {{ data|tojson }};
+        labelSwitcher(data_source);
     </script>
 {% endblock %}
