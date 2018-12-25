@@ -194,7 +194,8 @@ def graph_pro(professor=None, coursesection=None):
         for eachterm in terms:
             term_dict = {}
             course_dict_list = []
-            all_course_list = list(db.CourseForGraph.find({"class_term": eachterm, "class_instructor": professor}))
+            all_course_list = list(
+                db.CourseForGraph.find({"class_term": eachterm, "class_instructor": professor}, {"_id": 0}))
             if all_course_list:
                 for eachcourse in all_course_list:
                     course_dict = {}
@@ -208,7 +209,7 @@ def graph_pro(professor=None, coursesection=None):
         return render_template('graph.html', professor_name=professor,
                                professor_json=professor_json)
     if coursesection:
-        all_course_list = list(db.CourseForGraph.find({"class_section": {"$regex": coursesection}}))
+        all_course_list = list(db.CourseForGraph.find({"class_section": {"$regex": coursesection}}, {"_id": 0}))
         if not all_course_list:
             abort(404)
         else:
