@@ -52,10 +52,18 @@
         <div class="container">
             <div class="row">
                 {% if professor_name %}
-                    <h2>{{ professor_name }}</h2>
+                    <h2><a href={{ url_for('findrate', name=professor_name) }} target="_blank"
+                           name="ratemyprofessors">{{ professor_name }}</a></h2>
                     {% set datasource=professor_json %}
                 {% elif course_name %}
-                    <h2>{{ course_name }}</h2>
+                    <h2>
+                        {% if course_section[-4] >= '5' %}
+                            <a href="https://catalog.utdallas.edu/2018/graduate/courses/{{ course_section }}"
+                               target="_blank">{{ course_name }}</a>
+                        {% else %}
+                            {{ course_name }}
+                        {% endif %}
+                    </h2>
                     {% set datasource=course_json %}
                 {% endif %}
             </div>

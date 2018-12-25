@@ -232,7 +232,9 @@ def graph_pro(professor=None, coursesection=None):
             temp_final_dict = {"name": eachterm, "children": term_dict.get(eachterm)}
             final_list.append(temp_final_dict)
         final_dict = {"name": coursesection, "children": final_list}
-        return render_template('graph.html', course_name=course_name, course_json=final_dict)
+        return render_template('graph.html', course_section=coursesection.lower().replace(' ', ''),
+                               course_name=course_name,
+                               course_json=final_dict)
 
 
 @app.errorhandler(404)
