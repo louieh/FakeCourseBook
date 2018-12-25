@@ -16,7 +16,7 @@ function changesource(click_source, data_source) {
 }
 
 
-var tableHeaderDict = {
+var tabHeadDictForSearch = {
     1: "class_term",
     2: "class_status",
     3: "class_title",
@@ -27,6 +27,11 @@ var tableHeaderDict = {
     8: "class_time",
     9: "class_location",
     10: "class_isFull",
+};
+
+var tabHeadDictForGraph = {
+    0: "class_section",
+    1: "class_title",
 };
 
 
@@ -62,56 +67,83 @@ function CompareFunction(propertyName, order) {
 
 
 function deltabheadericon(headerItem) {
-    for (var i = 1; i < headerItem.length; i++) {
+    for (var i = 0; i < headerItem.length; i++) {
         headerItem[i].innerHTML = headerItem[i].innerHTML.replace("▲", "").replace("▼", "");
     }
 }
 
-function sortBasedOn(propertyOrder, dataSort) {
-    var headerItem = document.querySelector(".table").children[1].children[0].children;
+
+function getSortedData(propertyOrder, dataOrig, tabledict) { //get sorted data and setting icon on the header of table
+    var headerItem = document.querySelector(".table").children[0].children[0].children;
     var trs = document.querySelector(".table").lastElementChild.children;
     if (trs[0].children[propertyOrder].innerHTML >= trs[trs.length - 1].children[propertyOrder].innerHTML) {
-        dataSort.sort(CompareFunction(tableHeaderDict[propertyOrder], 'asc'));
+        dataOrig.sort(CompareFunction(tabledict[propertyOrder], 'asc'));
         deltabheadericon(headerItem);
-        headerItem[propertyOrder].innerHTML = tableHeaderDict[propertyOrder].replace("_", " ") + "▲";
+        headerItem[propertyOrder].innerHTML = tabledict[propertyOrder].replace("_", " ") + "▲";
     } else {
-        dataSort.sort(CompareFunction(tableHeaderDict[propertyOrder], 'des'));
+        dataOrig.sort(CompareFunction(tabledict[propertyOrder], 'des'));
         deltabheadericon(headerItem);
-        headerItem[propertyOrder].innerHTML = tableHeaderDict[propertyOrder].replace("_", " ") + "▼";
+        headerItem[propertyOrder].innerHTML = tabledict[propertyOrder].replace("_", " ") + "▼";
     }
+    return dataOrig
+}
+
+
+function sortForSearch(propertyOrder, dataOrig) {   //reset new sorted data for the search page
+    var dataNew = getSortedData(propertyOrder, dataOrig, tabHeadDictForSearch);
+    var trs = document.querySelector(".table").lastElementChild.children;
+    htmlTemplate1 = "<a href='https://catalog.utdallas.edu/2018/graduate/courses/%major%%tempInnerHTML_%' target='_blank'>%tempInnerHTML%</a>";
+    htmlTemplate2 = "<a href='/findrate/%professorname%' target='_blank' name='ratemyprofessors'>%professorname%</a>";
+
     for (var i = 0; i < trs.length; i++) {
         trs[i].children[0].innerHTML = i + 1;
-        for (var j = 1; j < 11; j++) {
+        for (var j = 1; j < trs[0].children.length; j++) {
             if (j === 5) {
-                var tempInnerHTML = dataSort[i][tableHeaderDict[j]];
+                var tempInnerHTML = dataNew[i][tabHeadDictForSearch[j]];
                 var tempInnerHTML_ = tempInnerHTML.split(' ')[1].split('.')[0];
-                html = "<a href='https://catalog.utdallas.edu/2018/graduate/courses/%major%%tempInnerHTML_%' target='_blank'>%tempInnerHTML%</a>";
                 if (tempInnerHTML.indexOf('CS') !== -1) {
-                    trs[i].children[j].innerHTML = html.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'cs')
+                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'cs')
                 } else if (tempInnerHTML.indexOf('CE') !== -1) {
-                    trs[i].children[j].innerHTML = html.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'ce')
+                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'ce')
                 } else if (tempInnerHTML.indexOf('EE') !== -1) {
-                    trs[i].children[j].innerHTML = html.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'ee')
+                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'ee')
                 } else if (tempInnerHTML.indexOf('SE') !== -1) {
-                    trs[i].children[j].innerHTML = html.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'se')
+                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'se')
                 } else {
                     trs[i].children[j].innerHTML = tempInnerHTML;
                 }
 
             } else if (j === 6) {
-                for (var n = 0; n < dataSort[i][tableHeaderDict[j]].length; n++) {
-                    var professorname = dataSort[i][tableHeaderDict[j]][n];
-                    html = "<a href='/findrate/%professorname%' target='_blank' name='ratemyprofessors'>%professorname%</a>";
+                for (var n = 0; n < dataNew[i][tabHeadDictForSearch[j]].length; n++) {
+                    var professorname = dataNew[i][tabHeadDictForSearch[j]][n];
+
                     if (professorname !== '-Staff-') {
-                        trs[i].children[j].innerHTML = html.replace('%professorname%', professorname).replace('%professorname%', professorname);
+                        trs[i].children[j].innerHTML = htmlTemplate2.replace('%professorname%', professorname).replace('%professorname%', professorname);
                     } else {
-                        trs[i].children[j].innerHTML = dataSort[i][tableHeaderDict[j]];
+                        trs[i].children[j].innerHTML = dataNew[i][tabHeadDictForSearch[j]];
                     }
                 }
             } else {
-                trs[i].children[j].innerHTML = dataSort[i][tableHeaderDict[j]];
+                trs[i].children[j].innerHTML = dataNew[i][tabHeadDictForSearch[j]];
             }
         }
 
     }
+}
+
+function sortForGraph(propertyOrder, dataOrig) {
+    var dataNew = getSortedData(propertyOrder, dataOrig, tabHeadDictForGraph);
+    var trs = document.querySelector(".table").lastElementChild.children;
+    htmlTemplate = '<a href="/graph/course/%tempInnerHTML%">%tempInnerHTML%</a>';
+
+    for (var i = 0; i < trs.length; i++) {
+        for (var j = 0; j < trs[0].children.length; j++) {
+            if (j === 0) {
+                trs[i].children[j].innerHTML = htmlTemplate.replace('%tempInnerHTML%', dataNew[i][tabHeadDictForGraph[j]]).replace('%tempInnerHTML%', dataNew[i][tabHeadDictForGraph[j]]);
+            } else {
+                trs[i].children[j].innerHTML = dataNew[i][tabHeadDictForGraph[j]];
+            }
+        }
+    }
+
 }

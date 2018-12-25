@@ -27,7 +27,17 @@
         {% endfor %}
     {% elif cou_dict_list %}
         <div class="container">
-            <table>
+            <table class="table table-sm table-hover">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col" style="cursor: pointer" onclick='sortForGraph(0,{{ cou_dict_list|tojson }})'>class
+                        section
+                    </th>
+                    <th scope="col" style="cursor: pointer" onclick='sortForGraph(1,{{ cou_dict_list|tojson }})'>class
+                        title
+                    </th>
+                </tr>
+                </thead>
                 {% for eachdict in cou_dict_list %}
                     <tr>
                         <td>
