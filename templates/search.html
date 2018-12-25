@@ -122,11 +122,12 @@
                             {% endif %}
                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                 <label class="btn btn-secondary active" id="19S"
-                                       onclick="changesource('19S',data_source)">
+                                       onclick='changesource("19S",{{ DATA_SOURCE|tojson }})'>
                                     <input type="radio" id="option19S"
                                            autocomplete="off"> 19S
                                 </label>
-                                <label class="btn btn-secondary" id="18F" onclick="changesource('18F',data_source)">
+                                <label class="btn btn-secondary" id="18F"
+                                       onclick='changesource("18F",{{ DATA_SOURCE|tojson }})'>
                                     <input type="radio" id="option18F"
                                            autocomplete="off"> 18F
                                 </label>
@@ -143,22 +144,32 @@
         <div class="row table-responsive">
             <div class="col-xl">
                 <table class="table table-sm table-hover">
-                    <tbody>
                     {% if data %}
                         <thead class="thead-dark">
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">class term</th>
-                            <th scope="col" style="cursor: pointer" onclick="sortBasedOn(2,dataSort)">class status</th>
-                            <th scope="col" style="cursor: pointer" onclick="sortBasedOn(3,dataSort)">class title</th>
-                            <th scope="col" style="cursor: pointer" onclick="sortBasedOn(4,dataSort)">class number</th>
-                            <th scope="col" style="cursor: pointer" onclick="sortBasedOn(5,dataSort)">class section</th>
-                            <th scope="col" style="cursor: pointer" onclick="sortBasedOn(6,dataSort)">class instructor
+                            <th scope="col" style="cursor: pointer" onclick='sortForSearch(2,{{ data|tojson }})'>class
+                                status
+                            </th>
+                            <th scope="col" style="cursor: pointer" onclick='sortForSearch(3,{{ data|tojson }})'>class
+                                title
+                            </th>
+                            <th scope="col" style="cursor: pointer" onclick='sortForSearch(4,{{ data|tojson }})'>class
+                                number
+                            </th>
+                            <th scope="col" style="cursor: pointer" onclick='sortForSearch(5,{{ data|tojson }})'>class
+                                section
+                            </th>
+                            <th scope="col" style="cursor: pointer" onclick='sortForSearch(6,{{ data|tojson }})'>class
+                                instructor
                             </th>
                             <th scope="col">class day</th>
                             <th scope="col">class time</th>
                             <th scope="col">class location</th>
-                            <th scope="col" style="cursor: pointer" onclick="sortBasedOn(10,dataSort)">class isFull</th>
+                            <th scope="col" style="cursor: pointer" onclick='sortForSearch(10,{{ data|tojson }})'>class
+                                isFull
+                            </th>
                         </tr>
                         </thead>
 
@@ -199,14 +210,11 @@
                             </tr>
                         {% endfor %}
                     {% endif %}
-                    </tbody>
                 </table>
             </div>
         </div>
     </div>
     <script>
-        var data_source = {{ DATA_SOURCE|tojson }};
-        var dataSort = {{ data|tojson }};
-        labelSwitcher(data_source);
+        labelSwitcher({{ DATA_SOURCE|tojson }});
     </script>
 {% endblock %}
