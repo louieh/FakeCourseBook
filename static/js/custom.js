@@ -147,3 +147,16 @@ function sortForGraph(propertyOrder, dataOrig) {
     }
 
 }
+
+function test() {
+    fetch('/test')
+        .then(result => {
+            return result.json()
+        })
+        .then(result => {
+            console.log(result)
+        })
+        .catch(error => {
+            console.log(`This is a error here ${error}`)
+        })
+}
