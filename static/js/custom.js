@@ -10,7 +10,17 @@ function labelSwitcher(data_source) {
 
 function changesource(click_source, data_source) {
     if (data_source != click_source) {
-        window.location.href = '/changesource/' + click_source;
+        //window.location.href = '/changesource/' + click_source;
+        fetch(`/changesource/${click_source}`)
+            .then(data => {
+                return data.json()
+            })
+            .then(data => {
+                console.log(data)
+            })
+            .catch(error => {
+                console.log(`There is a error ${error}`)
+            })
     }
 
 }
@@ -89,8 +99,7 @@ function getSortedData(propertyOrder, dataOrig, tabledict) { //get sorted data a
 }
 
 
-function sortForSearch(propertyOrder, dataOrig) {   //reset new sorted data for the search page
-    var dataNew = getSortedData(propertyOrder, dataOrig, tabHeadDictForSearch);
+function setdataForSearch(newData) {
     var trs = document.querySelector(".table").lastElementChild.children;
     htmlTemplate1 = "<a href='https://catalog.utdallas.edu/2018/graduate/courses/%major%%tempInnerHTML_%' target='_blank'>%tempInnerHTML%</a>";
     htmlTemplate2 = "<a href='/findrate/%professorname%' target='_blank' name='ratemyprofessors'>%professorname%</a>";
@@ -99,7 +108,7 @@ function sortForSearch(propertyOrder, dataOrig) {   //reset new sorted data for 
         trs[i].children[0].innerHTML = i + 1;
         for (var j = 1; j < trs[0].children.length; j++) {
             if (j === 5) {
-                var tempInnerHTML = dataNew[i][tabHeadDictForSearch[j]];
+                var tempInnerHTML = newData[i][tabHeadDictForSearch[j]];
                 var tempInnerHTML_ = tempInnerHTML.split(' ')[1].split('.')[0];
                 if (tempInnerHTML.indexOf('CS') !== -1) {
                     trs[i].children[j].innerHTML = htmlTemplate1.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'cs')
@@ -114,36 +123,46 @@ function sortForSearch(propertyOrder, dataOrig) {   //reset new sorted data for 
                 }
 
             } else if (j === 6) {
-                for (var n = 0; n < dataNew[i][tabHeadDictForSearch[j]].length; n++) {
-                    var professorname = dataNew[i][tabHeadDictForSearch[j]][n];
+                for (var n = 0; n < newData[i][tabHeadDictForSearch[j]].length; n++) {
+                    var professorname = newData[i][tabHeadDictForSearch[j]][n];
 
                     if (professorname !== '-Staff-') {
                         trs[i].children[j].innerHTML = htmlTemplate2.replace('%professorname%', professorname).replace('%professorname%', professorname);
                     } else {
-                        trs[i].children[j].innerHTML = dataNew[i][tabHeadDictForSearch[j]];
+                        trs[i].children[j].innerHTML = newData[i][tabHeadDictForSearch[j]];
                     }
                 }
             } else {
-                trs[i].children[j].innerHTML = dataNew[i][tabHeadDictForSearch[j]];
+                trs[i].children[j].innerHTML = newData[i][tabHeadDictForSearch[j]];
             }
         }
 
     }
 }
 
-function sortForGraph(propertyOrder, dataOrig) {
-    var dataNew = getSortedData(propertyOrder, dataOrig, tabHeadDictForGraph);
+function setdataForGraph(newData) {
     var trs = document.querySelector(".table").lastElementChild.children;
     htmlTemplate = '<a href="/graph/course/%tempInnerHTML%">%tempInnerHTML%</a>';
 
     for (var i = 0; i < trs.length; i++) {
         for (var j = 0; j < trs[0].children.length; j++) {
             if (j === 0) {
-                trs[i].children[j].innerHTML = htmlTemplate.replace('%tempInnerHTML%', dataNew[i][tabHeadDictForGraph[j]]).replace('%tempInnerHTML%', dataNew[i][tabHeadDictForGraph[j]]);
+                trs[i].children[j].innerHTML = htmlTemplate.replace('%tempInnerHTML%', newData[i][tabHeadDictForGraph[j]]).replace('%tempInnerHTML%', newData[i][tabHeadDictForGraph[j]]);
             } else {
-                trs[i].children[j].innerHTML = dataNew[i][tabHeadDictForGraph[j]];
+                trs[i].children[j].innerHTML = newData[i][tabHeadDictForGraph[j]];
             }
         }
+    }
+}
+
+function sortForSearchGraph(propertyOrder, dataOrig, obj) {   //reset new sorted data for the search page
+    var newData;
+    if (obj === 'Search') {
+        newData = getSortedData(propertyOrder, dataOrig, tabHeadDictForSearch);
+        setdataForSearch(newData)
+    } else if (obj === 'Graph') {
+        newData = getSortedData(propertyOrder, dataOrig, tabHeadDictForGraph);
+        setdataForGraph(newData)
     }
 
 }
