@@ -1,5 +1,6 @@
-function labelSwitcher(data_source) {
-    if (data_source == '18F') {
+function labelSwitcher() {
+    var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
+    if (data_source_now == '18F') {
         document.getElementById('18F').classList.add('active');
         document.getElementById('19S').classList.remove('active');
     } else {
@@ -8,15 +9,17 @@ function labelSwitcher(data_source) {
     }
 }
 
-function changesource(click_source, data_source) {
-    if (data_source != click_source) {
+function changesource(click_source) {
+    var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
+    if (click_source !== data_source_now) {
         //window.location.href = '/changesource/' + click_source;
         fetch(`/changesource/${click_source}`)
             .then(data => {
                 return data.json()
             })
             .then(data => {
-                console.log(data)
+                setdataForSearch(data);
+                labelSwitcher();
             })
             .catch(error => {
                 console.log(`There is a error ${error}`)
@@ -47,12 +50,13 @@ var tabHeadDictForGraph = {
 
 function CompareFunction(propertyName, order) {
     return function (obj1, obj2) {
+        var value1, value2;
         if (propertyName === "class_isFull") {
-            var value1 = parseInt(obj1[propertyName].split("%")[0]);
-            var value2 = parseInt(obj2[propertyName].split("%")[0]);
+            value1 = parseInt(obj1[propertyName].split("%")[0]);
+            value2 = parseInt(obj2[propertyName].split("%")[0]);
         } else {
-            var value1 = obj1[propertyName];
-            var value2 = obj2[propertyName];
+            value1 = obj1[propertyName];
+            value2 = obj2[propertyName];
         }
         if (order === 'asc') {
             if (value1 < value2) {
@@ -100,13 +104,28 @@ function getSortedData(propertyOrder, dataOrig, tabledict) { //get sorted data a
 
 
 function setdataForSearch(newData) {
-    var trs = document.querySelector(".table").lastElementChild.children;
+    var table = document.querySelector(".table");
+    var i, j, n;
+    if (newData.length < table.children[1].childElementCount) {
+        var numOfDel = table.children[1].childElementCount - newData.length;
+        for (i = 0; i < numOfDel; i++) {
+            table.deleteRow(1)
+        }
+    } else if (newData.length > table.children[1].childElementCount) {
+        var numOfAdd = newData.length - table.children[1].childElementCount;
+        var el = '<tr><th></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        for (i = 0; i < numOfAdd; i++) {
+            table.children[1].insertAdjacentHTML('beforeend', el)
+        }
+    }
+
+    var trs = table.lastElementChild.children;
     htmlTemplate1 = "<a href='https://catalog.utdallas.edu/2018/graduate/courses/%major%%tempInnerHTML_%' target='_blank'>%tempInnerHTML%</a>";
     htmlTemplate2 = "<a href='/findrate/%professorname%' target='_blank' name='ratemyprofessors'>%professorname%</a>";
 
-    for (var i = 0; i < trs.length; i++) {
+    for (i = 0; i < trs.length; i++) {
         trs[i].children[0].innerHTML = i + 1;
-        for (var j = 1; j < trs[0].children.length; j++) {
+        for (j = 1; j < trs[0].children.length; j++) {
             if (j === 5) {
                 var tempInnerHTML = newData[i][tabHeadDictForSearch[j]];
                 var tempInnerHTML_ = tempInnerHTML.split(' ')[1].split('.')[0];
@@ -123,7 +142,7 @@ function setdataForSearch(newData) {
                 }
 
             } else if (j === 6) {
-                for (var n = 0; n < newData[i][tabHeadDictForSearch[j]].length; n++) {
+                for (n = 0; n < newData[i][tabHeadDictForSearch[j]].length; n++) {
                     var professorname = newData[i][tabHeadDictForSearch[j]][n];
 
                     if (professorname !== '-Staff-') {
@@ -138,6 +157,7 @@ function setdataForSearch(newData) {
         }
 
     }
+
 }
 
 function setdataForGraph(newData) {

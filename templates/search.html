@@ -121,13 +121,11 @@
                                 {{ data_update_time }}
                             {% endif %}
                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-secondary active" id="19S"
-                                       onclick='changesource("19S",{{ DATA_SOURCE|tojson }})'>
+                                <label class="btn btn-secondary active" id="19S" onclick="changesource('19S')">
                                     <input type="radio" id="option19S"
                                            autocomplete="off"> 19S
                                 </label>
-                                <label class="btn btn-secondary" id="18F"
-                                       onclick='changesource("18F",{{ DATA_SOURCE|tojson }})'>
+                                <label class="btn btn-secondary" id="18F" onclick="changesource('18F')">
                                     <input type="radio" id="option18F"
                                            autocomplete="off"> 18F
                                 </label>
@@ -222,6 +220,8 @@
         </div>
     </div>
     <script>
-        labelSwitcher({{ DATA_SOURCE|tojson }});
+        labelSwitcher();
+        //document.getElementById("18F").addEventListener("click", changesource("18F"));
+        //document.getElementById("19S").addEventListener("click", changesource("19S"));
     </script>
 {% endblock %}

@@ -50,16 +50,6 @@ def getRateId(name):
         return None, 'parsefail'
 
 
-# def makesureDataSource():
-#     collection = db.courses19spring
-#     datasource = session.get('DATA_SOURCE')
-#     if datasource == '18f':
-#         collection = db.courses18fall
-#     elif datasource == '19s':
-#         collection = db.courses19spring
-#     return collection
-
-
 @app.before_first_request
 def before_first_request():
     session['DATA_SOURCE'] = '19S'  # 18F/19S
@@ -83,12 +73,12 @@ def findrate(name):
 @app.route('/changesource/<source>')
 def changesource(source):
     session['DATA_SOURCE'] = source
-    return redirect('/')
+    data = list(collection.find({"class_term": source}, {"_id": 0}))
+    return jsonify(data)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def search():
-    # collection = makesureDataSource()  # Reacquire collection
     term = session.get("DATA_SOURCE", "19S")  # get term first
 
     item_list = ["class_title", "class_number", "class_section", "class_instructor",
@@ -144,7 +134,7 @@ def search():
     if data_update_time:
         data_update_time = str(data_update_time, encoding='utf-8')
     return render_template('search.html', data=courses_list, Filter=item_dict,
-                           DATA_SOURCE=session.get('DATA_SOURCE', '19S'), data_update_time=data_update_time)
+                           data_update_time=data_update_time)
 
 
 @app.route('/graph/professor/')
@@ -235,6 +225,12 @@ def graph_pro(professor=None, coursesection=None):
         return render_template('graph.html', course_section=coursesection.lower().replace(' ', ''),
                                course_name=course_name,
                                course_json=final_dict)
+
+
+@app.route('/test')
+def testForAJAX():
+    a = "ajsofi"
+    return jsonify(a)
 
 
 @app.errorhandler(404)
