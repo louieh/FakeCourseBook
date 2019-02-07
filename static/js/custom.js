@@ -11,6 +11,7 @@ function labelSwitcher() {
 
 function changesource(click_source) {
     var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
+    var headerItem = document.querySelector(".table").children[0].children[0].children;
     if (click_source !== data_source_now) {
         //window.location.href = '/changesource/' + click_source;
         fetch(`/changesource/${click_source}`)
@@ -20,6 +21,7 @@ function changesource(click_source) {
             .then(data => {
                 setdataForSearch(data);
                 labelSwitcher();
+                deltabheadericon(headerItem);
             })
             .catch(error => {
                 console.log(`There is a error ${error}`)
