@@ -1,3 +1,6 @@
+/**
+ * switch active of each label
+ */
 function labelSwitcher() {
     var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
     if (data_source_now == '18F') {
@@ -9,6 +12,10 @@ function labelSwitcher() {
     }
 }
 
+/**
+ * change data source (18F/19S) and set data
+ * @param click_source
+ */
 function changesource(click_source) {
     var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
     var headerItem = document.querySelector(".table").children[0].children[0].children;
@@ -49,7 +56,13 @@ var tabHeadDictForGraph = {
     1: "class_title",
 };
 
-
+/**
+ * sort function for the sort data function
+ * @param propertyName
+ * @param order
+ * @returns {Function}
+ * @constructor
+ */
 function CompareFunction(propertyName, order) {
     return function (obj1, obj2) {
         var value1, value2;
@@ -81,18 +94,33 @@ function CompareFunction(propertyName, order) {
     }
 }
 
-
+/**
+ * delete ▲▼
+ * @param headerItem
+ */
 function deltabheadericon(headerItem) {
     for (var i = 0; i < headerItem.length; i++) {
         headerItem[i].innerHTML = headerItem[i].innerHTML.replace("▲", "").replace("▼", "");
     }
 }
 
-
-function getSortedData(propertyOrder, dataOrig, tabledict) { //get sorted data and setting icon on the header of table
+/**
+ * get sorted data and setting icon on the header of table
+ * @param propertyOrder
+ * @param dataOrig
+ * @param tabledict
+ * @returns {*}
+ */
+function getSortedData(propertyOrder, dataOrig, tabledict) {
     var headerItem = document.querySelector(".table").children[0].children[0].children;
     var trs = document.querySelector(".table").lastElementChild.children;
-    if (trs[0].children[propertyOrder].innerHTML >= trs[trs.length - 1].children[propertyOrder].innerHTML) {
+    var text1 = trs[0].children[propertyOrder].innerHTML;
+    var text2 = trs[trs.length - 1].children[propertyOrder].innerHTML;
+    if (text1.indexOf("%") != -1) {
+        text1 = parseInt(text1.split("%")[0]);
+        text2 = parseInt(text2.split("%")[0]);
+    }
+    if (text1 >= text2) {
         dataOrig.sort(CompareFunction(tabledict[propertyOrder], 'asc'));
         deltabheadericon(headerItem);
         headerItem[propertyOrder].innerHTML = tabledict[propertyOrder].replace("_", " ") + "▲";
@@ -104,8 +132,13 @@ function getSortedData(propertyOrder, dataOrig, tabledict) { //get sorted data a
     return dataOrig
 }
 
-
+/**
+ * set data for search view
+ * @param newData
+ */
 function setdataForSearch(newData) {
+
+    // adjust the number of td
     var table = document.querySelector(".table");
     var i, j, n;
     if (newData.length < table.children[1].childElementCount) {
@@ -144,13 +177,19 @@ function setdataForSearch(newData) {
                 }
 
             } else if (j === 6) {
-                for (n = 0; n < newData[i][tabHeadDictForSearch[j]].length; n++) {
+                var instructorNum = newData[i][tabHeadDictForSearch[j]].length, text;
+                trs[i].children[j].innerHTML = "";
+                for (n = 0; n < instructorNum; n++) {
                     var professorname = newData[i][tabHeadDictForSearch[j]][n];
-
                     if (professorname !== '-Staff-') {
-                        trs[i].children[j].innerHTML = htmlTemplate2.replace('%professorname%', professorname).replace('%professorname%', professorname);
+                        text = htmlTemplate2.replace('%professorname%', professorname).replace('%professorname%', professorname);
                     } else {
-                        trs[i].children[j].innerHTML = newData[i][tabHeadDictForSearch[j]];
+                        text = newData[i][tabHeadDictForSearch[j]];
+                    }
+                    if (instructorNum > 1) {
+                        trs[i].children[j].innerHTML += text + ";";
+                    } else {
+                        trs[i].children[j].innerHTML += text;
                     }
                 }
             } else {
@@ -162,6 +201,10 @@ function setdataForSearch(newData) {
 
 }
 
+/**
+ * set data for the graph view
+ * @param newData
+ */
 function setdataForGraph(newData) {
     var trs = document.querySelector(".table").lastElementChild.children;
     htmlTemplate = '<a href="/graph/course/%tempInnerHTML%">%tempInnerHTML%</a>';
@@ -177,15 +220,52 @@ function setdataForGraph(newData) {
     }
 }
 
-function sortForSearchGraph(propertyOrder, dataOrig, obj) {   //reset new sorted data for the search page
+/**
+ * reset new sorted data for the search page
+ * @param propertyOrder
+ * @param obj
+ */
+function sortForSearchGraph(propertyOrder, obj) {
     var newData;
+    dataOrig = getdatanow();
     if (obj === 'Search') {
         newData = getSortedData(propertyOrder, dataOrig, tabHeadDictForSearch);
+        //console.log(newData);
         setdataForSearch(newData)
     } else if (obj === 'Graph') {
         newData = getSortedData(propertyOrder, dataOrig, tabHeadDictForGraph);
         setdataForGraph(newData)
     }
+
+}
+
+/**
+ * get current data
+ * @returns {Array}
+ */
+function getdatanow() {
+    var table = document.querySelector(".table");
+    var dataNowList = [];
+    for (var i = 1; i < table.rows.length; i++) {
+        var rowDict = {};
+        for (var j = 1; j < table.rows[i].cells.length; j++) {
+            if (tabHeadDictForSearch[j] === "class_instructor") {
+                var forList = table.rows[i].cells[j].innerText.split(";");
+                var retuList = [];
+                for (eachIndex in forList) {
+                    if (forList[eachIndex]) {
+                        retuList[eachIndex] = forList[eachIndex].replace(/^\s+|\s+$/g, "");
+                    }
+                }
+                rowDict[tabHeadDictForSearch[j]] = retuList;
+            } else {
+                rowDict[tabHeadDictForSearch[j]] = table.rows[i].cells[j].innerText;
+            }
+        }
+        dataNowList[i - 1] = rowDict;
+    }
+    //console.log(dataNowList);
+    return dataNowList;
 
 }
 
