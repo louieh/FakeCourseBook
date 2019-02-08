@@ -225,12 +225,13 @@ function setdataForGraph(newData) {
  * @param propertyOrder
  * @param obj
  */
-function sortForSearchGraph(propertyOrder, obj) {
+function sortForSearchGraph(propertyOrder, obj, dataOrig = null) {
     var newData;
-    dataOrig = getdatanow();
+    if (!dataOrig) {
+        dataOrig = getdatanow();
+    }
     if (obj === 'Search') {
         newData = getSortedData(propertyOrder, dataOrig, tabHeadDictForSearch);
-        //console.log(newData);
         setdataForSearch(newData)
     } else if (obj === 'Graph') {
         newData = getSortedData(propertyOrder, dataOrig, tabHeadDictForGraph);
@@ -264,7 +265,6 @@ function getdatanow() {
         }
         dataNowList[i - 1] = rowDict;
     }
-    //console.log(dataNowList);
     return dataNowList;
 
 }

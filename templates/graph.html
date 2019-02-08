@@ -30,12 +30,12 @@
             <table class="table table-sm table-hover">
                 <thead class="thead-dark">
                 <tr>
-                    <th scope="col" style="cursor: pointer"
-                        onclick='sortForSearchGraph(0,{{ cou_dict_list|tojson }},"Graph")'>class
+                    <th scope="col" id="sortlabel"
+                        onclick='sortForSearchGraph(0,"Graph",{{ cou_dict_list|tojson }})'>class
                         section
                     </th>
-                    <th scope="col" style="cursor: pointer"
-                        onclick='sortForSearchGraph(1,{{ cou_dict_list|tojson }},"Graph")'>class
+                    <th scope="col" id="sortlabel"
+                        onclick='sortForSearchGraph(1,"Graph",{{ cou_dict_list|tojson }})'>class
                         title
                     </th>
                 </tr>
