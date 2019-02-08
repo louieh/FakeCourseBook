@@ -5,3 +5,7 @@
 #githubicon:hover {
     color: #fff;
 }
+
+#sortlabel {
+    cursor: pointer;
+}
