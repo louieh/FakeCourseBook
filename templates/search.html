@@ -148,30 +148,30 @@
                             <th scope="col">#</th>
                             <th scope="col">class term</th>
                             <th scope="col" style="cursor: pointer"
-                                onclick='sortForSearchGraph(2,{{ data|tojson }},"Search")'>class
+                                onclick='sortForSearchGraph(2,"Search")'>class
                                 status
                             </th>
                             <th scope="col" style="cursor: pointer"
-                                onclick='sortForSearchGraph(3,{{ data|tojson }},"Search")'>class
+                                onclick='sortForSearchGraph(3,"Search")'>class
                                 title
                             </th>
                             <th scope="col" style="cursor: pointer"
-                                onclick='sortForSearchGraph(4,{{ data|tojson }},"Search")'>class
+                                onclick='sortForSearchGraph(4,"Search")'>class
                                 number
                             </th>
                             <th scope="col" style="cursor: pointer"
-                                onclick='sortForSearchGraph(5,{{ data|tojson }},"Search")'>class
+                                onclick='sortForSearchGraph(5,"Search")'>class
                                 section
                             </th>
                             <th scope="col" style="cursor: pointer"
-                                onclick='sortForSearchGraph(6,{{ data|tojson }},"Search")'>class
+                                onclick='sortForSearchGraph(6,"Search")'>class
                                 instructor
                             </th>
                             <th scope="col">class day</th>
                             <th scope="col">class time</th>
                             <th scope="col">class location</th>
                             <th scope="col" style="cursor: pointer"
-                                onclick='sortForSearchGraph(10,{{ data|tojson }},"Search")'>class
+                                onclick='sortForSearchGraph(10,"Search")'>class
                                 isFull
                             </th>
                         </tr>
@@ -199,14 +199,25 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% for eachinstructor in course['class_instructor'] %}
-                                        {% if eachinstructor != '-Staff-' %}
-                                            <a href={{ url_for('findrate', name=eachinstructor) }} target="_blank"
-                                               name="ratemyprofessors">{{ eachinstructor }}</a>
-                                        {% else %}
-                                            {{ eachinstructor }}
-                                        {% endif %}
-                                    {% endfor %}
+                                    {% if course['class_instructor']|length > 1 %}
+                                        {% for eachinstructor in course['class_instructor'] %}
+                                            {% if eachinstructor != '-Staff-' %}
+                                                <a href={{ url_for('findrate', name=eachinstructor) }} target="_blank"
+                                                   name="ratemyprofessors">{{ eachinstructor }}</a>;
+                                            {% else %}
+                                                {{ eachinstructor }};
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for eachinstructor in course['class_instructor'] %}
+                                            {% if eachinstructor != '-Staff-' %}
+                                                <a href={{ url_for('findrate', name=eachinstructor) }} target="_blank"
+                                                   name="ratemyprofessors">{{ eachinstructor }}</a>
+                                            {% else %}
+                                                {{ eachinstructor }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                 </td>
                                 <td>{{ course['class_day'] }}</td>
                                 <td>{{ course['class_time'] }}</td>
@@ -219,6 +230,7 @@
             </div>
         </div>
     </div>
+
     <script>
         labelSwitcher();
         //document.getElementById("18F").addEventListener("click", changesource("18F"));
