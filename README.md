@@ -4,5 +4,5 @@
 
 * Provide higher query response speed, a simple and efficient UI, and more convenient ways to query and links and sortable results.
 
-* Visualize the semester data for the past decade and make full use of historical data to present more comprehensive and valuable information, implemented by ECharts.
+* Visualize the semester data for the past decade and make full use of historical data to present more comprehensive and valuable information, implemented by [ECharts](https://echarts.apache.org/).
 
