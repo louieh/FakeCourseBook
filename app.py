@@ -33,15 +33,14 @@ def getDataupdatetime():
 
 
 def getRateId(name):
-    rateuri = "http://search.mtvnservices.com/typeahead/suggest/?rows=20&q=" + name + "&defType=edismax&qf=teacherfirstname_t%5E2000+teacherlastname_t%5E2000+teacherfullname_t%5E2000+autosuggest&siteName=rmp&group=on&group.field=content_type_s&group.limit=50"
-
+    rateuri = "https://search-production.ratemyprofessors.com/solr/rmp/select/?rows=20&wt=json&q=" + name + "&defType=edismax&qf=teacherfirstname_t%5E2000+teacherlastname_t%5E2000+teacherfullname_t%5E2000+autosuggest&group.limit=50"
     try:
         resp = requests.get(rateuri)
     except:
         return None, 'downloadfail'
     try:
         resp_parse = json.loads(resp.text)
-        resp_parse_list = resp_parse.get('grouped').get('content_type_s').get('groups')[0].get('doclist').get('docs')
+        resp_parse_list = resp_parse.get('response').get('docs')
         for each_resp in resp_parse_list:
             if each_resp.get("schoolname_s") == 'University of Texas at Dallas':
                 return each_resp.get('pk_id'), 'ok'
