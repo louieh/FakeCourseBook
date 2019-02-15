@@ -5,8 +5,6 @@
 Update data and some search functions
 """
 
-import xlrd
-import pprint
 from pymongo import MongoClient
 import requests
 from lxml import html
@@ -16,6 +14,7 @@ import datetime
 import logging
 import redis
 import log
+import json
 
 
 class CourseBook(object):
@@ -296,6 +295,38 @@ class CourseBook(object):
         courses_list = list(self.collection.find(self.search_information))
         return courses_list
 
+    def job_downloader(self, url_temp, header=None, **kwargs):
+        # kwargs: 'kw_tuple':(1,2)
+        # 此处重构的时候判断参数数量等问题
+        if not kwargs:
+            url = url_temp
+        else:
+            url = url_temp % kwargs['kw_tuple']
+        if header:
+            resp = requests.get(url, headers=header)
+        else:
+            resp = requests.get(url)
+        return resp
+
+    def job_parser(self, resp):
+        json_text = json.loads(resp.text)
+        position_list = json_text.get('positions')
+        for eachPosition in position_list:
+            eachPosition['company'] = 'bytedance'
+            self.db.JobInfo.insert(eachPosition)
+            print(1)
+
+    def update_jobinfo(self):
+        url = 'https://job.bytedance.com/api/recruitment/position/list/?type=3&summary_id=873&limit=350'
+        try:
+            print("download start")
+            resp = self.job_downloader(url)
+        except:
+            print("download fail")
+        print("download ok")
+        self.job_parser(resp)
+
 
 newCourseBook = CourseBook()
-newCourseBook.update_database()
+# newCourseBook.update_database()
+newCourseBook.update_jobinfo()
