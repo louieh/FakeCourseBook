@@ -9,3 +9,7 @@
 #sortlabel {
     cursor: pointer;
 }
+
+#jobinfotable {
+    table-layout: fixed;
+}
