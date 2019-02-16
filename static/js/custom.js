@@ -56,6 +56,13 @@ var tabHeadDictForGraph = {
     1: "class_title",
 };
 
+var tabHeadDictForjobinfo = {
+    0: "name",
+    1: "company",
+    2: "city",
+    3: "create_time",
+};
+
 /**
  * sort function for the sort data function
  * @param propertyName
@@ -269,15 +276,104 @@ function getdatanow() {
 
 }
 
-function test() {
-    fetch('/test')
+/**
+ * get rate from ratemyprofessor
+ * 跨域请求
+ */
+function findrate(name) {
+    fetch('https://search-production.ratemyprofessors.com/solr/rmp/select/?rows=20&wt=json&q=' + name + '&defType=edismax&qf=teacherfirstname_t%5E2000+teacherlastname_t%5E2000+teacherfullname_t%5E2000+autosuggest&group.limit=50')
         .then(result => {
             return result.json()
         })
         .then(result => {
-            console.log(result)
+            var resp_parse_list;
+            resp_parse_list = result.response.docs;
+            for (i = 0; i < resp_parse_list.length; i++) {
+                if (resp_parse_list[i].schoolname_s === 'University of Texas at Dallas') {
+                    console.log(resp_parse_list[i].pk_id)
+                }
+            }
+        })
+}
+
+
+function dosomething(data) {
+    data.s.map(function (html) {
+        console.log("123");
+        console.log(html);
+        var oLi = document.createElement('li');
+        oLi.innerHTML = html;
+        oLi.onclick = function () {
+            window.location.href = `http://www.baidu.com/s?wd=${html}`
+        };
+        oUl.appendChild(oLi)
+    });
+}
+
+function test1(val) {
+    var script = document.createElement('script');
+    script.src = `https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=${val}&cb=dosomething`;
+    document.body.appendChild(script);
+}
+
+/**
+ * the pagination of jobinfo
+ */
+function jobinfo_Pagination(numnum) {
+    var url_now = location.href;
+    var page_pre = document.getElementById('page_pre');
+    var page_next = document.getElementById('page_next');
+
+    if (url_now.indexOf('?') === -1) {
+        url_next = url_now + '?num=10'
+    } else {
+        num_now = url_now.match(/num=(\d+)/g);
+        if (num_now == null) {
+            url_next = url_now + '&num=10'
+        } else {
+            num_now = parseInt(num_now[0].match(/(\d+)/g)[0])
+        }
+        url_next = url_now.replace(('num=' + num_now), ('num=' + (num_now + numnum)));
+    }
+    window.history.pushState({}, 0, url_next);
+    fetch('/jobinfodata?' + url_next.split('?')[1])
+        .then(result => {
+            return result.json()
+        })
+        .then(result => {
+            data = result['data'];
+            setdataForjobinfo(data);
+            if (!result['ifnext']) {
+                page_next.classList.add('disabled');
+            } else {
+                page_next.classList.remove('disabled');
+            }
+            if (!result['ifpre']) {
+                page_pre.classList.add('disabled');
+            } else {
+                page_pre.classList.remove('disabled')
+            }
         })
         .catch(error => {
-            console.log(`This is a error here ${error}`)
+            console.log(`There is a error ${error}`)
         })
+}
+
+/**
+ * set data for jobinfo
+ * @param newData
+ */
+function setdataForjobinfo(newData) {
+    var trs = document.querySelector(".table").lastElementChild.children;
+
+    for (var i = 0; i < trs.length; i++) {
+        for (var j = 0; j < trs[0].children.length; j++) {
+            if (tabHeadDictForjobinfo[j] === 'create_time')
+                dataTemp = newData[i][tabHeadDictForjobinfo[j]].split(' ')[0];
+            else {
+                dataTemp = newData[i][tabHeadDictForjobinfo[j]]
+            }
+            trs[i].children[j].innerHTML = dataTemp;
+        }
+    }
 }

@@ -4,6 +4,7 @@ from flask_wtf import Form
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
 from flask_bootstrap import Bootstrap
+from flask import g
 
 from pymongo import MongoClient
 import re
@@ -226,10 +227,64 @@ def graph_pro(professor=None, coursesection=None):
                                course_json=final_dict)
 
 
-@app.route('/test')
-def testForAJAX():
-    a = "ajsofi"
-    return jsonify(a)
+@app.route('/jobinfo')
+def jobinfo():
+    job_filter, num = get_jobinfo_args()
+    if db.JobInfo.find(job_filter).count() - num <= 10:
+        return render_template('jobinfo.html')
+    else:
+        data = db.JobInfo.find(job_filter, {'_id': 0, 'name': 1, 'company': 1, 'city': 1, 'create_time': 1}).sort(
+            [{'create_time', -1}]).skip(num).limit(10)
+
+        return render_template('jobinfo.html', data=list(data), job_filter=job_filter)
+
+
+def get_jobinfo_args():
+    job_filter = {}
+
+    city_index = request.args.get('city')
+    city = city_dict.get(city_index)
+    if city:
+        job_filter['city'] = city
+
+    firm_index = request.args.get('firm')
+    firm = firm_dict.get(firm_index)
+    if firm:
+        job_filter['company'] = firm
+
+    num = request.args.get('num')
+    if not num:
+        num = 0
+    else:
+        num = int(num)
+    return job_filter, num
+
+
+@app.route('/jobinfodata')
+def jobinfodata():
+    job_filter, num = get_jobinfo_args()
+
+    data = db.JobInfo.find(job_filter, {'_id': 0, 'name': 1, 'company': 1, 'city': 1, 'create_time': 1}).sort(
+        [{'create_time', -1}]).skip(num).limit(10)
+    ifnext = not db.JobInfo.find(job_filter).count() - num <= 10
+    ifpre = num > 0
+    result = {'data': list(data), 'ifnext': ifnext, 'ifpre': ifpre}
+    return jsonify(result)
+
+
+city_dict = {
+    '1': '北京',
+    '2': '上海',
+    '3': '杭州',
+    '4': '深圳',
+    '5': '武汉',
+}
+
+firm_dict = {
+    '1': 'bytedance',
+    '2': 'baidu',
+    '3': 'bilibili',
+}
 
 
 @app.errorhandler(404)
