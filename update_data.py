@@ -39,6 +39,7 @@ class CourseBook(object):
         self.course_dict_list = []
 
         self.TIMENOW = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime("%Y-%m-%d %H:%M")
+        self.TIMENOW_UTC = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
         self.FAKE_HEADER = {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
             "Accept-Encoding": "gzip, deflate, br",
@@ -96,7 +97,7 @@ class CourseBook(object):
             try:
                 redis_db = redis.StrictRedis.from_url("localhost")
                 redis_db.set(self.data_update_time,
-                             datetime.datetime.utcnow())  # write the time to redis 'localhost' 'data_update_time'
+                             self.TIMENOW_UTC)  # write the time to redis 'localhost' 'data_update_time'
                 log.logger.info("redis set OK")
             except Exception as e:
                 log.logger.error("redis set fail: " + repr(e))
@@ -116,7 +117,7 @@ class CourseBook(object):
             try:
                 redis_db = redis.StrictRedis.from_url("localhost")
                 redis_db.set(self.data_update_time,
-                             datetime.datetime.utcnow())  # write the time to redis 'localhost' 'data_update_time'
+                             self.TIMENOW_UTC)  # write the time to redis 'localhost' 'data_update_time'
                 log.logger.info("redis set OK")
             except Exception as e:
                 log.logger.error("redis set fail:" + repr(e))
