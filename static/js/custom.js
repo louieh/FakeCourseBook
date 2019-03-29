@@ -3,17 +3,17 @@
  */
 function labelSwitcher() {
     var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
-    if (data_source_now == '18F') {
-        document.getElementById('18F').classList.add('active');
+    if (data_source_now == '19F') {
+        document.getElementById('19F').classList.add('active');
         document.getElementById('19S').classList.remove('active');
     } else {
         document.getElementById('19S').classList.add('active');
-        document.getElementById('18F').classList.remove('active');
+        document.getElementById('19F').classList.remove('active');
     }
 }
 
 /**
- * change data source (18F/19S) and set data
+ * change data source (19F/19S) and set data
  * @param click_source
  */
 function changesource(click_source) {

@@ -29,7 +29,7 @@ class CourseBook(object):
         #                   '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
         #                   '10U', '10S']
         # self.PREFIX_LIST = ['CS']  # CS/CE/EE/SE
-        self.TERM_LIST = ['19S', '18F']
+        self.TERM_LIST = ['19F', '19s']
         self.PREFIX_LIST = ['CS', 'CE', 'EE', 'SE']
 
         self.justupdate = False
@@ -38,7 +38,7 @@ class CourseBook(object):
         self.search_information = {}
         self.course_dict_list = []
 
-        self.TIMENOW = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%Y-%m-%d %H:%M")
+        self.TIMENOW = (datetime.datetime.utcnow() - datetime.timedelta(hours=5)).strftime("%Y-%m-%d %H:%M")
         self.FAKE_HEADER = {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
             "Accept-Encoding": "gzip, deflate, br",
@@ -96,7 +96,7 @@ class CourseBook(object):
             try:
                 redis_db = redis.StrictRedis.from_url("localhost")
                 redis_db.set(self.data_update_time,
-                             self.TIMENOW)  # write the time to redis 'localhost' 'data_update_time'
+                             datetime.datetime.utcnow())  # write the time to redis 'localhost' 'data_update_time'
                 log.logger.info("redis set OK")
             except Exception as e:
                 log.logger.error("redis set fail: " + repr(e))
@@ -116,7 +116,7 @@ class CourseBook(object):
             try:
                 redis_db = redis.StrictRedis.from_url("localhost")
                 redis_db.set(self.data_update_time,
-                             self.TIMENOW)  # write the time to redis 'localhost' 'data_update_time'
+                             datetime.datetime.utcnow())  # write the time to redis 'localhost' 'data_update_time'
                 log.logger.info("redis set OK")
             except Exception as e:
                 log.logger.error("redis set fail:" + repr(e))
@@ -328,5 +328,5 @@ class CourseBook(object):
 
 
 newCourseBook = CourseBook()
-# newCourseBook.update_database()
-newCourseBook.update_jobinfo()
+newCourseBook.update_database()
+# newCourseBook.update_jobinfo()

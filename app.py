@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, url_for, session, escape, jsonify, abort
 from flask import render_template
+from flask_moment import Moment
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
@@ -18,10 +19,11 @@ import redis
 client = MongoClient("localhost", 27017)
 db = client.Coursebook
 collection = db.CourseForSearch
-TIMEDELTA = 6
+TIMEDELTA = 5  # summer time
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('config.py')
+moment = Moment(app)
 
 
 def getDataupdatetime():
@@ -52,7 +54,7 @@ def getRateId(name):
 
 @app.before_first_request
 def before_first_request():
-    session['DATA_SOURCE'] = '19S'  # 18F/19S
+    session['DATA_SOURCE'] = '19F'  # 19F/19S
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -79,7 +81,7 @@ def changesource(source):
 
 @app.route('/', methods=['GET', 'POST'])
 def search():
-    term = session.get("DATA_SOURCE", "19S")  # get term first
+    term = session.get("DATA_SOURCE", "19F")  # get term first
 
     item_list = ["class_title", "class_number", "class_section", "class_instructor",
                  "class_day", "class_start_time",
@@ -142,7 +144,7 @@ def search():
 @app.route('/graph/course')
 @app.route('/graph/course/<coursesection>')
 def graph_pro(professor=None, coursesection=None):
-    terms = ['19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
+    terms = ['19F', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
              '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
              '10U', '10S']
 

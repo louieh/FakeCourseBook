@@ -118,16 +118,16 @@
                         <div class="col-5">
                             Last update:
                             {% if data_update_time %}
-                                {{ data_update_time }}
+                                {{ moment(data_update_time).format('LLL') }}
                             {% endif %}
                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-secondary active" id="19S" onclick="changesource('19S')">
+                                <label class="btn btn-secondary active" id="19F" onclick="changesource('19F')">
+                                    <input type="radio" id="option19F"
+                                           autocomplete="off"> 19F
+                                </label>
+                                <label class="btn btn-secondary" id="19S" onclick="changesource('19S')">
                                     <input type="radio" id="option19S"
                                            autocomplete="off"> 19S
-                                </label>
-                                <label class="btn btn-secondary" id="18F" onclick="changesource('18F')">
-                                    <input type="radio" id="option18F"
-                                           autocomplete="off"> 18F
                                 </label>
                             </div>
 
