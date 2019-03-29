@@ -23,17 +23,17 @@ class CourseBook(object):
         self.data_update_time = "data_update_time"
         self.client = MongoClient("localhost", 27017)
         self.db = self.client.Coursebook
-        self.collection = self.db.CourseForGraph
+        self.collection = self.db.CourseForSearch
         self.collectionname = "CourseForSearch"
         # self.TERM_LIST = ['19F', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
         #                   '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
         #                   '10U', '10S']
         # self.PREFIX_LIST = ['CS']  # CS/CE/EE/SE
-        self.TERM_LIST = ['19F']
-        self.PREFIX_LIST = ['CS']
+        self.TERM_LIST = ['19F', '19S']
+        self.PREFIX_LIST = ['CS', 'CE', 'EE', 'SE']
 
         self.justupdate = False
-        self.insertdirectly = True
+        self.insertdirectly = False
 
         self.search_information = {}
         self.course_dict_list = []
