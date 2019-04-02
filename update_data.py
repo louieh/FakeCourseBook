@@ -184,7 +184,7 @@ class CourseBook(object):
             if class_title:
                 each_course_dict['class_title'] = class_title[0].replace("(3 Semester Credit Hours)", "").replace(
                     "(1 Semester Credit Hours)", "").replace("(1-9 Credits)", "").replace(
-                    "(1 Semester Credit Hour)", "")
+                    "(1 Semester Credit Hour)", "").strip()
 
             class_instructor = each_course_selector.xpath(
                 '''//td[4]//text()''')  # ['Don Vogel', '\n, ', 'Stephen Perkins', '\n']
