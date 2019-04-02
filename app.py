@@ -178,7 +178,8 @@ def graph_pro(professor=None, coursesection=None):
             cou_dict_list_fin = []
             for eachcou_dict in cou_dict_list_temp:
                 cou_dict_list_fin.append(json.loads(eachcou_dict))
-            return render_template("graph.html", cou_dict_list=cou_dict_list_fin)
+            num = len(cou_dict_list_fin)
+            return render_template("graph.html", cou_dict_list=cou_dict_list_fin, num=num)
 
     if professor:
         if not list(db.CourseForGraph.find({"class_instructor": professor})):
