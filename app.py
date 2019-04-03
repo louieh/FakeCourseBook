@@ -171,14 +171,13 @@ def graph_pro(professor=None, coursesection=None):
             return render_template("graph.html", professor_list_list=professor_list_list)
         elif "graph/course" in request.url:
             cou_set = set()
+            cou_dict_list_fin = []
             cou_dict_list = list(db.CourseForGraph.find({}, {"class_title": 1, "class_section": 1, "_id": 0}))
             for eachcou_dict in cou_dict_list:
                 eachcou_dict["class_section"] = eachcou_dict.get("class_section").split(".")[0]
-                cou_set.add(json.dumps(OrderedDict(sorted(eachcou_dict.items(), key=lambda t: t[0])))) # Sort the dict to avoid duplication due to different key sequences.
-            cou_dict_list_temp = sorted(list(cou_set))
-            cou_dict_list_fin = []
-            for eachcou_dict in cou_dict_list_temp:
-                cou_dict_list_fin.append(json.loads(eachcou_dict))
+                if eachcou_dict["class_section"] not in cou_set:
+                    cou_set.add(eachcou_dict["class_section"])
+                    cou_dict_list_fin.append(eachcou_dict)
             return render_template("graph.html", cou_dict_list=cou_dict_list_fin)
 
     if professor:
