@@ -10,6 +10,20 @@ function labelSwitcher() {
         document.getElementById('19S').classList.add('active');
         document.getElementById('19F').classList.remove('active');
     }
+    setOpenStatus()
+}
+
+function setOpenStatus() {
+    var table = document.querySelector(".table").lastElementChild.children;
+    for (var i = 0; i < table.length; i++) {
+        if (table[i].children[2].innerHTML === "Open") {
+            table[i].children[2].className = 'classOpen';
+            // table[i].children[2].classList.add('classOpen')
+        } else if (table[i].children[2].innerHTML === "Closed") {
+            table[i].children[2].className = 'classClosed';
+            // table[i].children[2].classList.add('classClosed')
+        }
+    }
 }
 
 /**
@@ -203,9 +217,8 @@ function setdataForSearch(newData) {
                 trs[i].children[j].innerHTML = newData[i][tabHeadDictForSearch[j]];
             }
         }
-
     }
-
+    setOpenStatus(); // reset the open or closed class for td[2]
 }
 
 /**
@@ -239,10 +252,10 @@ function sortForSearchGraph(propertyOrder, obj, dataOrig = null) {
     }
     if (obj === 'Search') {
         newData = getSortedData(propertyOrder, dataOrig, tabHeadDictForSearch);
-        setdataForSearch(newData)
+        setdataForSearch(newData);
     } else if (obj === 'Graph') {
         newData = getSortedData(propertyOrder, dataOrig, tabHeadDictForGraph);
-        setdataForGraph(newData)
+        setdataForGraph(newData);
     }
 
 }
