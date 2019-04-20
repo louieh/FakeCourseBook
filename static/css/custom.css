@@ -13,3 +13,11 @@
 #jobinfotable {
     table-layout: fixed;
 }
+
+.classOpen {
+    color: #3CB371;
+}
+
+.classClosed {
+    color: #FF6347;
+}
