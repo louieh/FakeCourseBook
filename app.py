@@ -87,6 +87,18 @@ def search():
     item_list = ["class_title", "class_number", "class_section", "class_instructor",
                  "class_day", "class_start_time",
                  "class_end_time", "class_location"]  # "class_term", "class_status" 非前端筛选条件
+
+    abbr_dict = {
+        'ai': 'Artificial Intelligence',
+        'ml': 'Machine Learning',
+        'nlp': 'Natural Language Processing',
+        'ca': 'Computer Architecture',
+        'os': 'Operating System',
+        'hci': 'Human Computer Interactions',
+        'vr': 'Virtual Reality',
+        'aos': 'Advanced Operating Systems',
+    }
+
     item_dict = session.get('item_dict')
     if not item_dict:
         item_dict = {}
@@ -97,6 +109,9 @@ def search():
         for each_item in item_list:
             if each_item in request.form and request.form[each_item]:
                 item_dict[each_item] = request.form[each_item]
+        if "class_title" in item_dict.keys():  # update class title based on addr dict
+            if item_dict.get("class_title").lower() in abbr_dict.keys():
+                item_dict.update(class_title=abbr_dict.get(item_dict.get("class_title").lower()))
         fuzzyquery = 1 if "fuzzyquery" in request.form else 0
 
         session['item_dict'] = item_dict
