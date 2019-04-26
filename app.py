@@ -46,7 +46,7 @@ def getRateId(name):
         resp_parse = json.loads(resp.text)
         resp_parse_list = resp_parse.get('response').get('docs')
         for each_resp in resp_parse_list:
-            if each_resp.get("schoolname_s") == 'University of Texas at Dallas':
+            if 'University of Texas at Dallas' in each_resp.get("schoolname_s"):
                 return each_resp.get('pk_id'), 'ok'
         return None, 'notfound'
     except:
