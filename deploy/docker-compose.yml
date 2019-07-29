@@ -13,7 +13,7 @@ services:
       - redis
       - mongo
       - nginx
-    
+
   nginx:
     image: harbor.leaniot.cn/lib/nginx:alpine-1.15.3
     container_name: nginx
