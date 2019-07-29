@@ -1,7 +1,7 @@
 version: '3'
 services:
   course-search:
-    image: test
+    image: course-search
     container_name: course-search
     ports:
       - "9000:9000"
@@ -15,7 +15,7 @@ services:
       - nginx
 
   nginx:
-    image: harbor.leaniot.cn/lib/nginx:alpine-1.15.3
+    image: nginx
     container_name: nginx
     restart: unless-stopped
     volumes:
@@ -25,11 +25,11 @@ services:
       - '${PORT_PROXY}:80'
 
   mongo:
-    image: harbor.leaniot.cn/red-middleware/mongo:3.2.21
+    image: mongo
     container_name: mongo
     restart: always
-    # ports:
-    #  - "27017:27017"
+    ports:
+      - "27017:27017"
     volumes:
       - $PWD/mongo/data:/data/db
       - $PWD/mongo/log:/var/log/mongodb/mongod.log
@@ -37,8 +37,8 @@ services:
   redis:
     image: redis
     container_name: redis
-    # ports:
-    #     - "6379:6379"
+    ports:
+      - "6379:6379"
     volumes:
       - $PWD/redis:/data
     restart: always
