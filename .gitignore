@@ -5,3 +5,4 @@ app.pyc
 instance/
 log/
 util/__pycache__
+deploy/
