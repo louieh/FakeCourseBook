@@ -3,6 +3,6 @@ __pycache__/
 classnumbers.xlsx
 app.pyc
 instance/
-log/
+update_data/log/
 util/__pycache__
 deploy/
