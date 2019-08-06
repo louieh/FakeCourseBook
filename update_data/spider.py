@@ -81,7 +81,7 @@ class Spider(object):
         else:
             prefix = self.all_prefix
             term = self.all_term
-        resps = self.download(prefix, term)
+        resps = self.download(term, prefix)
         self.parse(resps)
 
     def get_prefix(self):  # get all prefix of courses

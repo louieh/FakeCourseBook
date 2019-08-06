@@ -13,7 +13,8 @@ REDIS_PORT = 6379
 REDIS_UPDATE_TIME_KEY = 'DATA_UPDATE_TIME'
 
 # base uri
-BASE_URI = 'https://coursebook.utdallas.edu/{0}/term_{1}'
+# BASE_URI = 'https://coursebook.utdallas.edu/{0}/term_{1}'
+BASE_URI = 'https://coursebook.utdallas.edu/term_{1}/cp_{0}'
 BASE_URL_FOR_PREFIX = 'https://coursebook.utdallas.edu/guidedsearch'
 
 # term and prefix
@@ -34,8 +35,9 @@ FAKE_HEADER = {
     "Accept-Encoding": "gzip, deflate, br",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,ja;q=0.6",
     "DNT": "1",
+    "Connection": "keep-alive",
     "Host": "coursebook.utdallas.edu",
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36",
 }
 ENCODING = 'utf-8'
 

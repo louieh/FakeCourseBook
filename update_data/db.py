@@ -29,7 +29,7 @@ class DB(object):
             return True
         except:
             print('init redis error.')
-            return True
+            return False
 
     def init_mongo(self):
         self.mongo_client = MongoClient(self.mongo_host, self.mongo_port)
