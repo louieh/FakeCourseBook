@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from . import setting, downloader, parser, db
+import setting, downloader, parser, db
 from urllib.parse import urljoin
 
 
@@ -12,8 +12,8 @@ class Spider(object):
                  current_prefix=setting.CURRENT_PREFIX_LIST,
                  all_prefix=setting.ALL_PREFIX_LIST, header=None):
         self.downloader = None
-        self.mongo_client = None
-        self.redis_client = None
+        self.db = None
+        self.parser = None
         self.base_uri = base_uri
         self.all_term = all_term
         self.all_prefix = all_prefix
@@ -26,9 +26,11 @@ class Spider(object):
         self.downloader = downloader.Downloader()
 
     def init_db(self):
-        DB = db.DB()
-        self.redis_client = DB.get_redis()
-        self.mongo_client = DB.get_mongo()
+        self.db = db.DB()
+        r = self.db.init_redis()
+        m = self.db.init_mongo()
+        if not (r or m):
+            return False
 
     def init_parser(self):
         self.parser = parser.Parser()
@@ -54,12 +56,19 @@ class Spider(object):
             self.init_parser()
         if self.parser:
             self.parser.get_selector(resps)
-            self.parser.parse_data()
+            final_dict_list = self.parser.parse_data()
+            if not self.db:
+                self.init_db()
+            self.db.insert_mongo(final_dict_list)
         else:
             print('init parse failed.')
             return
 
     def update_data(self):
+        if not self.db:
+            if not self.init_db():
+                print('init db error')
+                return
         if self.update_for_search:
             prefix = self.current_prefix
             term = self.current_term

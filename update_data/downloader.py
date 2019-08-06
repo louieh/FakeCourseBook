@@ -4,9 +4,6 @@ import setting
 import requests
 
 
-# import log
-
-
 class Downloader(object):
     def __init__(self, header=setting.FAKE_HEADER):
         self.header = header

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from . import setting
+import setting
 from lxml import html
 
 
@@ -137,3 +137,4 @@ class Parser(object):
                 each_course_dict['class_isFull'] = class_ifFull[0]
             # pprint.pprint(each_course_dict)
             final_dict_list.append(each_course_dict)
+        return final_dict_list
