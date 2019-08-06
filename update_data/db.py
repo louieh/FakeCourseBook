@@ -29,7 +29,7 @@ class DB(object):
             return True
         except:
             print('init redis error.')
-            return False
+            return True
 
     def init_mongo(self):
         self.mongo_client = MongoClient(self.mongo_host, self.mongo_port)
@@ -42,6 +42,9 @@ class DB(object):
             return False
 
     def insert_mongo(self, data, just_update=False, **kwargs):
+        if not data:
+            print('insert_mongo: no data')
+            return
         if not self.mongo_client:
             self.init_mongo()
         collection, collection_name = (self.db.CourseForSearch, self.col_name_search) if self.update_for_search else (

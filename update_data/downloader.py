@@ -20,6 +20,7 @@ class Downloader(object):
         resps = []
         for url in urls:
             try:
+                print('download url: {0}'.format(url))
                 resp = self.session.get(url, headers=self.header)
             except requests.exceptions.ConnectionError as e:
                 pass

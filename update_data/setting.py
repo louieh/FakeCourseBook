@@ -22,7 +22,7 @@ ALL_TERM_LIST = ['19F', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', 
                  '10U', '10S']
 CURRENT_TERM_LIST = ['19F', '19S']
 ALL_PREFIX_LIST = ['CS', 'CE', 'EE', 'SE']
-CURRENT_PREFIX_LIST = ['CS', 'CE', 'EE', 'SE']
+CURRENT_PREFIX_LIST = ['CS']
 
 #
 UPDATE_FRO_SEARCH = True

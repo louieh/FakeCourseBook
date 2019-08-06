@@ -19,7 +19,7 @@ class Spider(object):
         self.all_prefix = all_prefix
         self.current_term = current_term
         self.current_prefix = current_prefix
-        self.header = header
+        self.header = {} if header is None else header
         self.update_for_search = update_for_search
 
     def init_downloader(self):
@@ -29,29 +29,35 @@ class Spider(object):
         self.db = db.DB()
         r = self.db.init_redis()
         m = self.db.init_mongo()
-        if not (r or m):
+        if not r or not m:
             return False
+        else:
+            return True
 
     def init_parser(self):
         self.parser = parser.Parser()
 
-    def download(self, term, perfix, **kwargs):
+    def download(self, term, prefix, **kwargs):
         kwargs.update(self.header)
         if not self.downloader:
             self.init_downloader()
         if self.downloader:
             urls = []
+            print("term, prefix: {0},{1}".format(term, prefix))
             for each_term in term:
-                for each_prefix in perfix:
+                for each_prefix in prefix:
                     url = self.base_uri.format(each_prefix, each_term)
                     urls.append(url)
-                    resps = self.downloader.download(urls, **kwargs)
-                    return resps
+            resps = self.downloader.download(urls, **kwargs)
+            return resps
         else:
             print('init downloader failed.')
             return
 
     def parse(self, resps):
+        if not resps:
+            print('no resps')
+            return
         if not self.parser:
             self.init_parser()
         if self.parser:
