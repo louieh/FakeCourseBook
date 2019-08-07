@@ -10,7 +10,7 @@ COLLECTION_NAME_FOR_SEARCH = 'CourseForSearch'
 COLLECTION_NAME_FOR_GRAPH = 'CourseForGraph'
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
-REDIS_UPDATE_TIME_KEY = 'DATA_UPDATE_TIME'
+REDIS_UPDATE_TIME_KEY = 'data_update_time'
 
 # base uri
 # BASE_URI = 'https://coursebook.utdallas.edu/{0}/term_{1}'
@@ -22,7 +22,7 @@ ALL_TERM_LIST = ['19F', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', 
                  '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
                  '10U', '10S']
 CURRENT_TERM_LIST = ['19F', '19S']
-ALL_PREFIX_LIST = ['CS', 'CE', 'EE', 'SE']
+ALL_PREFIX_LIST = ['CS']
 CURRENT_PREFIX_LIST = ['CS']
 
 #
