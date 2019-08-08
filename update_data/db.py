@@ -3,6 +3,7 @@
 import setting
 import redis
 from pymongo import MongoClient
+from log import logger
 
 
 class DB(object):
@@ -41,35 +42,37 @@ class DB(object):
             print('init mongo error.')
             return False
 
-    def insert_mongo(self, data, just_update=False, **kwargs):
+    def insert_mongo_for_SG(self, data, just_update=False, **kwargs):
         if not data:
-            print('insert_mongo: no data')
+            logger.info('insert_mongo: no data')
             return
         if not self.mongo_client:
             self.init_mongo()
-        collection, collection_name = (self.db.CourseForSearch, self.col_name_search) if self.update_for_search else (
+
+        collection, collection_name = (
+            self.db.CourseForSearch, self.col_name_search) if self.update_for_search else (
             self.db.CourseForGraph, self.col_name_graph)
         try:
             self.db.temp.insert_many(data)
         except Exception as e:
-            print('insert temp collection failed: {0}'.format(str(e)))
+            logger.error('insert temp collection failed: {0}'.format(str(e)))
             self.db.temp.drop()
-            print('drop temp collection')
+            logger.info('drop temp collection')
             return
 
         try:
             collection.drop()
-            print('the old collection has dropped')
+            logger.info('the old collection has dropped')
         except Exception as e:
-            print('the old collection drop failed: {0}'.format(str(e)))
+            logger.error('the old collection drop failed: {0}'.format(str(e)))
             self.db.temp.drop()
             return
 
         try:
             self.db.temp.rename(collection_name)
-            print('db.temp has rename to {0}'.format(collection_name))
+            logger.info('db.temp has rename to {0}'.format(collection_name))
         except Exception as e:
-            print('db.temp rename to {0} error'.format(collection_name))
+            logger.error('db.temp rename to {0} error'.format(collection_name))
             return
 
         self.insert_redis(setting.TIMENOW_UTC())
@@ -82,5 +85,6 @@ class DB(object):
             self.init_redis()
         try:
             self.redis_client.set(key_prefix, data)
+            logger.info('set redis key OK.')
         except Exception as e:
-            print('insert redis failed: {0}'.format(str(e)))
+            logger.error('insert redis failed: {0}'.format(str(e)))

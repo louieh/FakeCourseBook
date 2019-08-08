@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import setting
 import requests
+from log import logger
 
 
 class Downloader(object):
@@ -20,18 +21,18 @@ class Downloader(object):
         resps = []
         for url in urls:
             try:
-                print('download url: {0}'.format(url))
+                logger.info('download url: {0}'.format(url))
                 resp = self.session.get(url, headers=self.header)
             except requests.exceptions.ConnectionError as e:
-                pass
-                # log.logger.error('Unable to download the webpage: {0}'.format(url))
+                logger.error('Unable to download the webpage: {0}'.format(url))
+                return
             except Exception as e:
-                pass
-                # log.logger.error('other error: {0}'.format(str(e)))
+                logger.error('other error: {0}'.format(str(e)))
+                return
             if resp.status_code == 200:
                 resps.append(resp)
             else:
-                pass
-                # log.logger.error('the status_code:{0}'.format(resp.status_code))
+                logger.error('the status_code:{0}'.format(resp.status_code))
+                return
 
         return resps

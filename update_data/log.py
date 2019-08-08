@@ -1,24 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-import sys
 import logging
+import os
 from logging.handlers import TimedRotatingFileHandler
 
-logger = logging.getLogger()
+THIS_DIR = os.path.split(os.path.realpath(__file__))[0]
 
-log_path = './log/'
 
-fp = logging.handlers.RotatingFileHandler(log_path + "datainsert.log", mode='a', maxBytes=1 * 1024 * 1024,
-                                          backupCount=10)
-logger.addHandler(fp)
+def get_logger():
+    fmt = "%(asctime)s-%(name)s pid=%(process)d %(filename)s " + \
+          "%(funcName)s %(lineno)s %(levelname)s %(message)s"
 
-std = logging.StreamHandler(sys.stderr)
-logger.addHandler(std)
+    logging.basicConfig(format=fmt)
+    logger = logging.getLogger('update_data')
+    logger.setLevel(logging.INFO)
 
-formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] [%(filename)s] [%(lineno)d]- %(message)s")
-fp.setFormatter(formatter)
-std.setFormatter(formatter)
+    log_path = os.path.join(THIS_DIR, 'logs')
+    if not os.path.exists(log_path):
+        os.mkdir(log_path)
 
-logger.setLevel(logging.NOTSET)
+    handler = TimedRotatingFileHandler(os.path.join(log_path, 'update_data.log'),
+                                       when='D', interval=1, backupCount=30)
+    handler.setFormatter(logging.Formatter(fmt))
+    handler.suffix = "%Y-%m-%d_%H-%M-%S.log"
+    logger.addHandler(handler)
+    return logger
+
+
+logger = get_logger()

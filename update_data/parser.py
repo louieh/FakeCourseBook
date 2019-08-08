@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import setting
 from lxml import html
+from log import logger
 
 
 class Parser(object):
@@ -20,7 +21,9 @@ class Parser(object):
                 resp_selector = html.etree.HTML(resp_text)
                 self.selectors.append(resp_selector)
             except Exception as e:
-                print("parser: etree failed: {0},{1}".format(repr(e), resp_url))
+                logger.error("parser: etree failed: {0},{1}".format(repr(e), resp_url))
+                return
+        return True
 
     def parse_prefix(self):
         all_prefix = []
@@ -38,9 +41,8 @@ class Parser(object):
         for selector in self.selectors:
             courses = selector.xpath('''.//div[@class="section-list"]//tbody/tr''')
             if not courses:
-                # log.logger.error("xpath changed? no courses")
-                print("xpath changed? no courses")
-                return False
+                logger.error("xpath changed? no courses")
+                return
             for each_course in courses:
                 each_course_text = html.etree.tostring(each_course, method='html')
                 each_course_text_group.append(each_course_text)
