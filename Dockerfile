@@ -9,7 +9,8 @@ COPY instance instance
 COPY static static
 COPY templates templates
 COPY util util
-COPY app.py log.py update_data.py ./
+COPY update_data update_data
+COPY app.py ./
 
 EXPOSE 9000
 CMD ["gunicorn", "-w", "4", "-b", ":9000", "--log-level", "debug", "app:app"]
