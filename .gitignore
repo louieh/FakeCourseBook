@@ -6,3 +6,4 @@ instance/
 update_data/logs/
 util/__pycache__
 deploy/
+*.app
