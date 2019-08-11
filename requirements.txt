@@ -8,3 +8,4 @@ telepot==12.7
 WTForms==2.2.1
 redis==3.3.0
 Requests==2.22.0
+gunicorn==19.9.0
