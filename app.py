@@ -17,7 +17,10 @@ import os
 import redis
 from collections import OrderedDict
 
-client = MongoClient("localhost", 27017)
+MONGO_HOST = os.getenv('MONGO_HOST')
+MONGO_PORT = int(os.getenv('MONGO_PORT'))
+REDIS = os.getenv('REDIS')
+client = MongoClient(MONGO_HOST, MONGO_PORT)
 db = client.Coursebook
 collection = db.CourseForSearch
 TIMEDELTA = 5  # summer time
@@ -29,8 +32,8 @@ moment = Moment(app)
 
 def getDataupdatetime():
     try:
-        redis_url = redis.StrictRedis.from_url('localhost')
-        data_update_time = redis_url.get('data_update_time')
+        redis_client = redis.StrictRedis.from_url(REDIS)
+        data_update_time = redis_client.get('data_update_time')
     except:
         return None
     return data_update_time
