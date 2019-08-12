@@ -4,12 +4,13 @@ import os
 import datetime
 
 # db
-MONGO_HOST = 'localhost'
-MONGO_PORT = 27017
+MONGO_HOST = os.getenv('MONGO_HOST', 'mongo')
+MONGO_PORT = int(os.getenv('MONGO_PORT', 27017))
 COLLECTION_NAME_FOR_SEARCH = 'CourseForSearch'
 COLLECTION_NAME_FOR_GRAPH = 'CourseForGraph'
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
+REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379')
 REDIS_UPDATE_TIME_KEY = 'data_update_time'
 
 # base uri
