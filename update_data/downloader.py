@@ -12,6 +12,7 @@ class Downloader(object):
         self.session = requests.Session()
 
     def download(self, urls, **kwargs):
+        # TODO multiple proce
         if not urls:
             return
         if not isinstance(urls, list):
