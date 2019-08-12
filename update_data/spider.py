@@ -64,9 +64,8 @@ class Spider(object):
         if self.__parser:
             logger.info('download completed, parse start...')
             if self.update_method == 1:
-                if self.__parser.get_selector(resps):
-                    final_dict_list = self.__parser.parse_data()
-                    return final_dict_list
+                final_dict_list = self.__parser.parse_data(resps)
+                return final_dict_list
             else:
                 logger.error('no match update method')
                 return
