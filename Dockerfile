@@ -12,5 +12,7 @@ COPY util util
 COPY update_data update_data
 COPY app.py ./
 
+RUN apt-get update && apt-get install -y vim
+
 EXPOSE 9000
 CMD ["gunicorn", "-w", "4", "-b", ":9000", "--log-level", "debug", "app:app"]
