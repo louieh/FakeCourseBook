@@ -3,6 +3,9 @@
 import setting
 import requests
 from log import logger
+from concurrent import futures
+
+MAX_WORKERS = 20
 
 
 class Downloader(object):
@@ -10,30 +13,31 @@ class Downloader(object):
         self.header = header
         self.proxy = ''
         self.session = requests.Session()
+        self.resps = []
+
+    def download_tool(self, url):
+        if not url:
+            return
+
+        try:
+            logger.info('download url: {0}'.format(url))
+            resp = self.session.get(url, headers=self.header)
+        except requests.exceptions.ConnectionError as e:
+            logger.error('Unable to download the webpage: {0}'.format(url))
+            return
+        except Exception as e:
+            logger.error('other error: {0}'.format(str(e)))
+            return
+        if resp.status_code == 200:
+            self.resps.append(resp)
+        else:
+            logger.error('the status_code:{0}'.format(resp.status_code))
+            return
 
     def download(self, urls, **kwargs):
-        # TODO multiple proce
-        if not urls:
-            return
-        if not isinstance(urls, list):
-            urls = [urls]
         header = kwargs.get('header', {})
         self.header.update(header)
-        resps = []
-        for url in urls:
-            try:
-                logger.info('download url: {0}'.format(url))
-                resp = self.session.get(url, headers=self.header)
-            except requests.exceptions.ConnectionError as e:
-                logger.error('Unable to download the webpage: {0}'.format(url))
-                return
-            except Exception as e:
-                logger.error('other error: {0}'.format(str(e)))
-                return
-            if resp.status_code == 200:
-                resps.append(resp)
-            else:
-                logger.error('the status_code:{0}'.format(resp.status_code))
-                return
-
-        return resps
+        workers = min(MAX_WORKERS, len(urls))
+        with futures.ThreadPoolExecutor(workers) as executor:
+            executor.map(self.download_tool, urls)
+        return self.resps
