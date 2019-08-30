@@ -211,7 +211,7 @@
                                     {% else %}
                                         {% for eachinstructor in course['class_instructor'] %}
                                             {% if eachinstructor != '-Staff-' %}
-                                                <a href={{ url_for('findrate', name=eachinstructor) }} target="_blank"
+                                                <a href={{ url_for('main.findrate', name=eachinstructor) }} target="_blank"
                                                    name="ratemyprofessors">{{ eachinstructor }}</a>
                                             {% else %}
                                                 {{ eachinstructor }}

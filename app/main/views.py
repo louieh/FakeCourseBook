@@ -1,21 +1,13 @@
-from flask import Flask, request, redirect, url_for, session, escape, jsonify, abort
-from flask import render_template
-from flask_moment import Moment
-from flask_wtf import Form
-from wtforms import StringField, SubmitField
-from wtforms.validators import Required
-from flask_bootstrap import Bootstrap
-from flask import g
+import datetime
+from flask import render_template, session, redirect, url_for, jsonify, request, abort
+from . import main
 
 from pymongo import MongoClient
 import re
 import datetime
 import json
 import requests
-import logging
-import os
 import redis
-from collections import OrderedDict
 from update_data import setting
 
 MONGO_HOST = setting.MONGO_HOST
@@ -25,10 +17,6 @@ client = MongoClient(MONGO_HOST, MONGO_PORT)
 db = client.Coursebook
 collection = db.CourseForSearch
 TIMEDELTA = 5  # summer time
-
-app = Flask(__name__, instance_relative_config=True)
-app.config.from_pyfile('config.py')
-moment = Moment(app)
 
 
 def getDataupdatetime():
@@ -57,17 +45,17 @@ def getRateId(name):
         return None, 'parsefail'
 
 
-@app.before_first_request
+@main.before_app_first_request
 def before_first_request():
     session['DATA_SOURCE'] = '19F'  # 19F/19S
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@main.route('/login', methods=['GET', 'POST'])
 def login():
     return render_template('login.html')
 
 
-@app.route('/findrate/<name>')
+@main.route('/findrate/<name>')
 def findrate(name):
     pk_id, reason = getRateId(name)
     if not pk_id:
@@ -77,14 +65,14 @@ def findrate(name):
     return redirect('http://www.ratemyprofessors.com/ShowRatings.jsp?tid=%s' % pk_id)
 
 
-@app.route('/changesource/<source>')
+@main.route('/changesource/<source>')
 def changesource(source):
     session['DATA_SOURCE'] = source
     data = list(collection.find({"class_term": source}, {"_id": 0}))
     return jsonify(data)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@main.route('/', methods=['GET', 'POST'])
 def search():
     term = session.get("DATA_SOURCE", "19F")  # get term first
 
@@ -121,7 +109,7 @@ def search():
         session['item_dict'] = item_dict
         session['fuzzyquery'] = fuzzyquery
         session['button'] = 'nowclass' if 'nowclass' in request.form else 'search'
-        return redirect(url_for('search'))
+        return redirect(url_for('main.search'))
 
     if item_dict and session.get('button') == 'search':
         if session.get('fuzzyquery'):
@@ -161,10 +149,10 @@ def search():
                            data_update_time=data_update_time)
 
 
-@app.route('/graph/professor/')
-@app.route('/graph/professor/<professor>')
-@app.route('/graph/course')
-@app.route('/graph/course/<coursesection>')
+@main.route('/graph/professor/')
+@main.route('/graph/professor/<professor>')
+@main.route('/graph/course')
+@main.route('/graph/course/<coursesection>')
 def graph_pro(professor=None, coursesection=None):
     terms = ['19F', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
              '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
@@ -250,7 +238,7 @@ def graph_pro(professor=None, coursesection=None):
                                course_json=final_dict)
 
 
-@app.route('/jobinfo')
+@main.route('/jobinfo')
 def jobinfo():
     job_filter, num = get_jobinfo_args()
     if db.JobInfo.find(job_filter).count() - num <= 10:
@@ -283,7 +271,7 @@ def get_jobinfo_args():
     return job_filter, num
 
 
-@app.route('/jobinfodata')
+@main.route('/jobinfodata')
 def jobinfodata():
     job_filter, num = get_jobinfo_args()
 
@@ -308,17 +296,3 @@ firm_dict = {
     '2': 'baidu',
     '3': 'bilibili',
 }
-
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
-
-
-if __name__ == '__main__':
-    app.run()
