@@ -1,4 +1,5 @@
 .idea
+.env
 __pycache__/
 classnumbers.xlsx
 app.pyc
