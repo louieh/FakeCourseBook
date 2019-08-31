@@ -144,7 +144,6 @@ def search():
     session['button'] = None
     data_update_time = getDataupdatetime()
     if data_update_time:
-        data_update_time = str(data_update_time, encoding='utf-8')
         data_update_time = datetime.datetime.strptime(data_update_time, "%Y-%m-%d %H:%M")
 
     return render_template('search.html', data=courses_list, Filter=item_dict,
