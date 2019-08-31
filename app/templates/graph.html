@@ -54,7 +54,7 @@
         <div class="container">
             <div class="row">
                 {% if professor_name %}
-                    <h2><a href={{ url_for('findrate', name=professor_name) }} target="_blank"
+                    <h2><a href={{ url_for('main.findrate', name=professor_name) }} target="_blank"
                            name="ratemyprofessors">{{ professor_name }}</a></h2>
                     {% set datasource=professor_json %}
                 {% elif course_name %}
