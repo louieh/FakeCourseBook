@@ -1,7 +1,6 @@
-from flask import Flask, request, redirect, url_for, session, escape, jsonify, abort
-from flask import render_template
+from flask import Flask
 from flask_moment import Moment
-from flask import g
+
 from config import config
 
 moment = Moment()
