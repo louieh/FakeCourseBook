@@ -1,28 +1,20 @@
-import datetime
 from flask import render_template, session, redirect, url_for, jsonify, request, abort
+from flask import current_app
 from . import main
-
 from pymongo import MongoClient
 import re
 import datetime
 import json
 import requests
 import redis
-from update_data import setting
 
-MONGO_HOST = setting.MONGO_HOST
-MONGO_PORT = setting.MONGO_PORT
-REDIS_URL = setting.REDIS_URL
-client = MongoClient(MONGO_HOST, MONGO_PORT)
-db = client.Coursebook
-collection = db.CourseForSearch
 TIMEDELTA = 5  # summer time
 
 
 def getDataupdatetime():
     try:
-        redis_client = redis.StrictRedis.from_url(REDIS_URL)
-        data_update_time = redis_client.get('data_update_time')
+        redis_client = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+        data_update_time = redis_client.get(REDIS_UPDATE_TIME_KEY)
     except:
         return None
     return data_update_time
@@ -48,6 +40,16 @@ def getRateId(name):
 @main.before_app_first_request
 def before_first_request():
     session['DATA_SOURCE'] = '19F'  # 19F/19S
+
+    global collection, db, REDIS_HOST, REDIS_PORT, REDIS_UPDATE_TIME_KEY
+    REDIS_UPDATE_TIME_KEY = 'data_update_time'
+    MONGO_HOST = current_app.config.get('MONGO_HOST')
+    MONGO_PORT = current_app.config.get('MONGO_PORT')
+    REDIS_HOST = current_app.config.get('REDIS_HOST')
+    REDIS_PORT = current_app.config.get('REDIS_PORT')
+    client = MongoClient(MONGO_HOST, MONGO_PORT)
+    db = client.Coursebook
+    collection = db.CourseForSearch
 
 
 @main.route('/login', methods=['GET', 'POST'])

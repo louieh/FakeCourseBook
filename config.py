@@ -11,8 +11,14 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    MONGO_URI = None
-    REDIS_URI = None
+    MONGO_HOST = os.getenv('MONGO_HOST', 'mongo')
+    MONGO_PORT = int(os.getenv('MONGO_PORT', 27017))
+    COLLECTION_NAME_FOR_SEARCH = 'CourseForSearch'
+    COLLECTION_NAME_FOR_GRAPH = 'CourseForGraph'
+    REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
+    REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+    REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379')
+    REDIS_UPDATE_TIME_KEY = 'data_update_time'
 
     @staticmethod
     def init_app(app):
