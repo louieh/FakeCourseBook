@@ -39,7 +39,7 @@ def getRateId(name):
 
 @main.before_app_first_request
 def before_first_request():
-    session['DATA_SOURCE'] = '19F'  # 19F/19S
+    session['DATA_SOURCE'] = '20S'  # 19F/19S
 
     global collection, db, REDIS_HOST, REDIS_PORT, REDIS_UPDATE_TIME_KEY
     REDIS_UPDATE_TIME_KEY = 'data_update_time'

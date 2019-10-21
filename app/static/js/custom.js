@@ -3,12 +3,12 @@
  */
 function labelSwitcher() {
     var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
-    if (data_source_now == '19F') {
-        document.getElementById('19F').classList.add('active');
-        document.getElementById('19S').classList.remove('active');
-    } else {
-        document.getElementById('19S').classList.add('active');
+    if (data_source_now == '20S') {
+        document.getElementById('20S').classList.add('active');
         document.getElementById('19F').classList.remove('active');
+    } else {
+        document.getElementById('19F').classList.add('active');
+        document.getElementById('20S').classList.remove('active');
     }
     setOpenStatus()
 }
