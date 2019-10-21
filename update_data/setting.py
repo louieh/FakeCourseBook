@@ -19,10 +19,11 @@ BASE_URI = 'https://coursebook.utdallas.edu/term_{1}/cp_{0}'
 BASE_URL_FOR_PREFIX = 'https://coursebook.utdallas.edu/guidedsearch'
 
 # term and prefix
-ALL_TERM_LIST = ['19F', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
+ALL_TERM_LIST = ['20S', '19F', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U',
+                 '15S',
                  '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
                  '10U', '10S']
-CURRENT_TERM_LIST = ['19F', '19S']
+CURRENT_TERM_LIST = ['20S', '19F']
 ALL_PREFIX_LIST = ['CS']
 CURRENT_PREFIX_LIST = ['CS']
 
