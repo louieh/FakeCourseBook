@@ -392,7 +392,6 @@ function setdataForjobinfo(newData) {
 }
 
 function add_shadow(e) {
-    console.log("this is test_tr_onclick function.");
     var shadow_class_name = 'shadow-lg p-3 mb-5 bg-white rounded';
     if ($(e).hasClass(shadow_class_name))
         e.className -= shadow_class_name;
