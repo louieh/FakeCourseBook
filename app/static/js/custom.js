@@ -392,7 +392,7 @@ function setdataForjobinfo(newData) {
 }
 
 function add_shadow(e) {
-    var shadow_class_name = 'shadow-lg p-3 mb-5 bg-white rounded';
+    var shadow_class_name = 'font-weight-bold shadow-lg p-3 mb-5 bg-white rounded';
     if ($(e).hasClass(shadow_class_name))
         e.className = "";
     else e.className += shadow_class_name;
