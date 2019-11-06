@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import spider
+import setting
 from log import logger
 from apscheduler.schedulers.background import BackgroundScheduler, BlockingScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
@@ -19,5 +20,5 @@ executors = {
 timer = BlockingScheduler(executors=executors)
 
 if __name__ == "__main__":
-    timer.add_job(main, 'interval', hours=6)
+    timer.add_job(main, 'interval', hours=setting.UPDATE_INTERVAL)
     timer.start()

@@ -28,7 +28,7 @@ ALL_PREFIX_LIST = ['CS']
 CURRENT_PREFIX_LIST = ['CS']
 
 #
-UPDATE_FRO_SEARCH = True
+UPDATE_FRO_SEARCH = bool(os.getenv('UPDATE_FOR_SEARCH', True))
 GRADUATE_LEVEL = True
 
 # header
@@ -44,6 +44,9 @@ FAKE_HEADER = {
 ENCODING = 'utf-8'
 
 # get time
-TIMEDELTA = 5
+TIMEDELTA = 6
 TIMENOW = lambda: (datetime.datetime.utcnow() - datetime.timedelta(hours=TIMEDELTA)).strftime("%Y-%m-%d %H:%M")
 TIMENOW_UTC = lambda: datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+
+# update_interval
+UPDATE_INTERVAL = float(os.getenv('UPDATE_INTERVAL', 0.5))
