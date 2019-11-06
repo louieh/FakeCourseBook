@@ -9,8 +9,8 @@ from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 
 
 def main():
-    spider = spider.Spider(update_method=1)
-    spider.update_data()
+    Spider = spider.Spider(update_method=1)
+    Spider.update_data()
 
 
 executors = {
