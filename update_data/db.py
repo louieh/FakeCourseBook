@@ -49,9 +49,19 @@ class DB(object):
         if not self.mongo_client:
             self.init_mongo()
 
-        collection, collection_name = (
-            self.db.CourseForSearch, self.col_name_search) if self.update_for_search else (
-            self.db.CourseForGraph, self.col_name_graph)
+        collection_dump, collection, collection_name = (
+            self.db.CourseForSearch_dump, self.db.CourseForSearch,
+            self.col_name_search) if self.update_for_search else (self.db.CourseForGraph_dump,
+                                                                  self.db.CourseForGraph, self.col_name_graph)
+
+        # there are three collection:
+        # temp, CourseForSearch, CourseForSearch_dump
+        # 1. generate temp
+        # 2. delete CourseForSearch_dump
+        # 3. rename CourseForSearch to CourseForSearch_dump
+        # 4. rename temp to CourseForSearch
+
+        # generate collection temp
         try:
             self.db.temp.insert_many(data)
         except Exception as e:
@@ -60,19 +70,31 @@ class DB(object):
             logger.info('drop temp collection')
             return
 
+        # drop the old collection
         try:
-            collection.drop()
-            logger.info('the old collection has dropped')
+            collection_dump.drop()
+            logger.info('the collection dump has dropped')
         except Exception as e:
-            logger.error('the old collection drop failed: {0}'.format(str(e)))
+            logger.error('the collection dump drop failed: {0}'.format(str(e)))
             self.db.temp.drop()
             return
 
+        # rename collection to collection_dump
+        try:
+            collection.rename(collection_name + "dump")
+            logger.info('collection has rename to {0}'.format(collection_name + "dump"))
+        except Exception as e:
+            logger.error('collection rename to {0} failed'.format(collection_name + "dump"))
+            collection.drop()
+            logger.info('collection has been dropped')
+
+        # rename temp to collection
         try:
             self.db.temp.rename(collection_name)
             logger.info('db.temp has rename to {0}'.format(collection_name))
         except Exception as e:
             logger.error('db.temp rename to {0} error'.format(collection_name))
+            self.db.temp.drop()
             return
 
         self.insert_redis(setting.TIMENOW_UTC())
