@@ -29,24 +29,24 @@ class Parser(object):
                 logger.error("xpath changed? no courses")
                 return
             for each_course in courses:
-                each_course_text = html.etree.tostring(each_course, method='html')
-                each_course_dict = {
-                    'class_term': '',
-                    'class_status': '',
-                    'class_prefix': '',
-                    'class_section': '',
-                    'class_number': '',
-                    'class_title': '',
-                    'class_instructor': '',
-                    'class_day': '',
-                    'class_time': '',
-                    'class_start_time': '',
-                    'class_end_time': '',
-                    'class_location': '',
-                    'class_isFull': '',
-                }
-                each_course_selector = html.etree.HTML(each_course_text)
                 try:
+                    each_course_text = html.etree.tostring(each_course, method='html')
+                    each_course_dict = {
+                        'class_term': '',
+                        'class_status': '',
+                        'class_prefix': '',
+                        'class_section': '',
+                        'class_number': '',
+                        'class_title': '',
+                        'class_instructor': '',
+                        'class_day': '',
+                        'class_time': '',
+                        'class_start_time': '',
+                        'class_end_time': '',
+                        'class_location': '',
+                        'class_isFull': '',
+                    }
+                    each_course_selector = html.etree.HTML(each_course_text)
                     class_term_status = each_course_selector.xpath(
                         '''//td[1]//text()''')  # ['19S', 'Closed', '572/0.000293']
 
@@ -124,10 +124,10 @@ class Parser(object):
                         each_course_dict['class_isFull'] = class_ifFull[0]
                 except Exception as e:
                     logger.error("parser failed: {0}".format(str(e)))
-                    return
+                    continue
                 # pprint.pprint(each_course_dict)
                 final_dict_list.append(each_course_dict)
-        return final_dict_list
+        return final_dict_list if final_dict_list else None
 
     def parse_prefix(self):
         all_prefix = []
