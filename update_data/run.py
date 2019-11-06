@@ -20,5 +20,5 @@ executors = {
 timer = BlockingScheduler(executors=executors)
 
 if __name__ == "__main__":
-    timer.add_job(main, 'interval', hours=setting.UPDATE_INTERVAL)
+    timer.add_job(main, 'interval', minutes=setting.UPDATE_INTERVAL)
     timer.start()

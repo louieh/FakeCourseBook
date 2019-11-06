@@ -49,4 +49,4 @@ TIMENOW = lambda: (datetime.datetime.utcnow() - datetime.timedelta(hours=TIMEDEL
 TIMENOW_UTC = lambda: datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
 
 # update_interval
-UPDATE_INTERVAL = float(os.getenv('UPDATE_INTERVAL', 0.5))
+UPDATE_INTERVAL = float(os.getenv('UPDATE_INTERVAL', 360))
