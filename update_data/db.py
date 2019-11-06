@@ -13,7 +13,7 @@ class DB(object):
                  redis_port=setting.REDIS_PORT,
                  col_name_search=setting.COLLECTION_NAME_FOR_SEARCH,
                  col_name_graph=setting.COLLECTION_NAME_FOR_GRAPH,
-                 update_for_search=setting.UPDATE_FRO_SEARCH
+                 update_for_search=setting.UPDATE_FOR_SEARCH
                  ):
         self.mongo_host = mongo_host
         self.redis_host = redis_host
@@ -81,10 +81,10 @@ class DB(object):
 
         # rename collection to collection_dump
         try:
-            collection.rename(collection_name + "dump")
-            logger.info('collection has rename to {0}'.format(collection_name + "dump"))
+            collection.rename(collection_name + "_dump")
+            logger.info('collection has rename to {0}'.format(collection_name + "_dump"))
         except Exception as e:
-            logger.error('collection rename to {0} failed'.format(collection_name + "dump"))
+            logger.error('collection rename to {0} failed'.format(collection_name + "_dump"))
             collection.drop()
             logger.info('collection has been dropped')
 

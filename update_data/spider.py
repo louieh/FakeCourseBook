@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 
 class Spider(object):
     def __init__(self, update_method=None,
-                 update_for_search=setting.UPDATE_FRO_SEARCH,
+                 update_for_search=setting.UPDATE_FOR_SEARCH,
                  base_uri=setting.BASE_URI,
                  all_term=setting.ALL_TERM_LIST,
                  current_term=setting.CURRENT_TERM_LIST,

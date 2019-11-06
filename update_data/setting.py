@@ -28,7 +28,7 @@ ALL_PREFIX_LIST = ['CS']
 CURRENT_PREFIX_LIST = ['CS']
 
 #
-UPDATE_FRO_SEARCH = bool(os.getenv('UPDATE_FOR_SEARCH', True))
+UPDATE_FOR_SEARCH = True
 GRADUATE_LEVEL = True
 
 # header
