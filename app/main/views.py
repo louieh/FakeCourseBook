@@ -16,9 +16,10 @@ def getDataupdatetime():
     try:
         redis_client = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
         data_update_time = redis_client.get(REDIS_UPDATE_TIME_KEY)
+        data_update_next_time = redis_client.get(REDIS_UPDATE_NEXT_TIME_KEY)
     except:
         return None
-    return data_update_time
+    return data_update_time, data_update_next_time
 
 
 def getRateId(name):
@@ -42,8 +43,9 @@ def getRateId(name):
 def before_first_request():
     session['DATA_SOURCE'] = '20S'  # 19F/19S
 
-    global collection, db, REDIS_HOST, REDIS_PORT, REDIS_UPDATE_TIME_KEY
-    REDIS_UPDATE_TIME_KEY = 'data_update_time'
+    global collection, db, REDIS_HOST, REDIS_PORT, REDIS_UPDATE_TIME_KEY, REDIS_UPDATE_NEXT_TIME_KEY
+    REDIS_UPDATE_TIME_KEY = current_app.config.get('REDIS_UPDATE_TIME_KEY')
+    REDIS_UPDATE_NEXT_TIME_KEY = current_app.config.get('REDIS_UPDATE_NEXT_TIME_KEY')
     MONGO_HOST = current_app.config.get('MONGO_HOST')
     MONGO_PORT = current_app.config.get('MONGO_PORT')
     REDIS_HOST = current_app.config.get('REDIS_HOST')
@@ -143,12 +145,15 @@ def search():
     session['item_dict'] = None
     session['fuzzyquery'] = None
     session['button'] = None
-    data_update_time = getDataupdatetime()
-    if data_update_time:
-        data_update_time = datetime.datetime.strptime(data_update_time, "%Y-%m-%d %H:%M")
+    data_update_time, data_update_next_time = getDataupdatetime()
+    if data_update_time or data_update_next_time:
+        if data_update_time:
+            data_update_time = datetime.datetime.strptime(data_update_time, "%Y-%m-%d %H:%M")
+        if data_update_next_time:
+            data_update_next_time = datetime.datetime.strptime(data_update_next_time, "%Y-%m-%d %H:%M")
 
     return render_template('search.html', data=courses_list, Filter=item_dict,
-                           data_update_time=data_update_time)
+                           data_update_time=data_update_time, data_update_next_time=data_update_next_time)
 
 
 @main.route('/graph/professor/')

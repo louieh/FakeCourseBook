@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import setting
+from __init__ import config as setting
 import redis
 from pymongo import MongoClient
 from log import logger
@@ -97,16 +97,14 @@ class DB(object):
             self.db.temp.drop()
             return
 
-        self.insert_redis(setting.TIMENOW_UTC())
+        self.insert_redis()
 
-    def insert_redis(self, data, key_prefix=None, **kwargs):
-        if not key_prefix:
-            key_prefix = setting.REDIS_UPDATE_TIME_KEY
-
+    def insert_redis(self, **kwargs):
         if not self.redis_client:
             self.init_redis()
         try:
-            self.redis_client.set(key_prefix, data)
+            self.redis_client.set(setting.REDIS_UPDATE_TIME_KEY, setting.TIMENOW_UTC())
+            self.redis_client.set(setting.REDIS_UPDATE_NEXT_TIME_KEY, setting.TIMENOW_UTC_NEXT())
             logger.info('set redis key OK.')
         except Exception as e:
             logger.error('insert redis failed: {0}'.format(str(e)))

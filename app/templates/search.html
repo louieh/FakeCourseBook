@@ -112,15 +112,22 @@
                         </div>
                     </div>
                     <div class="row justify-content-between">
-                        <div class="col-4">
+                        <div class="col">
                             <button type="submit" name="search" class="btn btn-primary">Search</button>
                             <button type="submit" name="nowclass" class="btn btn-primary">At this moment</button>
                         </div>
-                        <div class="col-5">
+                        <div class="col-md-auto">
                             Last update:
                             {% if data_update_time %}
                                 {{ moment(data_update_time).format('LLL') }}
                             {% endif %}
+                            <br>
+                            Next update:
+                            {% if data_update_next_time %}
+                                {{ moment(data_update_next_time).format('LLL') }}
+                            {% endif %}
+                        </div>
+                        <div class="col col-lg-2">
                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                 <label class="btn btn-secondary active" id="20S" onclick="changesource('20S')">
                                     <input type="radio" id="option19F"
@@ -131,7 +138,6 @@
                                            autocomplete="off"> 19F
                                 </label>
                             </div>
-
                         </div>
                     </div>
 
