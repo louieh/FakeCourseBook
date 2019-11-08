@@ -2,7 +2,6 @@
 .env
 __pycache__/
 classnumbers.xlsx
-app.pyc
 update_data/logs/
 util/__pycache__
 deploy/
