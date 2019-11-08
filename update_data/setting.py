@@ -47,6 +47,9 @@ class Config(object):
             datetime.datetime.utcnow() + datetime.timedelta(minutes=Config.UPDATE_INTERVAL)).strftime(
         "%Y-%m-%d %H:%M")
 
+    # switch of updating next time key
+    UPDATE_NEXT_TIME_KEY = True
+
 
 class ProductionConfig(Config):
     # db

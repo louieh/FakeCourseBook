@@ -22,7 +22,9 @@ scheduler = BlockingScheduler(executors=executors)
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2 and ('-i' in sys.argv[1:] or '-I' in sys.argv[1:]):
+        setting.UPDATE_NEXT_TIME_KEY = False
         main()
+        setting.UPDATE_NEXT_TIME_KEY = True
     else:
         print("You may want to add -i or -I")
         print("Scheduler started...")
