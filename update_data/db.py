@@ -106,7 +106,9 @@ class DB(object):
             self.redis_client.set(setting.REDIS_UPDATE_TIME_KEY, setting.TIMENOW_UTC())
             if setting.UPDATE_NEXT_TIME_KEY:
                 self.redis_client.set(setting.REDIS_UPDATE_NEXT_TIME_KEY, setting.TIMENOW_UTC_NEXT())
+            else:
                 logger.info('did not update update next time key')
             logger.info('set redis key OK')
+
         except Exception as e:
             logger.error('insert redis failed: {0}'.format(str(e)))
