@@ -3,7 +3,7 @@
 
 import sys
 import spider
-import setting
+from __init__ import config as setting
 from log import logger
 from apscheduler.schedulers.background import BackgroundScheduler, BlockingScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor

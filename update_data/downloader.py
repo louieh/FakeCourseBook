@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import setting
+from __init__ import config as setting
 import requests
 from log import logger
 from concurrent import futures

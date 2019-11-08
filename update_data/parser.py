@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import setting
+from __init__ import config as setting
 from lxml import html
 from log import logger
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import setting, downloader, parser, db
+from __init__ import config as setting
+import downloader, parser, db
 from log import logger
 from urllib.parse import urljoin
 
