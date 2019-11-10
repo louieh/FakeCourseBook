@@ -6,7 +6,6 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 COPY app app
-COPY util util
 COPY config.py course_search.py ./
 
 EXPOSE 9000
