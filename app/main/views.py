@@ -8,9 +8,6 @@ import json
 import requests
 import redis
 
-# TIMEDELTA = 5  # summer time
-TIMEDELTA = 6  # winter time
-
 
 def getDataupdatetime():
     try:
@@ -41,9 +38,10 @@ def getRateId(name):
 
 @main.before_app_first_request
 def before_first_request():
-    session['DATA_SOURCE'] = '20S'  # 19F/19S
-
-    global collection, db, REDIS_HOST, REDIS_PORT, REDIS_UPDATE_TIME_KEY, REDIS_UPDATE_NEXT_TIME_KEY
+    global TIMEDELTA, collection, db, REDIS_HOST, REDIS_PORT, REDIS_UPDATE_TIME_KEY, REDIS_UPDATE_NEXT_TIME_KEY, TERM_LIST
+    TIMEDELTA = current_app.config.get('TIMEDELTA')
+    TERM_LIST = current_app.config.get('TERM_LIST')
+    session['DATA_SOURCE'] = TERM_LIST[0]  # first term
     REDIS_UPDATE_TIME_KEY = current_app.config.get('REDIS_UPDATE_TIME_KEY')
     REDIS_UPDATE_NEXT_TIME_KEY = current_app.config.get('REDIS_UPDATE_NEXT_TIME_KEY')
     MONGO_HOST = current_app.config.get('MONGO_HOST')
@@ -79,7 +77,7 @@ def changesource(source):
 
 @main.route('/', methods=['GET', 'POST'])
 def search():
-    term = session.get("DATA_SOURCE", "19F")  # get term first
+    term = session.get("DATA_SOURCE", TERM_LIST[0])  # get term first
 
     item_list = ["class_title", "class_number", "class_section", "class_instructor",
                  "class_day", "class_start_time",
@@ -161,10 +159,6 @@ def search():
 @main.route('/graph/course')
 @main.route('/graph/course/<coursesection>')
 def graph_pro(professor=None, coursesection=None):
-    terms = ['20S', '19F', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U', '15S',
-             '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
-             '10U', '10S']
-
     if not professor and not coursesection:
         if "graph/professor" in request.url:
             professor_set = set()
@@ -174,7 +168,7 @@ def graph_pro(professor=None, coursesection=None):
                     if "Staff" not in each:
                         professor_set.add(each)
             professor_char_dict = {}
-            for i in range(65, 91):  # 创建key为字母的字典，键值为空列表
+            for i in range(65, 91):  # use alphabet as key
                 professor_char_dict[chr(i)] = []
             for each_professor_name in professor_set:  # insert professor name to professor_char_dict based on the first letter of their name
                 professor_char_dict[each_professor_name[0]].append(each_professor_name)
@@ -199,7 +193,7 @@ def graph_pro(professor=None, coursesection=None):
             abort(404)
 
         term_dict_list = []
-        for eachterm in terms:
+        for eachterm in TERM_LIST:
             term_dict = {}
             course_dict_list = []
             all_course_list = list(
@@ -224,7 +218,7 @@ def graph_pro(professor=None, coursesection=None):
             course_name = all_course_list[0].get("class_title")
 
         term_dict = {}
-        for eachterm in terms:
+        for eachterm in TERM_LIST:
             term_dict[eachterm] = []
 
         for eachcourse_dict in all_course_list:
@@ -236,7 +230,7 @@ def graph_pro(professor=None, coursesection=None):
                     term_dict[term].append(temp_professorname_dict)
 
         final_list = []
-        for eachterm in terms:
+        for eachterm in TERM_LIST:
             temp_final_dict = {"name": eachterm, "children": term_dict.get(eachterm)}
             final_list.append(temp_final_dict)
         final_dict = {"name": coursesection, "children": final_list}

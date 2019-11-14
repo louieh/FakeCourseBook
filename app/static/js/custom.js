@@ -2,13 +2,15 @@
  * switch active of each label
  */
 function labelSwitcher() {
+    var term1 = '20S';
+    var term2 = '19F';
     var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
-    if (data_source_now == '20S') {
-        document.getElementById('20S').classList.add('active');
-        document.getElementById('19F').classList.remove('active');
+    if (data_source_now === term1) {
+        document.getElementById(term1).classList.add('active');
+        document.getElementById(term2).classList.remove('active');
     } else {
-        document.getElementById('19F').classList.add('active');
-        document.getElementById('20S').classList.remove('active');
+        document.getElementById(term2).classList.add('active');
+        document.getElementById(term1).classList.remove('active');
     }
     setOpenStatus()
 }
@@ -176,7 +178,7 @@ function setdataForSearch(newData) {
     }
 
     var trs = table.lastElementChild.children;
-    htmlTemplate1 = "<a href='https://catalog.utdallas.edu/2018/graduate/courses/%major%%tempInnerHTML_%' target='_blank'>%tempInnerHTML%</a>";
+    htmlTemplate1 = "<a href='https://catalog.utdallas.edu/2019/graduate/courses/%major%%tempInnerHTML_%' target='_blank'>%tempInnerHTML%</a>";
     htmlTemplate2 = "<a href='/findrate/%professorname%' target='_blank' name='ratemyprofessors'>%professorname%</a>";
 
     for (i = 0; i < trs.length; i++) {
