@@ -42,17 +42,23 @@ class DB(object):
             print('init mongo error.')
             return False
 
-    def insert_mongo_for_SG(self, data, just_update=False, **kwargs):
+    def insert_mongo_for_SG(self, data, **kwargs):
+        """
+        :param data: dict
+        :param kwargs:
+        :return:
+        """
         if not data:
             logger.info('insert_mongo: no data')
             return
         if not self.mongo_client:
             self.init_mongo()
 
-        collection_dump, collection, collection_name = (
+        collection_dump, collection, collection_name, data_for_search_graph = (
             self.db.CourseForSearch_dump, self.db.CourseForSearch,
-            self.col_name_search) if self.update_for_search else (self.db.CourseForGraph_dump,
-                                                                  self.db.CourseForGraph, self.col_name_graph)
+            self.col_name_search, data.get('UPDATE_FOR_SEARCH')) if self.update_for_search else (
+            self.db.CourseForGraph_dump,
+            self.db.CourseForGraph, self.col_name_graph, data.get('UPDATE_FOR_GRAPH'))
 
         # there are three collection:
         # temp, CourseForSearch, CourseForSearch_dump
@@ -63,7 +69,7 @@ class DB(object):
 
         # generate collection temp
         try:
-            self.db.temp.insert_many(data)
+            self.db.temp.insert_many(data_for_search_graph)
         except Exception as e:
             logger.error('insert temp collection failed: {0}'.format(str(e)))
             self.db.temp.drop()
@@ -96,8 +102,27 @@ class DB(object):
             logger.error('db.temp rename to {0} error'.format(collection_name))
             self.db.temp.drop()
             return
-
         self.insert_redis()
+
+        if 'UPDATE_FOR_SPEED' in data:
+            try:
+                for each_for_speed in data.get('UPDATE_FOR_SPEED'):
+                    if len(list(self.db.CourseForSpeed.find({'class_term': each_for_speed.get('class_term'),
+                                                             'class_number': each_for_speed.get('class_number')}))):
+                        self.db.CourseForSpeed.update({'class_term': each_for_speed.get('class_term'),
+                                                       'class_number': each_for_speed.get('class_number')}, {
+                                                          "$push": {'update_data': {
+                                                              'percentage': each_for_speed.get('class_isFull'),
+                                                              'timestamp': each_for_speed.get('timestamp')}}})
+                    else:
+                        each_for_speed.update({'update_data': [{'percentage': each_for_speed.get('class_isFull'),
+                                                                'timestamp': each_for_speed.get('timestamp')}]})
+                        each_for_speed.pop('class_isFull')
+                        each_for_speed.pop('timestamp')
+                        self.db.CourseForSpeed.insert_one(each_for_speed)
+                logger.info('update UPDATE_FOR_SPEED ok')
+            except Exception as e:
+                logger.error('update UPDATE_FOR_SPEED error: {0}'.format(str(e)))
 
     def insert_redis(self, **kwargs):
         if not self.redis_client:

@@ -65,7 +65,7 @@ class Spider(object):
         if self.__parser:
             logger.info('download completed, parse start...')
             if self.update_method == 1:
-                final_dict_list = self.__parser.parse_data(resps)
+                final_dict_list = self.__parser.parse_coursebook(resps)
                 return final_dict_list
             else:
                 logger.error('no match update method')
@@ -108,8 +108,8 @@ class Spider(object):
             logger.error('cannot find the update method')
             return
         resps = self.__download(urls)
-        final_data = self.__parse(resps)
-        self.__insert_db(final_data)
+        final_dict = self.__parse(resps)
+        self.__insert_db(final_dict)
 
     def get_prefix(self):  # get all prefix of courses
         base_url = setting.BASE_URL_FOR_PREFIX

@@ -3,6 +3,7 @@
 from __init__ import config as setting
 from lxml import html
 from log import logger
+import time
 
 
 class Parser(object):
@@ -20,8 +21,11 @@ class Parser(object):
             logger.error("parser: etree failed: {0},{1}".format(repr(e), resp_url))
             return
 
-    def parse_data(self, resps):
-        final_dict_list = []
+    def parse_coursebook(self, resps, **kwargs):
+        For_Speed_struc = setting.For_Speed_struc
+        # class time may change
+        For_Graph_struc = setting.For_Graph_struc
+        temp_dict_list = []
         for resp in resps:
             selector = self.get_selector(resp)
             courses = selector.xpath('''.//div[@class="section-list"]//tbody/tr''')
@@ -126,8 +130,38 @@ class Parser(object):
                     logger.error("parser failed: {0}".format(str(e)))
                     continue
                 # pprint.pprint(each_course_dict)
-                final_dict_list.append(each_course_dict)
-        return final_dict_list if final_dict_list else None
+                temp_dict_list.append(each_course_dict)
+        timestamp = int(time.time())
+        UPDATE_FOR_SEARCH_dict_list = []
+        UPDATE_FOR_GRAPH_dict_list = []
+        UPDATE_FOR_SPEED_dict_list = []
+        for each_dict in temp_dict_list:
+            if setting.UPDATE_FOR_SEARCH:
+                UPDATE_FOR_SEARCH_dict_list.append(each_dict)
+            else:
+                temp_dict = dict()
+                for each_key in For_Graph_struc:
+                    temp_dict[each_key] = each_dict[each_key]
+                UPDATE_FOR_GRAPH_dict_list.append(temp_dict)
+            if setting.UPDATE_FOR_SPEED:
+                if each_dict['class_term'] != setting.CURRENT_TERM_LIST[0]:
+                    continue
+                temp_dict = dict()
+                for each_key in For_Speed_struc:
+                    temp_dict[each_key] = int(
+                        each_dict[each_key].split('%')[0]) / 100 if each_key == 'class_isFull' else each_dict[each_key]
+                temp_dict['timestamp'] = timestamp
+                UPDATE_FOR_SPEED_dict_list.append(temp_dict)
+        if not UPDATE_FOR_SPEED_dict_list and not UPDATE_FOR_GRAPH_dict_list and not UPDATE_FOR_SEARCH_dict_list:
+            return None
+        final_dict = dict()
+        if UPDATE_FOR_SEARCH_dict_list:
+            final_dict['UPDATE_FOR_SEARCH'] = UPDATE_FOR_SEARCH_dict_list
+        else:
+            final_dict['UPDATE_FOR_GRAPH'] = UPDATE_FOR_GRAPH_dict_list
+        if UPDATE_FOR_SPEED_dict_list:
+            final_dict['UPDATE_FOR_SPEED'] = UPDATE_FOR_SPEED_dict_list
+        return final_dict
 
     def parse_prefix(self):
         all_prefix = []

@@ -19,8 +19,15 @@ class Config(object):
     ALL_PREFIX_LIST = ['CS']
     CURRENT_PREFIX_LIST = ['CS']
 
+    # data structure
+    For_Speed_struc = ['class_title', 'class_term', 'class_number', 'class_section', 'class_instructor',
+                       'class_isFull', 'class_day', 'class_start_time'] # timestamp
+    For_Graph_struc = ['class_title', 'class_section', 'class_term', 'class_instructor']
+
     #
     UPDATE_FOR_SEARCH = True
+    # UPDATE_FOR_GRAPH = False
+    UPDATE_FOR_SPEED = True
     GRADUATE_LEVEL = True
 
     # header
