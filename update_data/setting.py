@@ -69,8 +69,6 @@ class ProductionConfig(Config):
     REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
     REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
     REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379')
-    # REDIS_UPDATE_TIME_KEY = 'data_update_time'
-    # REDIS_UPDATE_NEXT_TIME_KEY = 'data_update_next_time'
     REDIS_KEY_FOR_SEARCH = 'search_data_update_time'
     REDIS_KEY_FOR_SEARCH_NEXT = 'search_data_next_update_time'
     REDIS_KEY_FOR_GRAPH = 'graph_data_update_time'
@@ -88,8 +86,6 @@ class DevelopmentConfig(Config):
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
     REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
     REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
-    # REDIS_UPDATE_TIME_KEY = 'data_update_time'
-    # REDIS_UPDATE_NEXT_TIME_KEY = 'data_update_next_time'
     REDIS_KEY_FOR_SEARCH = 'search_data_update_time'
     REDIS_KEY_FOR_SEARCH_NEXT = 'search_data_next_update_time'
     REDIS_KEY_FOR_GRAPH = 'graph_data_update_time'
