@@ -14,6 +14,10 @@ def main():
     Spider.update_data()
 
 
+def skip():
+    print("pass")
+
+
 executors = {
     'default': ThreadPoolExecutor(1),
     'processpool': ProcessPoolExecutor(1)
@@ -21,12 +25,17 @@ executors = {
 scheduler = BlockingScheduler(executors=executors)
 
 if __name__ == "__main__":
-    if len(sys.argv) >= 2 and ('-i' in sys.argv[1:] or '-I' in sys.argv[1:]):
+    if len(sys.argv) >= 2:
+        print("You may want to add -m or -s.")
+        if '-m' in sys.argv[1:] or '-M' in sys.argv[1:]:
+            print("Main scheduler started...")
+            scheduler.add_job(main, 'interval', minutes=setting.UPDATE_INTERVAL)
+            scheduler.start()
+        elif '-s' in sys.argv[1:] or '-S' in sys.argv[1:]:
+            print("Skip scheduler started...")
+            scheduler.add_job(skip, 'interval', minutes=setting.UPDATE_INTERVAL)
+            scheduler.start()
+    else:
         setting.UPDATE_NEXT_TIME_KEY = False
         main()
         setting.UPDATE_NEXT_TIME_KEY = True
-    else:
-        print("You may want to add -i or -I")
-        print("Scheduler started...")
-        scheduler.add_job(main, 'interval', minutes=setting.UPDATE_INTERVAL)
-        scheduler.start()
