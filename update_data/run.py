@@ -26,7 +26,7 @@ scheduler = BlockingScheduler(executors=executors)
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
-        print("You may want to add -m or -s.")
+        print("You may not want to add -m or -s")
         if '-m' in sys.argv[1:] or '-M' in sys.argv[1:]:
             print("Main scheduler started...")
             scheduler.add_job(main, 'interval', minutes=setting.UPDATE_INTERVAL)
