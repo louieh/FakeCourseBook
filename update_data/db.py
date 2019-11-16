@@ -197,7 +197,7 @@ class DB(object):
             try:
                 self.redis_client.set(self.redis_key_for_search, setting.TIMENOW_UTC())
                 if setting.UPDATE_NEXT_TIME_KEY:
-                    self.redis_client.set(self.redis_key_for_search_next, setting.TIMENOW_UTC_NEXT())
+                    self.update_next_time_search()
                 else:
                     logger.info('did not update update next time key')
                 logger.info('set redis key OK for {0}'.format(self.redis_key_for_search))
@@ -215,3 +215,8 @@ class DB(object):
                 logger.info('set redis key OK for {0}'.format(self.redis_key_for_speed))
             except Exception as e:
                 logger.error('insert redis {0} failed: {0}'.format(self.redis_key_for_speed, str(e)))
+
+    def update_next_time_search(self):
+        if not self.redis_client:
+            self.init_redis()
+        self.redis_client.set(self.redis_key_for_search_next, setting.TIMENOW_UTC_NEXT())
