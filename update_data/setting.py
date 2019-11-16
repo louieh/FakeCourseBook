@@ -21,14 +21,8 @@ class Config(object):
 
     # data structure
     For_Speed_struc = ['class_title', 'class_term', 'class_number', 'class_section', 'class_instructor',
-                       'class_isFull', 'class_day', 'class_start_time'] # timestamp
+                       'class_isFull', 'class_day', 'class_start_time']  # timestamp
     For_Graph_struc = ['class_title', 'class_section', 'class_term', 'class_instructor']
-
-    #
-    UPDATE_FOR_SEARCH = True
-    # UPDATE_FOR_GRAPH = False
-    UPDATE_FOR_SPEED = True
-    GRADUATE_LEVEL = True
 
     # header
     FAKE_HEADER = {
@@ -42,9 +36,6 @@ class Config(object):
     }
     ENCODING = 'utf-8'
 
-    # update_interval
-    UPDATE_INTERVAL = int(os.getenv('UPDATE_INTERVAL', 360))
-
     # get time
     TIMEDELTA = 6
     TIMENOW = lambda: (datetime.datetime.utcnow() - datetime.timedelta(hours=Config.TIMEDELTA)).strftime(
@@ -57,6 +48,15 @@ class Config(object):
     # switch of updating next time key
     UPDATE_NEXT_TIME_KEY = True
 
+    # update_interval
+    UPDATE_INTERVAL = int(os.getenv('UPDATE_INTERVAL', 360))
+
+    # switch of update object
+    UPDATE_FOR_SEARCH = True
+    UPDATE_FOR_GRAPH = False
+    UPDATE_FOR_SPEED = True
+    GRADUATE_LEVEL = True
+
 
 class ProductionConfig(Config):
     # db
@@ -64,11 +64,17 @@ class ProductionConfig(Config):
     MONGO_PORT = int(os.getenv('MONGO_PORT', 27017))
     COLLECTION_NAME_FOR_SEARCH = 'CourseForSearch'
     COLLECTION_NAME_FOR_GRAPH = 'CourseForGraph'
+    COLLECTION_NAME_FOR_SPEED = 'CourseForSpeed'
+    DB_NAME = 'Coursebook'
     REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
     REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
     REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379')
-    REDIS_UPDATE_TIME_KEY = 'data_update_time'
-    REDIS_UPDATE_NEXT_TIME_KEY = 'data_update_next_time'
+    # REDIS_UPDATE_TIME_KEY = 'data_update_time'
+    # REDIS_UPDATE_NEXT_TIME_KEY = 'data_update_next_time'
+    REDIS_KEY_FOR_SEARCH = 'search_data_update_time'
+    REDIS_KEY_FOR_SEARCH_NEXT = 'search_data_next_update_time'
+    REDIS_KEY_FOR_GRAPH = 'graph_data_update_time'
+    REDIS_KEY_FOR_SPEED = 'speed_data_update_time'
 
 
 class DevelopmentConfig(Config):
@@ -77,11 +83,17 @@ class DevelopmentConfig(Config):
     MONGO_PORT = int(os.getenv('MONGO_PORT', 27017))
     COLLECTION_NAME_FOR_SEARCH = 'CourseForSearch'
     COLLECTION_NAME_FOR_GRAPH = 'CourseForGraph'
+    COLLECTION_NAME_FOR_SPEED = 'CourseForSpeed'
+    DB_NAME = 'Coursebook'
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
     REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
     REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
-    REDIS_UPDATE_TIME_KEY = 'data_update_time'
-    REDIS_UPDATE_NEXT_TIME_KEY = 'data_update_next_time'
+    # REDIS_UPDATE_TIME_KEY = 'data_update_time'
+    # REDIS_UPDATE_NEXT_TIME_KEY = 'data_update_next_time'
+    REDIS_KEY_FOR_SEARCH = 'search_data_update_time'
+    REDIS_KEY_FOR_SEARCH_NEXT = 'search_data_next_update_time'
+    REDIS_KEY_FOR_GRAPH = 'graph_data_update_time'
+    REDIS_KEY_FOR_SPEED = 'speed_data_update_time'
 
 
 config = {
