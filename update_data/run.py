@@ -10,7 +10,7 @@ from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 
 
 def skip():
-    print("pass")
+    logger.info('pass')
 
 
 executors = {
@@ -21,14 +21,14 @@ scheduler = BlockingScheduler(executors=executors)
 
 Spider = spider.Spider(update_method=1)
 if len(sys.argv) >= 2:
-    print("You may not want to add -m or -s")
+    logger.info("You may not want to add -m or -s")
     if '-m' in sys.argv[1:] or '-M' in sys.argv[1:]:
-        print("Main scheduler started...")
+        logger.info("Main scheduler started...")
         scheduler.add_job(Spider.update_data, 'interval', minutes=setting.UPDATE_INTERVAL)
         Spider.init_next_update_search()
         scheduler.start()
     elif '-s' in sys.argv[1:] or '-S' in sys.argv[1:]:
-        print("Skip scheduler started...")
+        logger.info("Skip scheduler started...")
         scheduler.add_job(skip, 'interval', minutes=setting.UPDATE_INTERVAL)
         scheduler.start()
 else:

@@ -39,7 +39,7 @@ class DB(object):
             self.redis_client.keys()
             return True
         except:
-            print('init redis error.')
+            logger.error('init redis error.')
             return False
 
     def init_mongo(self):
@@ -49,7 +49,7 @@ class DB(object):
             self.db.list_collection_names()
             return True
         except:
-            print('init mongo error.')
+            logger.error('init mongo error.')
             return False
 
     def insert_mongo_for_SG(self, data, **kwargs):
