@@ -7,8 +7,21 @@ import time
 
 
 class Parser(object):
-    def __init__(self, encoding=setting.ENCODING):
+    def __init__(self, encoding=setting.ENCODING,
+                 update_for_graph=setting.UPDATE_FOR_GRAPH,
+                 update_for_search=setting.UPDATE_FOR_SEARCH,
+                 update_for_speed=setting.UPDATE_FOR_SPEED,
+                 col_name_search=setting.COLLECTION_NAME_FOR_SEARCH,
+                 col_name_graph=setting.COLLECTION_NAME_FOR_GRAPH,
+                 col_name_speed=setting.COLLECTION_NAME_FOR_SPEED,
+                 ):
         self.encoding = encoding
+        self.update_for_search = update_for_search
+        self.update_for_graph = update_for_graph
+        self.update_for_speed = update_for_speed
+        self.col_name_search = col_name_search
+        self.col_name_graph = col_name_graph
+        self.col_name_speed = col_name_speed
 
     def get_selector(self, resp):
         try:
@@ -22,9 +35,7 @@ class Parser(object):
             return
 
     def parse_coursebook(self, resps, **kwargs):
-        For_Speed_struc = setting.For_Speed_struc
-        # class time may change
-        For_Graph_struc = setting.For_Graph_struc
+        # parse data
         temp_dict_list = []
         for resp in resps:
             selector = self.get_selector(resp)
@@ -129,16 +140,21 @@ class Parser(object):
                 except Exception as e:
                     logger.error("parser failed: {0}".format(str(e)))
                     continue
-                # pprint.pprint(each_course_dict)
                 temp_dict_list.append(each_course_dict)
+
+        # classify
+        For_Speed_struc = setting.For_Speed_struc
+        # class time may change
+        For_Graph_struc = setting.For_Graph_struc
         timestamp = int(time.time())
         UPDATE_FOR_SEARCH_dict_list = []
         UPDATE_FOR_GRAPH_dict_list = []
         UPDATE_FOR_SPEED_dict_list = []
         for each_dict in temp_dict_list:
-            if setting.UPDATE_FOR_SEARCH:
-                UPDATE_FOR_SEARCH_dict_list.append(each_dict)
-            else:
+            if self.update_for_search:
+                if each_dict.get('class_term') in setting.CURRENT_TERM_LIST:
+                    UPDATE_FOR_SEARCH_dict_list.append(each_dict)
+            if self.update_for_graph:
                 temp_dict = dict()
                 for each_key in For_Graph_struc:
                     temp_dict[each_key] = each_dict[each_key]
@@ -156,11 +172,11 @@ class Parser(object):
             return None
         final_dict = dict()
         if UPDATE_FOR_SEARCH_dict_list:
-            final_dict['UPDATE_FOR_SEARCH'] = UPDATE_FOR_SEARCH_dict_list
-        else:
-            final_dict['UPDATE_FOR_GRAPH'] = UPDATE_FOR_GRAPH_dict_list
+            final_dict[self.col_name_search] = UPDATE_FOR_SEARCH_dict_list
+        if UPDATE_FOR_GRAPH_dict_list:
+            final_dict[self.col_name_graph] = UPDATE_FOR_GRAPH_dict_list
         if UPDATE_FOR_SPEED_dict_list:
-            final_dict['UPDATE_FOR_SPEED'] = UPDATE_FOR_SPEED_dict_list
+            final_dict[self.col_name_speed] = UPDATE_FOR_SPEED_dict_list
         return final_dict
 
     def parse_prefix(self):

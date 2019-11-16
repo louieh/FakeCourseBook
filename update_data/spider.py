@@ -8,7 +8,9 @@ from urllib.parse import urljoin
 
 class Spider(object):
     def __init__(self, update_method=None,
+                 update_for_graph=setting.UPDATE_FOR_GRAPH,
                  update_for_search=setting.UPDATE_FOR_SEARCH,
+                 update_for_speed=setting.UPDATE_FOR_SPEED,
                  base_uri=setting.BASE_URI,
                  all_term=setting.ALL_TERM_LIST,
                  current_term=setting.CURRENT_TERM_LIST,
@@ -25,6 +27,8 @@ class Spider(object):
         self.current_prefix = current_prefix
         self.header = {} if header is None else header
         self.update_for_search = update_for_search
+        self.update_for_graph = update_for_graph
+        self.update_for_speed = update_for_speed
 
     def __init_downloader(self):
         self.__downloader = downloader.Downloader()
@@ -96,9 +100,18 @@ class Spider(object):
                 return
         if self.update_method == 1:
             logger.info('update_method == 1')
+            logger.info('update object: update for search: {0}, update for graph: {1}, update for speed: {2}'.format(
+                self.update_for_search, self.update_for_graph, self.update_for_speed))
             urls = []
-            prefix, term = (self.current_prefix, self.current_term) if self.update_for_search else (
-                self.all_prefix, self.all_term)
+            if self.update_for_graph:
+                prefix, term = (self.all_prefix, self.all_term)
+            elif self.update_for_search:
+                prefix, term = (self.current_prefix, self.current_term)
+            elif self.update_for_speed:
+                prefix, term = (self.current_prefix, [self.current_term[0]])
+            else:
+                logger.info('no update object')
+                return
             logger.info("term, prefix: {0},{1}".format(term, prefix))
             for each_term in term:
                 for each_prefix in prefix:
