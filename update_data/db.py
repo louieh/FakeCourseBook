@@ -64,12 +64,6 @@ class DB(object):
         if not self.mongo_client:
             self.init_mongo()
 
-        # collection_dump, collection, collection_name, data_for_search_graph = (
-        #     self.db.CourseForSearch_dump, self.db.CourseForSearch,
-        #     self.col_name_search, data.get('UPDATE_FOR_SEARCH')) if self.update_for_search else (
-        #     self.db.CourseForGraph_dump,
-        #     self.db.CourseForGraph, self.col_name_graph, data.get('UPDATE_FOR_GRAPH'))
-
         # there are three collection:
         # temp, CourseFor***, CourseFor***_dump
         # 1. generate temp
