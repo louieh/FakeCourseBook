@@ -173,10 +173,16 @@ class Parser(object):
         final_dict = dict()
         if UPDATE_FOR_SEARCH_dict_list:
             final_dict[self.col_name_search] = UPDATE_FOR_SEARCH_dict_list
+            logger.info('{0}: {1} {2}'.format(self.col_name_search, len(UPDATE_FOR_SEARCH_dict_list),
+                                              len(final_dict[self.col_name_search])))
         if UPDATE_FOR_GRAPH_dict_list:
             final_dict[self.col_name_graph] = UPDATE_FOR_GRAPH_dict_list
-        if UPDATE_FOR_SPEED_dict_list:
-            final_dict[self.col_name_speed] = UPDATE_FOR_SPEED_dict_list
+            logger.info('{0}: {1} {2}'.format(self.col_name_graph, len(UPDATE_FOR_GRAPH_dict_list),
+                                              len(final_dict[self.col_name_graph])))
+            if UPDATE_FOR_SPEED_dict_list:
+                final_dict[self.col_name_speed] = UPDATE_FOR_SPEED_dict_list
+            logger.info('{0}: {1} {2}'.format(self.col_name_speed, len(UPDATE_FOR_SPEED_dict_list),
+                                              len(final_dict[self.col_name_speed])))
         return final_dict
 
     def parse_prefix(self):
