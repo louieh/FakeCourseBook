@@ -17,10 +17,10 @@ executors = {
     'default': ThreadPoolExecutor(1),
     'processpool': ProcessPoolExecutor(1)
 }
-scheduler = BlockingScheduler(executors=executors)
+scheduler = BlockingScheduler()
 
 Spider = spider.Spider(update_method=1)
-if len(sys.argv) >= 2:
+if len(sys.argv) > 1:
     logger.info("You may not want to add -m or -s")
     if '-m' in sys.argv[1:] or '-M' in sys.argv[1:]:
         logger.info("Main scheduler started...")
