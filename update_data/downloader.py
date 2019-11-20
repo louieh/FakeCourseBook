@@ -38,6 +38,8 @@ class Downloader(object):
         header = kwargs.get('header', {})
         self.header.update(header)
         workers = min(MAX_WORKERS, len(urls))
+        logger.info('len(urls): {0}'.format(len(urls)))
         with futures.ThreadPoolExecutor(workers) as executor:
             executor.map(self.download_tool, urls)
+        logger.info('downloader: len(self.resps): {0}'.format(len(self.resps)))
         return self.resps

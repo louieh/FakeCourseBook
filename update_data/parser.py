@@ -37,9 +37,11 @@ class Parser(object):
     def parse_coursebook(self, resps, **kwargs):
         # parse data
         temp_dict_list = []
+        logger.info('len(temp_dict_list): {0}, len(resps): {1}'.format(len(temp_dict_list), len(resps)))
         for resp in resps:
             selector = self.get_selector(resp)
             courses = selector.xpath('''.//div[@class="section-list"]//tbody/tr''')
+            logger.info('len(courses): {0}'.format(len(courses)))
             if not courses:
                 logger.error("xpath changed? no courses")
                 return
@@ -141,6 +143,7 @@ class Parser(object):
                     logger.error("parser failed: {0}".format(str(e)))
                     continue
                 temp_dict_list.append(each_course_dict)
+            logger.info('len(temp_dict_list): {0}'.format(len(temp_dict_list)))
 
         # classify
         For_Speed_struc = setting.For_Speed_struc
