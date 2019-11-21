@@ -124,12 +124,18 @@ class Spider(object):
         final_dict = self.__parse(resps)
         self.__insert_db(final_dict)
 
-    def init_next_update_search(self):
-        if not self.__db:
-            if not self.__init_db():
-                logger.error('init db error')
-                return
-        self.__db.update_next_time_search()
+    def init_next_update_search(self, method=None):
+        if method == 'add':
+            if not self.__db:
+                if not self.__init_db():
+                    logger.error('init db error')
+                    return
+            self.__db.update_next_time_search()
+        elif method == 'delete':
+            pass
+        # TODO
+        else:
+            return
 
     def get_prefix(self):  # get all prefix of courses
         base_url = setting.BASE_URL_FOR_PREFIX
