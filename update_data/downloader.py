@@ -35,6 +35,7 @@ class Downloader(object):
             return
 
     def download(self, urls, **kwargs):
+        self.resps = []
         header = kwargs.get('header', {})
         self.header.update(header)
         workers = min(MAX_WORKERS, len(urls))
