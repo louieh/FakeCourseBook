@@ -37,11 +37,9 @@ class Parser(object):
     def parse_coursebook(self, resps, **kwargs):
         # parse data
         temp_dict_list = []
-        logger.info('len(temp_dict_list): {0}, len(resps): {1}'.format(len(temp_dict_list), len(resps)))
         for resp in resps:
             selector = self.get_selector(resp)
             courses = selector.xpath('''.//div[@class="section-list"]//tbody/tr''')
-            logger.info('len(courses): {0}'.format(len(courses)))
             if not courses:
                 logger.error("xpath changed? no courses")
                 return
@@ -143,7 +141,6 @@ class Parser(object):
                     logger.error("parser failed: {0}".format(str(e)))
                     continue
                 temp_dict_list.append(each_course_dict)
-            logger.info('len(temp_dict_list): {0}'.format(len(temp_dict_list)))
 
         # classify
         For_Speed_struc = setting.For_Speed_struc
@@ -153,8 +150,6 @@ class Parser(object):
         UPDATE_FOR_SEARCH_dict_list = []
         UPDATE_FOR_GRAPH_dict_list = []
         UPDATE_FOR_SPEED_dict_list = []
-        logger.info('len(temp_dict_list): {0}'.format(len(temp_dict_list)))
-        logger.info('len(update_for_search_dict_list): {0}'.format(len(UPDATE_FOR_SEARCH_dict_list)))
         for each_dict in temp_dict_list:
             if self.update_for_search:
                 if each_dict.get('class_term') in setting.CURRENT_TERM_LIST:
@@ -178,16 +173,10 @@ class Parser(object):
         final_dict = dict()
         if UPDATE_FOR_SEARCH_dict_list:
             final_dict[self.col_name_search] = UPDATE_FOR_SEARCH_dict_list
-            logger.info('{0}: {1} {2}'.format(self.col_name_search, len(UPDATE_FOR_SEARCH_dict_list),
-                                              len(final_dict[self.col_name_search])))
         if UPDATE_FOR_GRAPH_dict_list:
             final_dict[self.col_name_graph] = UPDATE_FOR_GRAPH_dict_list
-            logger.info('{0}: {1} {2}'.format(self.col_name_graph, len(UPDATE_FOR_GRAPH_dict_list),
-                                              len(final_dict[self.col_name_graph])))
         if UPDATE_FOR_SPEED_dict_list:
             final_dict[self.col_name_speed] = UPDATE_FOR_SPEED_dict_list
-            logger.info('{0}: {1} {2}'.format(self.col_name_speed, len(UPDATE_FOR_SPEED_dict_list),
-                                              len(final_dict[self.col_name_speed])))
         return final_dict
 
     def parse_prefix(self):

@@ -100,8 +100,6 @@ class Spider(object):
                 return
         if self.update_method == 1:
             logger.info('update_method == 1')
-            logger.info('update object: update for search: {0}, update for graph: {1}, update for speed: {2}'.format(
-                self.update_for_search, self.update_for_graph, self.update_for_speed))
             urls = []
             if self.update_for_graph:
                 prefix, term = (self.all_prefix, self.all_term)
