@@ -123,15 +123,14 @@ class Spider(object):
         self.__insert_db(final_dict)
 
     def init_next_update_search(self, method=None):
+        if not self.__db:
+            if not self.__init_db():
+                logger.error('init db error')
+                return
         if method == 'add':
-            if not self.__db:
-                if not self.__init_db():
-                    logger.error('init db error')
-                    return
-            self.__db.update_next_time_search()
+            self.__db.update_next_time_search('add')
         elif method == 'delete':
-            pass
-        # TODO
+            self.__db.update_next_time_search('delete')
         else:
             return
 

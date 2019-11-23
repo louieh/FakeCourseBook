@@ -210,7 +210,10 @@ class DB(object):
             except Exception as e:
                 logger.error('insert redis {0} failed: {0}'.format(self.redis_key_for_speed, str(e)))
 
-    def update_next_time_search(self):
+    def update_next_time_search(self, method='add'):
         if not self.redis_client:
             self.init_redis()
-        self.redis_client.set(self.redis_key_for_search_next, setting.TIMENOW_UTC_NEXT())
+        if method == 'delete':
+            self.redis_client.delete(self.redis_key_for_search_next)
+        elif method == 'add':
+            self.redis_client.set(self.redis_key_for_search_next, setting.TIMENOW_UTC_NEXT())
