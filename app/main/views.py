@@ -158,8 +158,10 @@ def search():
 @main.route('/graph/professor/<professor>')
 @main.route('/graph/course')
 @main.route('/graph/course/<coursesection>')
-def graph_pro(professor=None, coursesection=None):
-    if not professor and not coursesection:
+@main.route('/graph/speed')
+@main.route('/graph/speed/<term_num>')
+def graph_pro(professor=None, coursesection=None, term_num=None):
+    if not professor and not coursesection and not term_num:
         if "graph/professor" in request.url:
             professor_set = set()
             professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1, "_id": 0}))
@@ -187,6 +189,27 @@ def graph_pro(professor=None, coursesection=None):
                     cou_set.add(eachcou_dict["class_section"])
                     cou_dict_list_fin.append(eachcou_dict)
             return render_template("graph.html", cou_dict_list=cou_dict_list_fin)
+        elif "graph/speed" in request.url:
+            speed_dict_list = list(
+                db.CourseForSpeed.find({}, {"_id": 0, "class_day": 0, "class_start_time": 0, "update_data": 0}))
+            return render_template("graph.html", speed_dict_list=speed_dict_list)
+
+    if term_num:
+        term, num = term_num.split("_")
+        speed_data = list(db.CourseForSpeed.find({"class_term": term, "class_number": num}, {"_id": 0}))
+        if not speed_data:
+            abort(404)
+        if len(speed_data) > 1:
+            print("len(speed_data) > 1")
+        speed_data = speed_data[0]
+        x_data = [each.get("timestamp") for each in speed_data.get("update_data")]
+        y_data = [each.get("percentage") for each in speed_data.get("update_data")]
+        return render_template('graph.html', x_data=x_data, y_data=y_data,
+                               class_term=term,
+                               class_title=speed_data.get("class_title"),
+                               class_section=speed_data.get("class_section"),
+                               class_instructor=speed_data.get("class_instructor")
+                               )
 
     if professor:
         if not list(db.CourseForGraph.find({"class_instructor": professor})):

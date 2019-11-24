@@ -52,9 +52,9 @@ class Config(object):
     UPDATE_INTERVAL = int(os.getenv('UPDATE_INTERVAL', 360))
 
     # switch of update object
-    UPDATE_FOR_SEARCH = True
-    UPDATE_FOR_GRAPH = False
-    UPDATE_FOR_SPEED = True
+    UPDATE_FOR_SEARCH = False
+    UPDATE_FOR_GRAPH = True
+    UPDATE_FOR_SPEED = False
     GRADUATE_LEVEL = True
 
 

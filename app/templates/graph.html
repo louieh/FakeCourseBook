@@ -50,6 +50,53 @@
                 {% endfor %}
             </table>
         </div>
+    {% elif speed_dict_list %}
+        <div class="container">
+            <table class="table table-sm table-hover">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">class term</th>
+                    <th scope="col">class title</th>
+                    <th scope="col">class section</th>
+                    <th scope="col">class number</th>
+                    <th scope="col">class instructor</th>
+                    <th scope="col">detail</th>
+                </tr>
+                </thead>
+                {% for eachdict in speed_dict_list %}
+                    <tr>
+                        <td>{{ eachdict.get("class_term") }}</td>
+                        <td>{{ eachdict.get("class_title") }}</td>
+                        <td>{{ eachdict.get("class_section") }}</td>
+                        <td>{{ eachdict.get("class_number") }}</td>
+                        <td>
+                            {% if eachdict.get('class_instructor')|length > 1 %}
+                                {% for eachinstructor in eachdict['class_instructor'] %}
+                                    {% if eachinstructor != '-Staff-' %}
+                                        <a href={{ url_for('main.findrate', name=eachinstructor) }} target="_blank"
+                                           name="ratemyprofessors">{{ eachinstructor }}</a>;
+                                    {% else %}
+                                        {{ eachinstructor }};
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {% for eachinstructor in eachdict['class_instructor'] %}
+                                    {% if eachinstructor != '-Staff-' %}
+                                        <a href={{ url_for('main.findrate', name=eachinstructor) }} target="_blank"
+                                           name="ratemyprofessors">{{ eachinstructor }}</a>
+                                    {% else %}
+                                        {{ eachinstructor }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/graph/speed/{{ eachdict.get("class_term")+'_'+eachdict.get("class_number") }}">detail</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
     {% elif professor_name or course_name %}
         <div class="container">
             <div class="row">
@@ -136,6 +183,39 @@
                         window.open('/graph/professor/' + encodeURIComponent(params.value));
                 {% endif %}
             });
+        </script>
+    {% elif x_data and y_data %}
+        <div class="container">
+            <div class="row">
+                <h2>{{ class_title }}</h2>
+            </div>
+            <div class="row">{{ class_term }} | {{ class_section }} | {{ (" ").join(class_instructor) }}</div>
+            <div class="row">
+                <div class="col-md-auto" id="graph" style="width:100%;height:800px;">
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var myChart = echarts.init(document.getElementById('graph'));
+            myChart.showLoading();
+            myChart.hideLoading();
+
+            option = {
+                xAxis: {
+                    type: 'category',
+                    data: {{ x_data }}
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: {{ y_data }},
+                    type: 'line'
+                }]
+            };
+            if (option && typeof option === "object") {
+                myChart.setOption(option, true);
+            }
         </script>
     {% endif %}
 {% endblock %}
