@@ -2,31 +2,42 @@
 {% block content %}
     {% if professor_list_list %}
         <div class="container">
-        {% if professor_list_list|length%6!=0 %}
-            {% set rownumber = (professor_list_list|length/6)|int+1 %}
-        {% else %}
-            {% set rownumber = (professor_list_list|length/6)|int %}
-        {% endif %}
-        {% for i in range(rownumber) %}
-            <div class="row">
-                {% if professor_list_list|length >= 6 %}
-                    {% set colnumber = 6 %}
-                {% else %}
-                    {% set colnumber = professor_list_list|length %}
-                {% endif %}
-                {% for j in range(colnumber) %}
-                    <div class="col">
-                        <ul>
-                            {% for eachprofessor in professor_list_list.pop(0) %}
-                                <li><a href="/graph/professor/{{ eachprofessor }}">{{ eachprofessor }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endfor %}
+            <div class="bd-callout bd-callout-info">
+                <p>Charts on this page show what courses the professor has taught in past semesters.</p>
             </div>
-        {% endfor %}
+            {% if professor_list_list|length%6!=0 %}
+                {% set rownumber = (professor_list_list|length/6)|int+1 %}
+            {% else %}
+                {% set rownumber = (professor_list_list|length/6)|int %}
+            {% endif %}
+            {% for i in range(rownumber) %}
+                <div class="row">
+                    {% if professor_list_list|length >= 6 %}
+                        {% set colnumber = 6 %}
+                    {% else %}
+                        {% set colnumber = professor_list_list|length %}
+                    {% endif %}
+                    {% for j in range(colnumber) %}
+                        <div class="col">
+                            <ul>
+                                {% for eachprofessor in professor_list_list.pop(0) %}
+                                    {% if eachprofessor|length == 1 %}
+                                        <li>{{ eachprofessor }}</li>
+                                    {% else %}
+                                        <li><a href="/graph/professor/{{ eachprofessor }}">{{ eachprofessor }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
     {% elif cou_dict_list %}
         <div class="container">
+            <div class="bd-callout bd-callout-info">
+                <p>Charts on this page show which professors have taught the course in past semesters.</p>
+            </div>
             <table class="table table-sm table-hover">
                 <thead class="thead-dark">
                 <tr>
@@ -52,6 +63,9 @@
         </div>
     {% elif speed_dict_list %}
         <div class="container">
+            <div class="bd-callout bd-callout-info">
+                <p>Charts on this page show the change of course selection rate at each time point.</p>
+            </div>
             <table class="table table-sm table-hover">
                 <thead class="thead-dark">
                 <tr>
@@ -60,7 +74,7 @@
                     <th scope="col">class section</th>
                     <th scope="col">class number</th>
                     <th scope="col">class instructor</th>
-                    <th scope="col">detail</th>
+                    <th scope="col">chart</th>
                 </tr>
                 </thead>
                 {% for eachdict in speed_dict_list %}
@@ -91,7 +105,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="/graph/speed/{{ eachdict.get("class_term")+'_'+eachdict.get("class_number") }}">detail</a>
+                            <a href="/graph/speed/{{ eachdict.get("class_term")+'_'+eachdict.get("class_number") }}">chart</a>
                         </td>
                     </tr>
                 {% endfor %}

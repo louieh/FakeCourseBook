@@ -162,6 +162,7 @@ def search():
 @main.route('/graph/speed/<term_num>')
 def graph_pro(professor=None, coursesection=None, term_num=None):
     if not professor and not coursesection and not term_num:
+        # TODO Sort by last name
         if "graph/professor" in request.url:
             professor_set = set()
             professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1, "_id": 0}))
@@ -177,7 +178,7 @@ def graph_pro(professor=None, coursesection=None, term_num=None):
             professor_list_list = []
             for eachkey in professor_char_dict.keys():  # insert the key_value of professor_char_dict to a new list
                 if professor_char_dict.get(eachkey):
-                    professor_list_list.append(professor_char_dict.get(eachkey))
+                    professor_list_list.append([eachkey] + professor_char_dict.get(eachkey))
             return render_template("graph.html", professor_list_list=professor_list_list)
         elif "graph/course" in request.url:
             cou_set = set()
