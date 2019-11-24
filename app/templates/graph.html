@@ -203,13 +203,20 @@
             option = {
                 xAxis: {
                     type: 'category',
-                    data: {{ x_data }}
+                    data: {{ x_data|tojson }}
                 },
                 yAxis: {
                     type: 'value'
                 },
+                dataZoom: [
+                    {
+                        type: 'slider',
+                        start: 10,
+                        end: 60
+                    }
+                ],
                 series: [{
-                    data: {{ y_data }},
+                    data: {{ y_data|tojson }},
                     type: 'line'
                 }]
             };

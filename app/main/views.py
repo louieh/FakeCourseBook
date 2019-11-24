@@ -202,8 +202,14 @@ def graph_pro(professor=None, coursesection=None, term_num=None):
         if len(speed_data) > 1:
             print("len(speed_data) > 1")
         speed_data = speed_data[0]
-        x_data = [each.get("timestamp") for each in speed_data.get("update_data")]
-        y_data = [each.get("percentage") for each in speed_data.get("update_data")]
+
+        def trans_utd(timestamp):
+            utc_time = (datetime.datetime.utcfromtimestamp(timestamp) - datetime.timedelta(hours=TIMEDELTA)).strftime(
+                "%Y-%m-%d %H:%M")
+            return utc_time
+
+        x_data = [trans_utd(each.get("timestamp")) for each in speed_data.get("update_data")]
+        y_data = [each.get("percentage") * 100 for each in speed_data.get("update_data")]
         return render_template('graph.html', x_data=x_data, y_data=y_data,
                                class_term=term,
                                class_title=speed_data.get("class_title"),
