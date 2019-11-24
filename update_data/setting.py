@@ -51,12 +51,6 @@ class Config(object):
     # update_interval
     UPDATE_INTERVAL = int(os.getenv('UPDATE_INTERVAL', 360))
 
-    # switch of update object
-    UPDATE_FOR_SEARCH = False
-    UPDATE_FOR_GRAPH = True
-    UPDATE_FOR_SPEED = False
-    GRADUATE_LEVEL = True
-
 
 class ProductionConfig(Config):
     # db
@@ -73,6 +67,11 @@ class ProductionConfig(Config):
     REDIS_KEY_FOR_SEARCH_NEXT = 'search_data_next_update_time'
     REDIS_KEY_FOR_GRAPH = 'graph_data_update_time'
     REDIS_KEY_FOR_SPEED = 'speed_data_update_time'
+    # switch of update object
+    UPDATE_FOR_SEARCH = True
+    UPDATE_FOR_GRAPH = False
+    UPDATE_FOR_SPEED = True
+    GRADUATE_LEVEL = True
 
 
 class DevelopmentConfig(Config):
@@ -90,6 +89,11 @@ class DevelopmentConfig(Config):
     REDIS_KEY_FOR_SEARCH_NEXT = 'search_data_next_update_time'
     REDIS_KEY_FOR_GRAPH = 'graph_data_update_time'
     REDIS_KEY_FOR_SPEED = 'speed_data_update_time'
+    # switch of update object
+    UPDATE_FOR_SEARCH = True
+    UPDATE_FOR_GRAPH = False
+    UPDATE_FOR_SPEED = True
+    GRADUATE_LEVEL = True
 
 
 config = {
