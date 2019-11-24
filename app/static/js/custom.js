@@ -15,6 +15,9 @@ function labelSwitcher() {
     setOpenStatus()
 }
 
+/**
+ * set open status class
+ */
 function setOpenStatus() {
     var table = document.querySelector(".table").lastElementChild.children;
     for (var i = 0; i < table.length; i++) {
@@ -288,7 +291,114 @@ function getdatanow() {
         dataNowList[i - 1] = rowDict;
     }
     return dataNowList;
+}
 
+/**
+ * add shadow class for each row
+ * @param e
+ */
+function add_shadow(e) {
+    var shadow_class_name = 'font-weight-bold shadow-lg p-3 mb-5 bg-white rounded';
+    if ($(e).hasClass(shadow_class_name))
+        e.className = "";
+    else e.className += shadow_class_name;
+}
+
+/**
+ * draw line chart for speed
+ * @param datasource
+ * @param ifprofessor
+ */
+function basic_line_chart(datasource, ifprofessor) {
+    var myChart = echarts.init(document.getElementById('graph'));
+    myChart.showLoading();
+    myChart.hideLoading();
+
+    // echarts.util.each(datasourse.children, function (datum, index) {
+    //     index % 2 === 0 && (datum.collapsed = true);
+    // });
+
+    myChart.setOption(option = {
+        tooltip: {
+            trigger: 'item',
+            triggerOn: 'mousemove'
+        },
+        series: [
+            {
+                type: 'tree',
+                data: [datasource],
+                top: '1%',
+                left: '9%',
+                bottom: '1%',
+                right: '30%',
+                symbolSize: 7,
+                label: {
+                    normal: {
+                        position: 'left',
+                        verticalAlign: 'middle',
+                        align: 'right',
+                        fontSize: 12
+                    }
+                },
+                leaves: {
+                    label: {
+                        normal: {
+                            position: 'right',
+                            verticalAlign: 'middle',
+                            align: 'left'
+                        }
+                    }
+                },
+                expandAndCollapse: true,
+                animationDuration: 550,
+                animationDurationUpdate: 750
+            }
+        ]
+    });
+    myChart.on('click', function (params) {
+        if (ifprofessor === 1) {
+            if (params.value)
+                window.open('/graph/course/CS ' + encodeURIComponent(params.value));
+        } else if (ifprofessor === 0) {
+            if (params.value)
+                window.open('/graph/professor/' + encodeURIComponent(params.value));
+        }
+    });
+}
+
+/**
+ * draw tree chart for professor and course
+ * @param x_data
+ * @param y_data
+ */
+function from_left_to_right_tree(x_data, y_data) {
+    var myChart = echarts.init(document.getElementById('graph'));
+    myChart.showLoading();
+    myChart.hideLoading();
+
+    option = {
+        xAxis: {
+            type: 'category',
+            data: x_data,
+        },
+        yAxis: {
+            type: 'value'
+        },
+        dataZoom: [
+            {
+                type: 'slider',
+                start: 10,
+                end: 60
+            }
+        ],
+        series: [{
+            data: y_data,
+            type: 'line'
+        }]
+    };
+    if (option && typeof option === "object") {
+        myChart.setOption(option, true);
+    }
 }
 
 /**
@@ -393,9 +503,3 @@ function setdataForjobinfo(newData) {
     }
 }
 
-function add_shadow(e) {
-    var shadow_class_name = 'font-weight-bold shadow-lg p-3 mb-5 bg-white rounded';
-    if ($(e).hasClass(shadow_class_name))
-        e.className = "";
-    else e.className += shadow_class_name;
-}

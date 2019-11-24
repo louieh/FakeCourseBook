@@ -69,16 +69,19 @@
             <table class="table table-sm table-hover">
                 <thead class="thead-dark">
                 <tr>
+                    <th scope="col">chart</th>
                     <th scope="col">class term</th>
                     <th scope="col">class title</th>
                     <th scope="col">class section</th>
                     <th scope="col">class number</th>
                     <th scope="col">class instructor</th>
-                    <th scope="col">chart</th>
                 </tr>
                 </thead>
                 {% for eachdict in speed_dict_list %}
                     <tr>
+                        <td>
+                            <a href="/graph/speed/{{ eachdict.get("class_term")+'_'+eachdict.get("class_number") }}">chart</a>
+                        </td>
                         <td>{{ eachdict.get("class_term") }}</td>
                         <td>{{ eachdict.get("class_title") }}</td>
                         <td>{{ eachdict.get("class_section") }}</td>
@@ -104,9 +107,6 @@
                                 {% endfor %}
                             {% endif %}
                         </td>
-                        <td>
-                            <a href="/graph/speed/{{ eachdict.get("class_term")+'_'+eachdict.get("class_number") }}">chart</a>
-                        </td>
                     </tr>
                 {% endfor %}
             </table>
@@ -115,10 +115,12 @@
         <div class="container">
             <div class="row">
                 {% if professor_name %}
+                    {% set ifprofessor = 1 %}
                     <h2><a href={{ url_for('main.findrate', name=professor_name) }} target="_blank"
                            name="ratemyprofessors">{{ professor_name }}</a></h2>
                     {% set datasource=professor_json %}
                 {% elif course_name %}
+                    {% set ifprofessor = 0 %}
                     <h2>
                         {% if course_section[-4] >= '5' %}
                             <a href="https://catalog.utdallas.edu/2019/graduate/courses/{{ course_section }}"
@@ -135,69 +137,7 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript">
-            var myChart = echarts.init(document.getElementById('graph'));
-            myChart.showLoading();
-            datasource = {{ datasource|tojson }};
-            myChart.hideLoading();
-
-            // echarts.util.each(datasourse.children, function (datum, index) {
-            //     index % 2 === 0 && (datum.collapsed = true);
-            // });
-
-            myChart.setOption(option = {
-                tooltip: {
-                    trigger: 'item',
-                    triggerOn: 'mousemove'
-                },
-                series: [
-                    {
-                        type: 'tree',
-
-                        data: [datasource],
-
-                        top: '1%',
-                        left: '9%',
-                        bottom: '1%',
-                        right: '30%',
-
-                        symbolSize: 7,
-
-                        label: {
-                            normal: {
-                                position: 'left',
-                                verticalAlign: 'middle',
-                                align: 'right',
-                                fontSize: 12
-                            }
-                        },
-
-                        leaves: {
-                            label: {
-                                normal: {
-                                    position: 'right',
-                                    verticalAlign: 'middle',
-                                    align: 'left'
-                                }
-                            }
-                        },
-
-                        expandAndCollapse: true,
-                        animationDuration: 550,
-                        animationDurationUpdate: 750
-                    }
-                ]
-            });
-            myChart.on('click', function (params) {
-                {% if professor_name %}
-                    if (params.value)
-                        window.open('/graph/course/CS ' + encodeURIComponent(params.value));
-                {% elif course_name %}
-                    if (params.value)
-                        window.open('/graph/professor/' + encodeURIComponent(params.value));
-                {% endif %}
-            });
-        </script>
+        <script>basic_line_chart({{ datasource|tojson }}, {{ ifprofessor }})</script>
     {% elif x_data and y_data %}
         <div class="container">
             <div class="row">
@@ -209,34 +149,6 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript">
-            var myChart = echarts.init(document.getElementById('graph'));
-            myChart.showLoading();
-            myChart.hideLoading();
-
-            option = {
-                xAxis: {
-                    type: 'category',
-                    data: {{ x_data|tojson }}
-                },
-                yAxis: {
-                    type: 'value'
-                },
-                dataZoom: [
-                    {
-                        type: 'slider',
-                        start: 10,
-                        end: 60
-                    }
-                ],
-                series: [{
-                    data: {{ y_data|tojson }},
-                    type: 'line'
-                }]
-            };
-            if (option && typeof option === "object") {
-                myChart.setOption(option, true);
-            }
-        </script>
+        <script>from_left_to_right_tree({{ x_data|tojson }}, {{ y_data|tojson }})</script>
     {% endif %}
 {% endblock %}
