@@ -119,12 +119,12 @@
                         <div class="col-md-auto">
                             Last update:
                             {% if data_update_time %}
-                                {{ moment(data_update_time).format('LLL') }}
+                                {{ moment(data_update_time).format('lll') }}
                             {% endif %}
                             <br>
                             Next update:
                             {% if data_update_next_time %}
-                                {{ moment(data_update_next_time).format('LLL') }}
+                                {{ moment(data_update_next_time).format('lll') }}
                             {% endif %}
                         </div>
                         <div class="col col-lg-2">
