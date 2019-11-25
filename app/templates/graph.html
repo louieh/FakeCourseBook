@@ -3,7 +3,9 @@
     {% if professor_list_list %}
         <div class="container">
             <div class="bd-callout bd-callout-info">
-                <p>Charts on this page show what courses the professor has taught in past semesters.</p>
+                <h5>Professor chart</h5>
+                <p>Charts on this page show what courses the professor has taught in past semesters.
+                    You can view the chart of that course by clicking on the leaf node.</p>
             </div>
             {% if professor_list_list|length%6!=0 %}
                 {% set rownumber = (professor_list_list|length/6)|int+1 %}
@@ -36,7 +38,9 @@
     {% elif cou_dict_list %}
         <div class="container">
             <div class="bd-callout bd-callout-info">
-                <p>Charts on this page show which professors have taught the course in past semesters.</p>
+                <h5>Course chart</h5>
+                <p>Charts on this page show which professors have taught the course in past semesters.
+                    You can view the professor's chart by clicking on the leaf node.</p>
             </div>
             <table class="table table-sm table-hover">
                 <thead class="thead-dark">
@@ -64,7 +68,8 @@
     {% elif speed_dict_list %}
         <div class="container">
             <div class="bd-callout bd-callout-info">
-                <p>Charts on this page show the change of course selection rate at each time point.</p>
+                <p>Charts on this page show the change of course selection rate at each time point.
+                    You can view all the charts by sliding the bottom slider.</p>
             </div>
             <table class="table table-sm table-hover">
                 <thead class="thead-dark">
