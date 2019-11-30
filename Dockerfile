@@ -1,9 +1,11 @@
 FROM python:3.6
 
 WORKDIR /Course-Search
+
+COPY requirements.txt .
+
 RUN apt-get update && apt-get install -y vim
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+ && pip install -r requirements.txt
 
 COPY app app
 COPY config.py course_search.py ./
