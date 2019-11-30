@@ -269,6 +269,25 @@ def graph_pro(professor=None, coursesection=None, term_num=None):
                                course_json=final_dict)
 
 
+@main.route('/comments/<professor>')
+def comments(professor):
+    if not professor:
+        abort(404)
+    courses = list(
+        db.CourseForGraph.find({"class_instructor": professor}, {"_id": 0, "class_term": 0, "class_instructor": 0}))
+    section_set = set()
+    title_set = set()
+    section_title_set = set()
+    for course in courses:
+        section = course.get("class_section").split(".")[0]
+        title = course.get("class_title")
+        if section not in section_set and title not in title_set:
+            section_set.add(section)
+            title_set.add(title)
+            section_title_set.add(section + "-" + title)
+    return render_template('comments.html', section_title_list=list(section_title_set))
+
+
 @main.route('/jobinfo')
 def jobinfo():
     job_filter, num = get_jobinfo_args()
