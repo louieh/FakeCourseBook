@@ -285,7 +285,7 @@ def comments(professor):
             section_set.add(section)
             title_set.add(title)
             section_title_set.add(section + "-" + title)
-    return render_template('comments.html', section_title_list=list(section_title_set))
+    return render_template('comments.html', professor_name=professor, section_title_list=list(section_title_set))
 
 
 @main.route('/jobinfo')

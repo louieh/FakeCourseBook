@@ -402,6 +402,34 @@ function from_left_to_right_tree(x_data, y_data) {
 }
 
 /**
+ * generate comment section
+ * @param data_title
+ * @param data_isso_id
+ */
+function comment_section(data_title, data_isso_id) {
+    var parent = document.getElementById("comment-section");
+    if (parent.firstChild != null) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
+    }
+
+    var section = document.createElement("section");
+    var attr_id = document.createAttribute("id");
+    attr_id.value = "isso-thread";
+    var attr_data_title = document.createAttribute("data-title");
+    attr_data_title.value = data_title;
+    var attr_data_isso_id = document.createAttribute("data-isso-id");
+    attr_data_isso_id.value = data_isso_id;
+    section.setAttributeNode(attr_id);
+    section.setAttributeNode(attr_data_isso_id);
+    section.setAttributeNode(attr_data_title);
+    parent.appendChild(section);
+    window.Isso.init();
+    window.Isso.fetchComments();
+}
+
+/**
  * get rate from ratemyprofessor
  * 跨域请求
  */
