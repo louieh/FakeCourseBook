@@ -63,9 +63,9 @@ def findrate(name):
     pk_id, reason = getRateId(name)
     if not pk_id:
         # logging.INFO(reason)
-        return redirect('http://www.ratemyprofessors.com/search.jsp?query=%s' % name)
+        return redirect('https://www.ratemyprofessors.com/search.jsp?query=%s' % name)
 
-    return redirect('http://www.ratemyprofessors.com/ShowRatings.jsp?tid=%s' % pk_id)
+    return redirect('https://www.ratemyprofessors.com/ShowRatings.jsp?tid=%s' % pk_id)
 
 
 @main.route('/changesource/<source>')
