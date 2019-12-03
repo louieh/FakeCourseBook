@@ -47,6 +47,9 @@
             <li class="nav-item" id="nav-item-home">
                 <a class="nav-link" href="/"><i class="fas fa-home"></i> Home </a>
             </li>
+            <li class="nav-item" id="nav-item-comment">
+                <a class="nav-link" href="/comment"><i class="fas fa-comment"></i> Comment</a>
+            </li>
             <li class="nav-item dropdown" id="nav-item-graph">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
@@ -55,7 +58,8 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="/graph/professor">Professor</a>
                     <a class="dropdown-item" href="/graph/course">Course</a>
-                    <a class="dropdown-item" href="/graph/speed">Speed <span class="badge badge-secondary">New</span></a>
+                    <a class="dropdown-item" href="/graph/speed">Speed <span
+                            class="badge badge-secondary">New</span></a>
                 </div>
             </li>
             <!--
@@ -86,9 +90,15 @@
     if (self.location.href.indexOf("graph") != -1) {
         document.getElementById("nav-item-graph").classList.add("active");
         document.getElementById("nav-item-home").classList.remove("active");
+        document.getElementById("nav-item-comment").classList.remove("active")
+    } else if (self.location.href.indexOf("comment") != -1) {
+        document.getElementById("nav-item-comment").classList.add("active");
+        document.getElementById("nav-item-home").classList.remove("active");
+        document.getElementById("nav-item-graph").classList.remove("active")
     } else {
         document.getElementById("nav-item-home").classList.add("active");
         document.getElementById("nav-item-graph").classList.remove("active");
+        document.getElementById("nav-item-comment").classList.remove("active")
     }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
