@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if not professor_name %}
+        <div class="container">
+            <div class="bd-callout bd-callout-info">
+                <h5>Comment <i class="fas fa-comments"></i></h5>
+                <p>Leave your comments below.</p>
+            </div>
+            <table class="table table-sm table-hover">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">professor</th>
+                    <th scope="col">comment number</th>
+                </tr>
+                </thead>
+                {% for eachprofessor in professor_list %}
+                    <tr>
+                        <td>
+                            <a href="/comment/{{ eachprofessor }}"> {{ eachprofessor }}</a>
+                        </td>
+                        <td><a href="#isso-thread" data-isso-id="{{ eachprofessor }}"></a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <script data-isso="//localhost:8080" src="//localhost:8080/js/count.min.js" data-isso-lang="en"></script>
+    {% else %}
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h1>{{ professor_name }}</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {% if section_title_list %}
+                        <div class="list-group">
+                            {% for section_title in section_title_list %}
+                                <button type="button" class="list-group-item list-group-item-action" data-toggle="list"
+                                        onclick="comment_section('{{ section_title }}','{{ professor_name }}')">
+                                    {{ section_title }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col" id="comment-section">
+                    <section id="isso-thread" data-title="Foo!" data-isso-id="19S_6379"></section>
+                </div>
+            </div>
+        </div>
+        <script data-isso="//localhost:8080" src="//localhost:8080/js/embed.min.js"
+                data-isso-reply-to-self="false"
+                data-isso-lang="en"></script>
+    {% endif %}
+{% endblock %}

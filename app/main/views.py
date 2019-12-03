@@ -154,7 +154,7 @@ def search():
                            data_update_time=data_update_time, data_update_next_time=data_update_next_time)
 
 
-@main.route('/graph/professor/')
+@main.route('/graph/professor')
 @main.route('/graph/professor/<professor>')
 @main.route('/graph/course')
 @main.route('/graph/course/<coursesection>')
@@ -221,7 +221,6 @@ def graph_pro(professor=None, coursesection=None, term_num=None):
     if professor:
         if not list(db.CourseForGraph.find({"class_instructor": professor})):
             abort(404)
-
         term_dict_list = []
         for eachterm in TERM_LIST:
             term_dict = {}
@@ -269,23 +268,30 @@ def graph_pro(professor=None, coursesection=None, term_num=None):
                                course_json=final_dict)
 
 
-@main.route('/comments/<professor>')
-def comments(professor):
+@main.route('/comment')
+@main.route('/comment/<professor>')
+def comment(professor=None):
     if not professor:
-        abort(404)
-    courses = list(
-        db.CourseForGraph.find({"class_instructor": professor}, {"_id": 0, "class_term": 0, "class_instructor": 0}))
-    section_set = set()
-    title_set = set()
-    section_title_set = set()
-    for course in courses:
-        section = course.get("class_section").split(".")[0]
-        title = course.get("class_title")
-        if section not in section_set and title not in title_set:
-            section_set.add(section)
-            title_set.add(title)
-            section_title_set.add(section + "-" + title)
-    return render_template('comments.html', professor_name=professor, section_title_list=list(section_title_set))
+        courses = list(db.CourseForGraph.find({}, {"_id": 0, "class_title": 0, "class_section": 0, "class_term": 0}))
+        professor_set = set()
+        for course in courses:
+            for each_professor in course.get("class_instructor"):
+                professor_set.add(each_professor)
+        return render_template('comment.html', professor_list=list(professor_set))
+    else:
+        courses = list(
+            db.CourseForGraph.find({"class_instructor": professor}, {"_id": 0, "class_term": 0, "class_instructor": 0}))
+        section_set = set()
+        title_set = set()
+        section_title_set = set()
+        for course in courses:
+            section = course.get("class_section").split(".")[0]
+            title = course.get("class_title")
+            if section not in section_set and title not in title_set:
+                section_set.add(section)
+                title_set.add(title)
+                section_title_set.add(section + "-" + title)
+        return render_template('comment.html', professor_name=professor, section_title_list=list(section_title_set))
 
 
 @main.route('/jobinfo')
