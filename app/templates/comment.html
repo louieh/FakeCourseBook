@@ -10,7 +10,7 @@
                 <thead class="thead-dark">
                 <tr>
                     <th scope="col">professor</th>
-                    <th scope="col">comment number</th>
+                    <th scope="col"></th>
                 </tr>
                 </thead>
                 {% for eachprofessor in professor_list %}
@@ -18,7 +18,7 @@
                         <td>
                             <a href="/comment/{{ eachprofessor }}"> {{ eachprofessor }}</a>
                         </td>
-                        <td><a href="#isso-thread" data-isso-id="{{ eachprofessor }}"></a></td>
+                        <td><a href="#isso-thread" data-isso-id="{{ eachprofessor }}" id="comNumber"></a></td>
                     </tr>
                 {% endfor %}
             </table>
@@ -47,7 +47,7 @@
             </div>
             <div class="row">
                 <div class="col" id="comment-section">
-                    <section id="isso-thread" data-title="Foo!" data-isso-id="19S_6379"></section>
+                    <section id="isso-thread" data-isso-id="{{ professor_name }}"></section>
                 </div>
             </div>
         </div>

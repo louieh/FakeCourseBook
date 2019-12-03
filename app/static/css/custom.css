@@ -10,6 +10,12 @@
     cursor: pointer;
 }
 
+#comNumber {
+    text-decoration: none;
+    color: inherit;
+    cursor: text;
+}
+
 #jobinfotable {
     table-layout: fixed;
 }
