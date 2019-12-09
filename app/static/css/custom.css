@@ -1,3 +1,12 @@
+.navbar {
+    margin-bottom: 30px;
+}
+
+ul {
+    list-style-type: none
+}
+
+
 #githubicon {
     color: rgba(255, 255, 255, .5);
 }
