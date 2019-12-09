@@ -22,7 +22,7 @@ class Config(object):
     # data structure
     For_Speed_struc = ['class_title', 'class_term', 'class_number', 'class_section', 'class_instructor',
                        'class_isFull', 'class_day', 'class_start_time']  # timestamp
-    For_Graph_struc = ['class_title', 'class_section', 'class_term', 'class_instructor']
+    For_Graph_struc = ['class_title', 'class_section', 'class_term', 'class_instructor', 'class_number']
 
     # header
     FAKE_HEADER = {
