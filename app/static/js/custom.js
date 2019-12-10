@@ -305,12 +305,12 @@ function add_shadow(e) {
 }
 
 /**
- * draw line chart for speed
+ * draw tree chart for professor and course
  * @param datasource
  * @param ifprofessor
  */
-function basic_line_chart(datasource, ifprofessor) {
-    var myChart = echarts.init(document.getElementById('graph'));
+function from_left_to_right_tree(datasource, ifprofessor, graph_id) {
+    var myChart = echarts.init(document.getElementById(graph_id));
     myChart.showLoading();
     myChart.hideLoading();
 
@@ -367,12 +367,13 @@ function basic_line_chart(datasource, ifprofessor) {
 }
 
 /**
- * draw tree chart for professor and course
+ * draw line chart for speed
  * @param x_data
  * @param y_data
+ * @param graph_id
  */
-function from_left_to_right_tree(x_data, y_data) {
-    var myChart = echarts.init(document.getElementById('graph'));
+function basic_line_chart(x_data, y_data, graph_id) {
+    var myChart = echarts.init(document.getElementById(graph_id));
     myChart.showLoading();
     myChart.hideLoading();
 
@@ -396,6 +397,74 @@ function from_left_to_right_tree(x_data, y_data) {
             type: 'line'
         }]
     };
+    if (option && typeof option === "object") {
+        myChart.setOption(option, true);
+    }
+}
+
+/**
+ * pie chart for grade graph
+ * @param grades
+ * @param graph_id
+ */
+function pie_doughnut_chart(grades, graph_id) {
+    var dom = document.getElementById(graph_id);
+    var myChart = echarts.init(dom);
+    var app = {};
+    option = null;
+
+    var series_data = new Array();
+    for (var key in grades) {
+        var temp = {value: grades[key], name: key};
+        series_data.push(temp);
+    }
+
+    option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b}: {c} ({d}%)"
+        },
+        legend: {
+            orient: 'vertical',
+            x: 'left',
+            data: Object.keys(grades)
+        },
+        series: [
+            {
+                name: 'Grades',
+                type: 'pie',
+                radius: ['20%', '40%'],
+                avoidLabelOverlap: false,
+                label: {
+                    normal: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        show: true,
+                        textStyle: {
+                            fontSize: '30',
+                            fontWeight: 'bold'
+                        }
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        show: false
+                    }
+                },
+                data: series_data
+                //     [
+                //     {value: 335, name: '直接访问'},
+                //     {value: 310, name: '邮件营销'},
+                //     {value: 234, name: '联盟广告'},
+                //     {value: 135, name: '视频广告'},
+                //     {value: 1548, name: '搜索引擎'}
+                // ]
+            }
+        ]
+    };
+
     if (option && typeof option === "object") {
         myChart.setOption(option, true);
     }
@@ -427,6 +496,28 @@ function comment_section(data_title, data_isso_id) {
     parent.appendChild(section);
     window.Isso.init();
     window.Isso.fetchComments();
+}
+
+/**
+ * use to fill course description div
+ * @param course_section
+ */
+function fill_course_description(course_section) {
+    if (course_section != null) {
+        fetch(`/get_course_description/${course_section}`)
+            .then(data => {
+                return data.json()
+            })
+            .then(data => {
+                var description_div = document.getElementById("course-description");
+                description_div.innerText = data;
+                var spinner = document.getElementById("spinner-grow");
+                spinner.setAttribute("hidden", "");
+            })
+            .catch(error => {
+                console.log(`There is a error ${error}`)
+            })
+    }
 }
 
 /**
