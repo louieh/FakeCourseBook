@@ -313,10 +313,10 @@ function from_left_to_right_tree(datasource, ifprofessor, graph_id) {
     var myChart = echarts.init(document.getElementById(graph_id));
     myChart.showLoading();
     myChart.hideLoading();
-
-    // echarts.util.each(datasourse.children, function (datum, index) {
-    //     index % 2 === 0 && (datum.collapsed = true);
-    // });
+    // 此处添加判断，数据多的时候才收起部分节点
+    echarts.util.each(datasource['children'], function (datum, index) {
+        (index + 1) % 2 === 0 && (datum.collapsed = true);
+    });
 
     myChart.setOption(option = {
         tooltip: {
@@ -413,9 +413,24 @@ function pie_doughnut_chart(grades, graph_id) {
     var app = {};
     option = null;
 
+    var grade_color = {
+        "A": "#009900",
+        "A-": "#00cc00",
+        "B+": "#ffcc00",
+        "B": "#ff9900",
+        "B-": "#ff6600",
+        "C+": "#ff3300",
+        "C": "#cc3300",
+        "F": "#cc0000",
+        "W": "#BDBDBD",
+    };
     var series_data = new Array();
     for (var key in grades) {
-        var temp = {value: grades[key], name: key};
+        var temp = {
+            value: grades[key], name: key, itemStyle: {
+                color: grade_color[key]
+            }
+        };
         series_data.push(temp);
     }
 
@@ -433,7 +448,7 @@ function pie_doughnut_chart(grades, graph_id) {
             {
                 name: 'Grades',
                 type: 'pie',
-                radius: ['20%', '40%'],
+                radius: ['40%', '60%'],
                 avoidLabelOverlap: false,
                 label: {
                     normal: {
@@ -518,6 +533,14 @@ function fill_course_description(course_section) {
                 console.log(`There is a error ${error}`)
             })
     }
+}
+
+/**
+ * sroll for side navbar
+ * @param target_id
+ */
+function anchor_sroll(target_id) {
+    document.getElementById(target_id).scrollIntoView({behavior: "smooth"});
 }
 
 /**
