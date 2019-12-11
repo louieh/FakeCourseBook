@@ -1,3 +1,4 @@
+/* all */
 .navbar {
     margin-bottom: 30px;
 }
@@ -6,16 +7,34 @@ ul {
     list-style-type: none
 }
 
+/* side navbar*/
 .bd-toc {
     position: sticky;
-    order: 2;
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
+    padding-left: 30px;
     font-size: 0.875rem;
     top: 4rem;
     height: calc(100vh - 4rem);
 }
 
+.section-nav {
+    padding-left: 0;
+    border-left: 1px solid #eee;
+}
+
+.toc-entry {
+    display: block;
+    padding: .125rem 1.5rem;
+    color: #77757a;
+}
+
+.toc-entry:hover {
+    color: #007bff;
+    cursor: pointer;
+}
+
+/* github icon */
 #githubicon {
     color: rgba(255, 255, 255, .5);
 }
@@ -24,20 +43,24 @@ ul {
     color: #fff;
 }
 
+/* sort label pointer */
 #sortlabel {
     cursor: pointer;
 }
 
+/* comment number */
 #comNumber {
     text-decoration: none;
     color: inherit;
     cursor: text;
 }
 
+/* job infor table */
 #jobinfotable {
     table-layout: fixed;
 }
 
+/* class status color */
 .classOpen {
     color: #3CB371;
 }
@@ -46,6 +69,7 @@ ul {
     color: #FF6347;
 }
 
+/* bootstrap bd-callout */
 .bd-callout {
     padding: 1.25rem;
     margin-top: 1.25rem;
