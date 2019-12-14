@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <div class="row flex-xl-nowrap">
+            <main class="bd-content" role="main">
+                <p><h4 class="display-4">{{ course_section }} {{ course_name }}</h4></p>
+                <h2 id="description">Description</h2>
+                <div class="spinner-grow" role="status" id="spinner-grow">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p id="course-description"></p>
+                <script>fill_course_description("{{ course_section }}");</script>
+
+                <h2 id="professors">Professors</h2>
+                <div class="bd-callout bd-callout-info">
+                    <p>The chart below shows which professors have taught the course in past semesters.
+                        You can view the professor's chart by clicking on the leaf node.</p>
+                </div>
+                <div class="col-md-auto" id="graph" style="width:100%;height:500px;"></div>
+                {% set datasource=course_json %}
+                <script>from_left_to_right_tree({{ datasource|tojson }}, 0, "graph");</script>
+
+                {% if speed_data_dict %}
+                    <h2 id="status">Status</h2>
+                    <div class="bd-callout bd-callout-info">
+                        <p>The chart below shows the elective status of each section in each semester.</p>
+                    </div>
+                    <div class="container">
+                        {% for each_term in speed_data_dict %}
+                            <div class="row">
+                                <h4>{{ each_term }}</h4>
+                            </div>
+                            <div class="row">
+                                {% set speed_data_each_term=speed_data_dict.get(each_term) %}
+                                {% for each_section in speed_data_each_term %}
+                                    <div class="col-lg-6">
+                                        {% set graph_id=each_term+each_section.replace(" ","") %}
+                                        <p>{{ each_section }}
+                                            | {{ (" ").join(speed_data_each_term.get(each_section).get("class_instructor")) }}</p>
+                                        <div class="col-md-auto"
+                                             id={{ graph_id }} style="width:100%;height:350px;"></div>
+                                        <script>basic_line_chart({{ speed_data_each_term.get(each_section).get("x_data")|tojson }}, {{ speed_data_each_term.get(each_section).get("y_data")|tojson }}, "{{ graph_id }}")</script>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if grade_data_dict %}
+                    <h2 id="grades">Grades</h2>
+                    <div class="bd-callout bd-callout-info">
+                        <p>Data comes from the UTD GRADES website. You can visit <a href="https://utdgrades.com/"
+                                                                                    target="_blank">utdgrades.com</a> to
+                            get
+                            more information.</p>
+                    </div>
+                    <div class="container">
+                        {% for each_professor in grade_data_dict %}
+                            {% set term_section_dict=grade_data_dict.get(each_professor) %}
+                            <div class="row">
+                                <h4>{{ each_professor }}</h4>
+                            </div>
+                            <div class="row">
+                                {% for each_term_section in term_section_dict %}
+                                    <div class="col-lg-6">
+                                        {% set graph_id=(each_professor+each_term_section).replace(" ","") %}
+                                        <p>{{ each_term_section }}</p>
+                                        <div id={{ graph_id }} style="width:100%;height:250px;"></div>
+                                        <script>pie_doughnut_chart({{ term_section_dict.get(each_term_section)|tojson }}, "{{ graph_id }}")</script>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <h2 id="comments">Comments</h2>
+            </main>
+            <nav class="bd-toc" aria-label="Secondary navigation">
+                <ul class="section-nav">
+                    <li class="toc-entry toc-h2" onclick="anchor_sroll('description')">Description</li>
+                    <li class="toc-entry toc-h2" onclick="anchor_sroll('professors')">Professors</li>
+                    {% if speed_data_dict %}
+                        <li class="toc-entry toc-h2" onclick="anchor_sroll('status')">Status</li>
+                    {% endif %}
+                    {% if grade_data_dict %}
+                        <li class="toc-entry toc-h2" onclick="anchor_sroll('grades')">Grades</li>
+                    {% endif %}
+                    <li class="toc-entry toc-h2" onclick="anchor_sroll('comments')">Comments</li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %}
