@@ -7,6 +7,11 @@ ul {
     list-style-type: none
 }
 
+/* course detail page h2 */
+.bd-content > h2 {
+    margin-top: 3rem;
+}
+
 /* side navbar*/
 .bd-toc {
     position: sticky;
