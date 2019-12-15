@@ -7,6 +7,8 @@ import datetime
 import json
 import requests
 import redis
+from lxml import html
+from collections import defaultdict
 
 
 def getDataupdatetime():
@@ -34,6 +36,18 @@ def getRateId(name):
         return None, 'notfound'
     except:
         return None, 'parsefail'
+
+
+@main.route('/get_course_description/<course_section>')
+def get_course_description(course_section):
+    description_url = "https://catalog.utdallas.edu/2019/graduate/courses/" + course_section
+    try:
+        resp = requests.get(description_url)
+        selector = html.etree.HTML(resp.text)
+        text_list = selector.xpath('''.//div[@id="bukku-page"]/p//text()''')
+    except:
+        return None
+    return jsonify("".join(text_list))
 
 
 @main.before_app_first_request
@@ -149,7 +163,6 @@ def search():
             data_update_time = datetime.datetime.strptime(data_update_time, "%Y-%m-%d %H:%M")
         if data_update_next_time:
             data_update_next_time = datetime.datetime.strptime(data_update_next_time, "%Y-%m-%d %H:%M")
-
     return render_template('search.html', data=courses_list, Filter=item_dict,
                            data_update_time=data_update_time, data_update_next_time=data_update_next_time)
 
@@ -183,7 +196,8 @@ def graph_pro(professor=None, coursesection=None, term_num=None):
         elif "graph/course" in request.url:
             cou_set = set()
             cou_dict_list_fin = []
-            cou_dict_list = list(db.CourseForGraph.find({}, {"class_title": 1, "class_section": 1, "_id": 0}))
+            cou_dict_list = list(
+                db.CourseForGraph.find({}, {"class_title": 1, "class_section": 1, "_id": 0}))
             for eachcou_dict in cou_dict_list:
                 eachcou_dict["class_section"] = eachcou_dict.get("class_section").split(".")[0]
                 if eachcou_dict["class_section"] not in cou_set:
@@ -197,26 +211,8 @@ def graph_pro(professor=None, coursesection=None, term_num=None):
 
     if term_num:
         term, num = term_num.split("_")
-        speed_data = list(db.CourseForSpeed.find({"class_term": term, "class_number": num}, {"_id": 0}))
-        if not speed_data:
-            abort(404)
-        if len(speed_data) > 1:
-            print("len(speed_data) > 1")
-        speed_data = speed_data[0]
-
-        def trans_utd(timestamp):
-            utc_time = (datetime.datetime.utcfromtimestamp(timestamp) - datetime.timedelta(hours=TIMEDELTA)).strftime(
-                "%Y-%m-%d %H:%M")
-            return utc_time
-
-        x_data = [trans_utd(each.get("timestamp")) for each in speed_data.get("update_data")]
-        y_data = [each.get("percentage") * 100 for each in speed_data.get("update_data")]
-        return render_template('graph.html', x_data=x_data, y_data=y_data,
-                               class_term=term,
-                               class_title=speed_data.get("class_title"),
-                               class_section=speed_data.get("class_section"),
-                               class_instructor=speed_data.get("class_instructor")
-                               )
+        speed_data_dict = get_speed_graph_data(class_term=term, class_number=num)
+        return render_template('graph.html', speed_data_dict=speed_data_dict)
 
     if professor:
         if not list(db.CourseForGraph.find({"class_instructor": professor})):
@@ -240,32 +236,117 @@ def graph_pro(professor=None, coursesection=None, term_num=None):
         return render_template('graph.html', professor_name=professor,
                                professor_json=professor_json)
     if coursesection:
-        all_course_list = list(db.CourseForGraph.find({"class_section": {"$regex": coursesection}}, {"_id": 0}))
-        if not all_course_list:
-            abort(404)
-        else:
-            course_name = all_course_list[0].get("class_title")
-
-        term_dict = {}
-        for eachterm in TERM_LIST:
-            term_dict[eachterm] = []
-
-        for eachcourse_dict in all_course_list:
-            professorname_list = eachcourse_dict.get("class_instructor")
-            term = eachcourse_dict.get("class_term")
-            for eachprofessorname in professorname_list:
-                temp_professorname_dict = {"name": eachprofessorname, "value": eachprofessorname}
-                if not temp_professorname_dict in term_dict[term]:
-                    term_dict[term].append(temp_professorname_dict)
-
-        final_list = []
-        for eachterm in TERM_LIST:
-            temp_final_dict = {"name": eachterm, "children": term_dict.get(eachterm)}
-            final_list.append(temp_final_dict)
-        final_dict = {"name": coursesection, "children": final_list}
-        return render_template('graph.html', course_section=coursesection.lower().replace(' ', ''),
+        course_section, course_name, final_dict, professor_list = get_course_graph_data(coursesection)
+        return render_template('graph.html',
+                               course_section=course_section,
                                course_name=course_name,
                                course_json=final_dict)
+
+
+def trans_utd(timestamp):
+    utc_time = (datetime.datetime.utcfromtimestamp(timestamp) - datetime.timedelta(hours=TIMEDELTA)).strftime(
+        "%Y-%m-%d %H:%M")
+    return utc_time
+
+
+def get_course_graph_data(coursesection):
+    all_course_list = list(db.CourseForGraph.find({"class_section": {"$regex": coursesection}}, {"_id": 0}))
+    if not all_course_list:
+        abort(404)
+    else:
+        course_name = all_course_list[0].get("class_title")
+        course_section = coursesection.lower().replace(' ', '')
+
+    term_dict = {}
+    professor_list = []
+    for eachterm in TERM_LIST:
+        term_dict[eachterm] = []
+
+    for eachcourse_dict in all_course_list:
+        professorname_list = eachcourse_dict.get("class_instructor")
+        professor_list += professorname_list
+        term = eachcourse_dict.get("class_term")
+        for eachprofessorname in professorname_list:
+            temp_professorname_dict = {"name": eachprofessorname, "value": eachprofessorname}
+            if not temp_professorname_dict in term_dict[term]:
+                term_dict[term].append(temp_professorname_dict)
+
+    final_list = []
+    for eachterm in TERM_LIST:
+        temp_final_dict = {"name": eachterm, "children": term_dict.get(eachterm)}
+        final_list.append(temp_final_dict)
+    final_dict = {"name": coursesection, "children": final_list}
+    return course_section, course_name, final_dict, list(set(professor_list))
+
+
+def get_speed_graph_data(**kwargs):
+    # TODO sort dict
+    if "class_number" in kwargs:
+        if "class_term" in kwargs:
+            speed_data = list(
+                db.CourseForSpeed.find(
+                    {"class_term": kwargs.get("class_term"), "class_number": kwargs.get("class_number")}, {"_id": 0}))
+        else:
+            speed_data = list(db.CourseForSpeed.find({"class_number": kwargs.get("class_number")}, {"_id": 0}))
+    elif "class_section" in kwargs:
+        if "class_term" in kwargs:
+            speed_data = list(
+                db.CourseForSpeed.find(
+                    {"class_term": kwargs.get("class_term"), "class_section": {"$regex": kwargs.get("class_section")}},
+                    {"_id": 0}))
+        else:
+            speed_data = list(
+                db.CourseForSpeed.find({"class_section": {"$regex": kwargs.get("class_section")}}, {"_id": 0}))
+    speed_data_dict = dict()
+    for each_speed_data in speed_data:
+        x_data = [trans_utd(each.get("timestamp")) for each in each_speed_data.get("update_data")]
+        y_data = [each.get("percentage") * 100 for each in each_speed_data.get("update_data")]
+        class_section = each_speed_data.get("class_section")
+        class_term = each_speed_data.get("class_term")
+        class_instructor = each_speed_data.get("class_instructor")
+        class_title = each_speed_data.get("class_title")
+        if class_term not in speed_data_dict:
+            speed_data_dict.update(
+                {class_term: {class_section: {"x_data": x_data, "y_data": y_data, "class_title": class_title,
+                                              "class_instructor": class_instructor}}})
+        else:
+            speed_data_dict[class_term].update(
+                {class_section: {"x_data": x_data, "y_data": y_data, "class_title": class_title,
+                                 "class_instructor": class_instructor}})
+    return speed_data_dict
+
+
+def get_grade_graph_data(course_section, **kwargs):
+    prefix, section_num = course_section.split(" ")
+    grade_graph_data_dict = defaultdict(list)
+    grade_graph_data = list(db.utdgrades.find({"subj": prefix, "num": section_num}, {"_id": 0}))
+    for each_grade_graph_data in grade_graph_data:
+        professor = each_grade_graph_data.get("prof")
+        term = each_grade_graph_data.get("term")
+        section = each_grade_graph_data.get("sect")
+        grades = each_grade_graph_data.get("grades")
+        term_section = term + " | " + course_section + " | " + section
+        grade_graph_data_dict[professor].append({term_section: grades})
+    for professor in grade_graph_data_dict:
+        grade_graph_data_dict[professor].sort(
+            key=lambda k: list(k.keys())[0])  # sort by section: 2019 Spring | CS 5333 | 001
+    return grade_graph_data_dict
+
+
+@main.route('/course/<coursesection>')
+@main.route('/professor/<professor>')
+def course(coursesection=None, professor=None):
+    if coursesection:
+        course_section, course_name, final_dict, professor_list = get_course_graph_data(coursesection)
+        speed_data_dict = get_speed_graph_data(class_section=coursesection)
+        grade_data_dict = get_grade_graph_data(coursesection)
+        return render_template("course.html", course_section=course_section, course_name=course_name,
+                               course_json=final_dict, speed_data_dict=speed_data_dict, grade_data_dict=grade_data_dict)
+    elif professor:
+        pass
+    else:
+        abort(404)
+    return render_template("course.html")
 
 
 @main.route('/comment')
@@ -293,62 +374,60 @@ def comment(professor=None):
                 section_title_set.add(section + "-" + title)
         return render_template('comment.html', professor_name=professor, section_title_list=list(section_title_set))
 
+# @main.route('/jobinfo')
+# def jobinfo():
+#     job_filter, num = get_jobinfo_args()
+#     if db.JobInfo.find(job_filter).count() - num <= 10:
+#         return render_template('jobinfo.html')
+#     else:
+#         data = db.JobInfo.find(job_filter, {'_id': 0, 'name': 1, 'company': 1, 'city': 1, 'create_time': 1}).sort(
+#             [{'create_time', -1}]).skip(num).limit(10)
+#
+#         return render_template('jobinfo.html', data=list(data), job_filter=job_filter)
 
-@main.route('/jobinfo')
-def jobinfo():
-    job_filter, num = get_jobinfo_args()
-    if db.JobInfo.find(job_filter).count() - num <= 10:
-        return render_template('jobinfo.html')
-    else:
-        data = db.JobInfo.find(job_filter, {'_id': 0, 'name': 1, 'company': 1, 'city': 1, 'create_time': 1}).sort(
-            [{'create_time', -1}]).skip(num).limit(10)
-
-        return render_template('jobinfo.html', data=list(data), job_filter=job_filter)
-
-
-def get_jobinfo_args():
-    job_filter = {}
-
-    city_index = request.args.get('city')
-    city = city_dict.get(city_index)
-    if city:
-        job_filter['city'] = city
-
-    firm_index = request.args.get('firm')
-    firm = firm_dict.get(firm_index)
-    if firm:
-        job_filter['company'] = firm
-
-    num = request.args.get('num')
-    if not num:
-        num = 0
-    else:
-        num = int(num)
-    return job_filter, num
-
-
-@main.route('/jobinfodata')
-def jobinfodata():
-    job_filter, num = get_jobinfo_args()
-
-    data = db.JobInfo.find(job_filter, {'_id': 0, 'name': 1, 'company': 1, 'city': 1, 'create_time': 1}).sort(
-        [{'create_time', -1}]).skip(num).limit(10)
-    ifnext = not db.JobInfo.find(job_filter).count() - num <= 10
-    ifpre = num > 0
-    result = {'data': list(data), 'ifnext': ifnext, 'ifpre': ifpre}
-    return jsonify(result)
-
-
-city_dict = {
-    '1': '北京',
-    '2': '上海',
-    '3': '杭州',
-    '4': '深圳',
-    '5': '武汉',
-}
-
-firm_dict = {
-    '1': 'bytedance',
-    '2': 'baidu',
-    '3': 'bilibili',
-}
+# def get_jobinfo_args():
+#     job_filter = {}
+#
+#     city_index = request.args.get('city')
+#     city = city_dict.get(city_index)
+#     if city:
+#         job_filter['city'] = city
+#
+#     firm_index = request.args.get('firm')
+#     firm = firm_dict.get(firm_index)
+#     if firm:
+#         job_filter['company'] = firm
+#
+#     num = request.args.get('num')
+#     if not num:
+#         num = 0
+#     else:
+#         num = int(num)
+#     return job_filter, num
+#
+#
+# @main.route('/jobinfodata')
+# def jobinfodata():
+#     job_filter, num = get_jobinfo_args()
+#
+#     data = db.JobInfo.find(job_filter, {'_id': 0, 'name': 1, 'company': 1, 'city': 1, 'create_time': 1}).sort(
+#         [{'create_time', -1}]).skip(num).limit(10)
+#     ifnext = not db.JobInfo.find(job_filter).count() - num <= 10
+#     ifpre = num > 0
+#     result = {'data': list(data), 'ifnext': ifnext, 'ifpre': ifpre}
+#     return jsonify(result)
+#
+#
+# city_dict = {
+#     '1': '北京',
+#     '2': '上海',
+#     '3': '杭州',
+#     '4': '深圳',
+#     '5': '武汉',
+# }
+#
+# firm_dict = {
+#     '1': 'bytedance',
+#     '2': 'baidu',
+#     '3': 'bilibili',
+# }
