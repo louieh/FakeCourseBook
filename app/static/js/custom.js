@@ -313,10 +313,16 @@ function from_left_to_right_tree(datasource, ifprofessor, graph_id) {
     var myChart = echarts.init(document.getElementById(graph_id));
     myChart.showLoading();
     myChart.hideLoading();
-    // 此处添加判断，数据多的时候才收起部分节点
-    echarts.util.each(datasource['children'], function (datum, index) {
-        (index + 1) % 2 === 0 && (datum.collapsed = true);
+
+    var count = 0;
+    datasource['children'].forEach(function (item) {
+        count += item['children'].length;
     });
+    if (count > 40) {  // 当有大于40个节点是收起部分节点，40写死
+        echarts.util.each(datasource['children'], function (datum, index) {
+            (index + 1) % 2 === 0 && (datum.collapsed = true);
+        })
+    }
 
     myChart.setOption(option = {
         tooltip: {
@@ -537,11 +543,73 @@ function fill_course_description(course_section) {
 
 /**
  * sroll for side navbar
- * @param target_id
  */
-function anchor_sroll(target_id) {
-    document.getElementById(target_id).scrollIntoView({behavior: "smooth"});
+function course_side_nav_init() {
+    $('#nav-description').on('click', function () {
+        $('#description')[0].scrollIntoView({behavior: "smooth"})
+    });
+    $('#nav-professors').on('click', function () {
+        $('#professors')[0].scrollIntoView({behavior: "smooth"})
+    });
+    $('#nav-status').on('click', function () {
+        $('#status')[0].scrollIntoView({behavior: "smooth"})
+    });
+    $('#nav-grades').on('click', function () {
+        $('#grades')[0].scrollIntoView({behavior: "smooth"})
+    });
+    $('#nav-comments').on('click', function () {
+        $('#comments')[0].scrollIntoView({behavior: "smooth"})
+    });
 }
+
+/**
+ * course grade icon init function
+ * bind click event: change icon and collapse status
+ * @param grade_data_dict
+ */
+function course_grade_icon_init(grade_data_dict) {
+    for (var each_professor in grade_data_dict) {
+        var term_section_dict_list = grade_data_dict[each_professor];
+        term_section_dict_list.forEach(function (item) {
+            var each_term_section = Object.keys(item)[0];
+            var graph_id = (each_professor + each_term_section)
+                .replace(/\s+/g, "")
+                .replace(/-/g, "")
+                .split('|').join('')
+                .split(',').join('');
+            $('#p-' + graph_id).on('click', {graph_id: graph_id}, function (event) { //循环绑定事件传参
+                $(this)
+                    .find('[data-fa-i2svg]')
+                    .toggleClass('fa-eye')
+                    .toggleClass('fa-eye-slash');
+                $('#' + event.data.graph_id).collapse('toggle');
+            });
+        });
+    }
+}
+
+/**
+ * course grade collapse close function: close some sections
+ * @param grade_data_dict
+ */
+function course_grade_collapse_close(grade_data_dict) {
+    for (var each_professor in grade_data_dict) {
+        var term_section_dict_list = grade_data_dict[each_professor];
+        if (term_section_dict_list.length > 1) {
+            for (var i = 1; i < term_section_dict_list.length; i++) {
+                var each_term_section = Object.keys(term_section_dict_list[i]);
+                var graph_id = (each_professor + each_term_section)
+                    .replace(/\s+/g, "")
+                    .replace(/-/g, "")
+                    .split('|').join('')
+                    .split(',').join('');
+                $('#' + graph_id).collapse('toggle');
+            }
+        }
+
+    }
+}
+
 
 /**
  * get rate from ratemyprofessor
