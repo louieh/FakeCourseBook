@@ -28,6 +28,10 @@ ul {
     border-left: 1px solid #eee;
 }
 
+.section-nav ul {
+    padding-left: 1rem;
+}
+
 .toc-entry {
     display: block;
     padding: .125rem 1.5rem;
