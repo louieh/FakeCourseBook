@@ -22,7 +22,7 @@
 
                 {% if speed_data_dict %}
                     <h2 id="status">Status</h2>
-                    <div class="bd-callout bd-callout-info collapse">
+                    <div class="bd-callout bd-callout-info">
                         <p>The chart below shows the elective status of each section in each semester.</p>
                     </div>
                     <div class="container">
@@ -53,7 +53,7 @@
                         <p>Data comes from the UTD GRADES website. You can visit <a href="https://utdgrades.com/"
                                                                                     target="_blank">utdgrades.com</a> to
                             get
-                            more information.</p>
+                            more information. Click section to show more.</p>
                     </div>
                     <div class="container">
                         {% for each_professor in grade_data_dict %}
@@ -68,6 +68,7 @@
                                         {% for each_term_section in each_term_section_dict %}
                                             {% set graph_id=(each_professor+each_term_section).replace(" ","").replace("|","").replace(",","").replace("-","") %}
                                             <p id="p-{{ graph_id }}">{{ each_term_section }}
+                                                <img src="{{ url_for('static', filename='people-fill.svg') }}" alt="" width="25" height="25" title="people-fill">{{ each_term_section_dict.get(each_term_section).values()|sum() }}
                                                 {% if outer_loop.first %}
                                                     <i class="fas fa-eye"></i>
                                                 {% else %}
@@ -83,15 +84,13 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <script>course_grade_icon_init({{ grade_data_dict|tojson }})</script>
-                    <script>course_grade_collapse_close({{ grade_data_dict|tojson }})</script>
+                    <script>course_grade_icon_init_collapse_close({{ grade_data_dict|tojson }})</script>
                 {% endif %}
 
                 <h2 id="comments">Comments</h2>
             </main>
             <nav class="bd-toc" aria-label="Secondary navigation">
                 <ul class="section-nav">
-                    {% set nav_list=[] %}
                     <li class="toc-entry toc-h2" id="nav-description">Description</li>
                     <li class="toc-entry toc-h2" id="nav-professors">Professors</li>
                     {% if speed_data_dict %}
