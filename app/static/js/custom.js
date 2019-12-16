@@ -565,9 +565,10 @@ function course_side_nav_init() {
 /**
  * course grade icon init function
  * bind click event: change icon and collapse status
+ * course grade collapse close function: close some sections
  * @param grade_data_dict
  */
-function course_grade_icon_init(grade_data_dict) {
+function course_grade_icon_init_collapse_close(grade_data_dict) {
     for (var each_professor in grade_data_dict) {
         var term_section_dict_list = grade_data_dict[each_professor];
         term_section_dict_list.forEach(function (item) {
@@ -586,13 +587,7 @@ function course_grade_icon_init(grade_data_dict) {
             });
         });
     }
-}
 
-/**
- * course grade collapse close function: close some sections
- * @param grade_data_dict
- */
-function course_grade_collapse_close(grade_data_dict) {
     for (var each_professor in grade_data_dict) {
         var term_section_dict_list = grade_data_dict[each_professor];
         if (term_section_dict_list.length > 1) {
@@ -608,6 +603,7 @@ function course_grade_collapse_close(grade_data_dict) {
         }
 
     }
+
 }
 
 
