@@ -116,33 +116,33 @@
                             <button type="submit" name="search" class="btn btn-primary">Search</button>
                             <button type="submit" name="nowclass" class="btn btn-primary">At this moment</button>
                         </div>
-                        <div class="col-md-auto">
-                            Last update:
-                            {% if data_update_time %}
-                                {{ moment(data_update_time).format('lll') }}
-                            {% endif %}
-                            <br>
-                            Next update:
-                            {% if data_update_next_time %}
-                                {{ moment(data_update_next_time).format('lll') }}
-                            {% endif %}
-                        </div>
-                        <div class="col col-lg-2">
-                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-secondary active" id="20S" onclick="changesource('20S')">
-                                    <input type="radio" id="option19F"
-                                           autocomplete="off"> 20S
-                                </label>
-                                <label class="btn btn-secondary" id="19F" onclick="changesource('19F')">
-                                    <input type="radio" id="option19S"
-                                           autocomplete="off"> 19F
-                                </label>
-                            </div>
-                        </div>
                     </div>
-
-
                 </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-auto">
+                Last update:
+                {% if data_update_time %}
+                    {{ moment(data_update_time).format('lll') }}
+                {% endif %}
+                <br>
+                Next update:
+                {% if data_update_next_time %}
+                    {{ moment(data_update_next_time).format('lll') }}
+                {% endif %}
+            </div>
+            <div class="col col-lg-2">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary active" id="20S" onclick="changesource('20S')">
+                        <input type="radio" id="option19F"
+                               autocomplete="off"> 20S
+                    </label>
+                    <label class="btn btn-secondary" id="19F" onclick="changesource('19F')">
+                        <input type="radio" id="option19S"
+                               autocomplete="off"> 19F
+                    </label>
+                </div>
             </div>
         </div>
         <br>
