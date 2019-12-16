@@ -7,6 +7,11 @@ ul {
     list-style-type: none
 }
 
+/* people-fill icon */
+#people-fill-icon {
+    vertical-align: bottom;
+}
+
 /* course detail page h2 */
 .bd-content > h2 {
     margin-top: 3rem;
