@@ -325,11 +325,13 @@ def get_grade_graph_data(course_section, **kwargs):
         term = each_grade_graph_data.get("term")
         section = each_grade_graph_data.get("sect")
         grades = each_grade_graph_data.get("grades")
+        for k, v in grades.items():
+            grades[k] = int(v)
         term_section = term + " | " + course_section + " | " + section
         grade_graph_data_dict[professor].append({term_section: grades})
     for professor in grade_graph_data_dict:
         grade_graph_data_dict[professor].sort(
-            key=lambda k: list(k.keys())[0])  # sort by section: 2019 Spring | CS 5333 | 001
+            key=lambda k: list(k.keys())[0], reverse=True)  # sort by section: 2019 Spring | CS 5333 | 001
     return grade_graph_data_dict
 
 
