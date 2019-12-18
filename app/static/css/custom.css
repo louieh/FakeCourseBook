@@ -1,23 +1,32 @@
 /* all */
 .navbar {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 ul {
     list-style-type: none
 }
 
-/* people-fill icon */
+table {
+    margin-top: 10px;
+}
+
+/* search page: search tool of */
+#search-tool {
+    margin-bottom: 20px;
+}
+
+/* course page: people-fill icon */
 #people-fill-icon {
     vertical-align: bottom;
 }
 
-/* course detail page h2 */
+/* course page: course detail page h2 */
 .bd-content > h2 {
     margin-top: 3rem;
 }
 
-/* side navbar*/
+/* course page: side navbar*/
 .bd-toc {
     position: sticky;
     padding-top: 1.5rem;
@@ -48,7 +57,7 @@ ul {
     cursor: pointer;
 }
 
-/* github icon */
+/* base: github icon */
 #githubicon {
     color: rgba(255, 255, 255, .5);
 }
@@ -57,24 +66,20 @@ ul {
     color: #fff;
 }
 
-/* sort label pointer */
+/* search page and graph page: sort label pointer */
 #sortlabel {
     cursor: pointer;
 }
 
-/* comment number */
+/* comment page: comment number */
 #comNumber {
     text-decoration: none;
     color: inherit;
     cursor: text;
 }
 
-/* job infor table */
-#jobinfotable {
-    table-layout: fixed;
-}
 
-/* class status color */
+/* search page: class status color */
 .classOpen {
     color: #3CB371;
 }
@@ -83,7 +88,7 @@ ul {
     color: #FF6347;
 }
 
-/* bootstrap bd-callout */
+/* all: bootstrap bd-callout */
 .bd-callout {
     padding: 1.25rem;
     margin-top: 1.25rem;
@@ -132,4 +137,9 @@ ul {
 
 .bd-callout-danger h4 {
     color: #d9534f
+}
+
+/* job infor table */
+#jobinfotable {
+    table-layout: fixed;
 }
