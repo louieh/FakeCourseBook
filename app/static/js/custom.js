@@ -1,37 +1,28 @@
 /**
- * switch active of each label
+ * search page init function
  */
-function labelSwitcher() {
-    var term1 = '20S';
-    var term2 = '19F';
-    var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
-    if (data_source_now === term1) {
-        document.getElementById(term1).classList.add('active');
-        document.getElementById(term2).classList.remove('active');
-    } else {
-        document.getElementById(term2).classList.add('active');
-        document.getElementById(term1).classList.remove('active');
-    }
-    setOpenStatus()
+function search_page_init() {
+    labelSwitcher();
+    collapse_search_tool();
+    add_shadow();
+    semester_switcher();
 }
 
 /**
- * set open status class
+ * for search page
+ * semester switcher event
  */
-function setOpenStatus() {
-    var table = document.querySelector(".table").lastElementChild.children;
-    for (var i = 0; i < table.length; i++) {
-        if (table[i].children[2].innerHTML === "Open") {
-            table[i].children[2].className = 'classOpen';
-            // table[i].children[2].classList.add('classOpen')
-        } else if (table[i].children[2].innerHTML === "Closed") {
-            table[i].children[2].className = 'classClosed';
-            // table[i].children[2].classList.add('classClosed')
-        }
-    }
+function semester_switcher() {
+    $('#20S').on('click', function () {
+        changesource('20S')
+    });
+    $('#19F').on('click', function () {
+        changesource('19F')
+    });
 }
 
 /**
+ * for search page
  * change data source (19F/19S) and set data
  * @param click_source
  */
@@ -53,7 +44,66 @@ function changesource(click_source) {
                 console.log(`There is a error ${error}`)
             })
     }
+}
 
+/**
+ * for search page
+ * add shadow class for each row
+ */
+function add_shadow() {
+    $('#search-page-table').on('dblclick', 'tr', function () {
+        var shadow_class_name = 'font-weight-bold shadow-lg p-3 mb-5 bg-white rounded';
+        $(this).toggleClass(shadow_class_name);
+    })
+}
+
+/**
+ * for search page
+ * switch active of each label
+ */
+function labelSwitcher() {
+    var term1 = '20S';
+    var term2 = '19F';
+    var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
+    if (data_source_now === term1) {
+        document.getElementById(term1).classList.add('active');
+        document.getElementById(term2).classList.remove('active');
+    } else {
+        document.getElementById(term2).classList.add('active');
+        document.getElementById(term1).classList.remove('active');
+    }
+    setOpenStatus()
+}
+
+/**
+ * for search page
+ * set open status class
+ */
+function setOpenStatus() {
+    var table = document.querySelector(".table").lastElementChild.children;
+    for (var i = 0; i < table.length; i++) {
+        if (table[i].children[2].innerHTML === "Open") {
+            table[i].children[2].className = 'classOpen';
+            // table[i].children[2].classList.add('classOpen')
+        } else if (table[i].children[2].innerHTML === "Closed") {
+            table[i].children[2].className = 'classClosed';
+            // table[i].children[2].classList.add('classClosed')
+        }
+    }
+}
+
+/**
+ * for search page
+ * collapse search tool function and switch icon
+ */
+function collapse_search_tool() {
+    $('#p-search-tool').on('click', function () {
+        $(this)
+            .find('[data-fa-i2svg]')
+            .toggleClass('fa-chevron-circle-down')
+            .toggleClass('fa-chevron-circle-up');
+        $('#search-tool').collapse('toggle');
+    })
 }
 
 
@@ -83,6 +133,7 @@ var tabHeadDictForjobinfo = {
 };
 
 /**
+ * For sorting
  * sort function for the sort data function
  * @param propertyName
  * @param order
@@ -121,6 +172,7 @@ function CompareFunction(propertyName, order) {
 }
 
 /**
+ * For sorting
  * delete ▲▼
  * @param headerItem
  */
@@ -131,6 +183,7 @@ function deltabheadericon(headerItem) {
 }
 
 /**
+ * For sorting
  * get sorted data and setting icon on the header of table
  * @param propertyOrder
  * @param dataOrig
@@ -159,6 +212,7 @@ function getSortedData(propertyOrder, dataOrig, tabledict) {
 }
 
 /**
+ * for search page and sorting of search page
  * set data for search view
  * @param newData
  */
@@ -227,6 +281,7 @@ function setdataForSearch(newData) {
 }
 
 /**
+ * For sorting of graph page
  * set data for the graph view
  * @param newData
  */
@@ -246,6 +301,7 @@ function setdataForGraph(newData) {
 }
 
 /**
+ * For sorting
  * reset new sorted data for the search page
  * @param propertyOrder
  * @param obj
@@ -266,6 +322,7 @@ function sortForSearchGraph(propertyOrder, obj, dataOrig = null) {
 }
 
 /**
+ * For sorting
  * get current data
  * @returns {Array}
  */
@@ -293,16 +350,6 @@ function getdatanow() {
     return dataNowList;
 }
 
-/**
- * add shadow class for each row
- * @param e
- */
-function add_shadow(e) {
-    var shadow_class_name = 'font-weight-bold shadow-lg p-3 mb-5 bg-white rounded';
-    if ($(e).hasClass(shadow_class_name))
-        e.className = "";
-    else e.className += shadow_class_name;
-}
 
 /**
  * draw tree chart for professor and course
@@ -492,6 +539,7 @@ function pie_doughnut_chart(grades, graph_id) {
 }
 
 /**
+ * For comment page
  * generate comment section
  * @param data_title
  * @param data_isso_id
@@ -520,6 +568,7 @@ function comment_section(data_title, data_isso_id) {
 }
 
 /**
+ * For course page
  * use to fill course description div
  * @param course_section
  */
@@ -542,6 +591,7 @@ function fill_course_description(course_section) {
 }
 
 /**
+ * For course page
  * sroll for side navbar
  */
 function course_side_nav_init() {
@@ -563,6 +613,7 @@ function course_side_nav_init() {
 }
 
 /**
+ * For course page
  * course grade icon init function
  * bind click event: change icon and collapse status
  * course grade collapse close function: close some sections
@@ -603,7 +654,6 @@ function course_grade_icon_init_collapse_close(grade_data_dict) {
         }
 
     }
-
 }
 
 
