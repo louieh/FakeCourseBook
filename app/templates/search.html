@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="container">
-        <div class="row">
+        <div class="row collapse" id="search-tool">
             <div class="col-xl">
                 <form method="post" action="/">
                     <div class="form-row">
@@ -121,6 +121,10 @@
             </div>
         </div>
         <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-secondary" id="p-search-tool">Search <i
+                        class="fas fa-chevron-circle-down"></i></button>
+            </div>
             <div class="col-md-auto">
                 Last update:
                 {% if data_update_time %}
@@ -134,21 +138,18 @@
             </div>
             <div class="col col-lg-2">
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                    <label class="btn btn-secondary active" id="20S" onclick="changesource('20S')">
-                        <input type="radio" id="option19F"
-                               autocomplete="off"> 20S
+                    <label class="btn btn-secondary active" id="20S">
+                        <input type="radio" autocomplete="off"> 20S
                     </label>
-                    <label class="btn btn-secondary" id="19F" onclick="changesource('19F')">
-                        <input type="radio" id="option19S"
-                               autocomplete="off"> 19F
+                    <label class="btn btn-secondary" id="19F">
+                        <input type="radio" autocomplete="off"> 19F
                     </label>
                 </div>
             </div>
         </div>
-        <br>
         <div class="row table-responsive">
             <div class="col-xl">
-                <table class="table table-sm table-hover">
+                <table class="table table-sm table-hover" id="search-page-table">
                     {% if data %}
                         <thead class="thead-dark">
                         <tr>
@@ -185,7 +186,8 @@
                         </thead>
 
                         {% for course in data %}
-                            <tr ondblclick="add_shadow(this)">
+                            {#                             ondblclick="add_shadow(this)"#}
+                            <tr>
                                 <th scope="row">{{ data.index(course)+1 }}</th>
                                 <td>{{ course['class_term'] }}</td>
                                 <td>{{ course['class_status'] }}</td>
@@ -226,10 +228,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        labelSwitcher();
-        //document.getElementById("18F").addEventListener("click", changesource("18F"));
-        //document.getElementById("19S").addEventListener("click", changesource("19S"));
-    </script>
+    <script>search_page_init();</script>
 {% endblock %}
