@@ -21,9 +21,13 @@ table {
     vertical-align: bottom;
 }
 
-/* course page: course detail page h2 */
+/* course page: course detail page */
 .bd-content > h2 {
     margin-top: 3rem;
+}
+
+.course-page-section {
+    cursor: pointer;
 }
 
 /* course page: side navbar*/
