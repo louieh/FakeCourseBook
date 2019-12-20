@@ -591,10 +591,10 @@ function fill_course_description(course_section) {
 }
 
 /**
- * For course page
+ * For course page and professor page
  * sroll for side navbar
  */
-function course_side_nav_init() {
+function side_nav_init() {
     $('#nav-description').on('click', function () {
         $('#description')[0].scrollIntoView({behavior: "smooth"})
     });
@@ -610,6 +610,12 @@ function course_side_nav_init() {
     $('#nav-comments').on('click', function () {
         $('#comments')[0].scrollIntoView({behavior: "smooth"})
     });
+    $('#nav-links').on('click', function () {
+        $('#links')[0].scrollIntoView({behavior: "smooth"})
+    });
+    $('#nav-courses').on('click', function () {
+        $('#courses')[0].scrollIntoView({behavior: "smooth"})
+    })
 }
 
 /**
@@ -639,21 +645,20 @@ function course_grade_icon_init_collapse_close(grade_data_dict) {
         });
     }
 
-    for (var each_professor in grade_data_dict) {
-        var term_section_dict_list = grade_data_dict[each_professor];
-        if (term_section_dict_list.length > 1) {
-            for (var i = 1; i < term_section_dict_list.length; i++) {
-                var each_term_section = Object.keys(term_section_dict_list[i]);
-                var graph_id = (each_professor + each_term_section)
-                    .replace(/\s+/g, "")
-                    .replace(/-/g, "")
-                    .split('|').join('')
-                    .split(',').join('');
-                $('#' + graph_id).collapse('toggle');
-            }
-        }
-
-    }
+    // for (var each_professor in grade_data_dict) {
+    //     var term_section_dict_list = grade_data_dict[each_professor];
+    //     if (term_section_dict_list.length > 1) {
+    //         for (var i = 1; i < term_section_dict_list.length; i++) {
+    //             var each_term_section = Object.keys(term_section_dict_list[i]);
+    //             var graph_id = (each_professor + each_term_section)
+    //                 .replace(/\s+/g, "")
+    //                 .replace(/-/g, "")
+    //                 .split('|').join('')
+    //                 .split(',').join('');
+    //             $('#' + graph_id).collapse('toggle');
+    //         }
+    //     }
+    // }
 }
 
 
