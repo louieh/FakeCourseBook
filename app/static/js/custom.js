@@ -235,26 +235,16 @@ function setdataForSearch(newData) {
     }
 
     var trs = table.lastElementChild.children;
-    htmlTemplate1 = "<a href='https://catalog.utdallas.edu/2019/graduate/courses/%major%%tempInnerHTML_%' target='_blank'>%tempInnerHTML%</a>";
-    htmlTemplate2 = "<a href='/findrate/%professorname%' target='_blank' name='ratemyprofessors'>%professorname%</a>";
+    htmlTemplate1 = "<a href='/course/%section_%' target='_blank'>%section%</a>";
+    htmlTemplate2 = "<a href='/professor/%professorname%' target='_blank'>%professorname%</a>";
 
     for (i = 0; i < trs.length; i++) {
         trs[i].children[0].innerHTML = i + 1;
         for (j = 1; j < trs[0].children.length; j++) {
             if (j === 5) {
                 var tempInnerHTML = newData[i][tabHeadDictForSearch[j]];
-                var tempInnerHTML_ = tempInnerHTML.split(' ')[1].split('.')[0];
-                if (tempInnerHTML.indexOf('CS') !== -1) {
-                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'cs')
-                } else if (tempInnerHTML.indexOf('CE') !== -1) {
-                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'ce')
-                } else if (tempInnerHTML.indexOf('EE') !== -1) {
-                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'ee')
-                } else if (tempInnerHTML.indexOf('SE') !== -1) {
-                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%tempInnerHTML%', tempInnerHTML).replace('%tempInnerHTML_%', tempInnerHTML_).replace('%major%', 'se')
-                } else {
-                    trs[i].children[j].innerHTML = tempInnerHTML;
-                }
+                var tempInnerHTML_ = tempInnerHTML.split('.')[0];
+                trs[i].children[j].innerHTML = htmlTemplate1.replace('%section_%', tempInnerHTML_).replace('%section%', tempInnerHTML)
 
             } else if (j === 6) {
                 var instructorNum = newData[i][tabHeadDictForSearch[j]].length, text;
