@@ -200,8 +200,8 @@
                                     {% if course['class_instructor']|length > 1 %}
                                         {% for eachinstructor in course['class_instructor'] %}
                                             {% if eachinstructor != '-Staff-' %}
-                                                <a href={{ url_for('main.findrate', name=eachinstructor) }} target="_blank"
-                                                   name="ratemyprofessors">{{ eachinstructor }}</a>;
+                                                <a href={{ url_for('main.course', professor=eachinstructor) }} target="_blank">{{ eachinstructor }}</a>
+                                                ;
                                             {% else %}
                                                 {{ eachinstructor }};
                                             {% endif %}
@@ -209,8 +209,7 @@
                                     {% else %}
                                         {% for eachinstructor in course['class_instructor'] %}
                                             {% if eachinstructor != '-Staff-' %}
-                                                <a href={{ url_for('main.findrate', name=eachinstructor) }} target="_blank"
-                                                   name="ratemyprofessors">{{ eachinstructor }}</a>
+                                                <a href={{ url_for('main.course', professor=eachinstructor) }} target="_blank">{{ eachinstructor }}</a>
                                             {% else %}
                                                 {{ eachinstructor }}
                                             {% endif %}
