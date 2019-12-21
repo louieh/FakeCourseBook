@@ -67,7 +67,7 @@
                                     <div class="col-lg-6">
                                         {% for each_term_section in each_term_section_dict %}
                                             {% set graph_id=(each_professor+each_term_section).replace(" ","").replace("|","").replace(",","").replace("-","") %}
-                                            <p id="p-{{ graph_id }}" class="course-page-section">{{ each_term_section }}
+                                            <p id="p-{{ graph_id }}" class="cour-prof-page-section">{{ each_term_section }}
                                                 <img id="people-fill-icon"
                                                      src="{{ url_for('static', filename='people-fill.svg') }}" alt=""
                                                      width="25" height="25"
