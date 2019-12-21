@@ -97,6 +97,7 @@ function setOpenStatus() {
  * collapse search tool function and switch icon
  */
 function collapse_search_tool() {
+    // 先从 session 中读状态，如果有状态根据状态调整，没有则默认收起
     $('#p-search-tool').on('click', function () {
         $(this)
             .find('[data-fa-i2svg]')
@@ -649,6 +650,32 @@ function course_grade_icon_init_collapse_close(grade_data_dict) {
     //         }
     //     }
     // }
+}
+
+/**
+ * For professor page
+ * professor introduction buttom
+ * @param professor_name
+ */
+function custom_search_button(professor_name) {
+    if (professor_name != null) {
+        fetch(`/custom_search_fun/${professor_name}`)
+            .then(data => {
+                return data.json()
+            })
+            .then(data => {
+                if (data.hasOwnProperty("link")) {
+                    var link = data["link"];
+                    window.open(link);
+                } else {
+                    console.log(data["error"]);
+                    window.open("https://www.google.com/search?q=" + professor_name);
+                }
+            })
+            .catch(error => {
+                console.log(`There is a error ${error}`)
+            })
+    }
 }
 
 
