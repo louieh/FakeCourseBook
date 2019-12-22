@@ -65,15 +65,17 @@ function add_shadow() {
 function labelSwitcher() {
     var term1 = '20S';
     var term2 = '19F';
-    var data_source_now = document.querySelector(".table").children[1].children[0].children[1].textContent;
-    if (data_source_now === term1) {
-        document.getElementById(term1).classList.add('active');
-        document.getElementById(term2).classList.remove('active');
-    } else {
-        document.getElementById(term2).classList.add('active');
-        document.getElementById(term1).classList.remove('active');
+    var data_source_now = document.querySelector(".table").children[1];
+    if (typeof (data_source_now) !== "undefined") {
+        if (data_source_now.children[0].children[1].textContent === term1) {
+            document.getElementById(term1).classList.add('active');
+            document.getElementById(term2).classList.remove('active');
+        } else {
+            document.getElementById(term2).classList.add('active');
+            document.getElementById(term1).classList.remove('active');
+        }
+        setOpenStatus();
     }
-    setOpenStatus()
 }
 
 /**
