@@ -3,6 +3,7 @@
  */
 function search_page_init() {
     labelSwitcher();
+    change_search_tool_base_status();
     collapse_search_tool();
     add_shadow();
     semester_switcher();
@@ -97,14 +98,69 @@ function setOpenStatus() {
  * collapse search tool function and switch icon
  */
 function collapse_search_tool() {
-    // 先从 session 中读状态，如果有状态根据状态调整，没有则默认收起
     $('#p-search-tool').on('click', function () {
-        $(this)
-            .find('[data-fa-i2svg]')
-            .toggleClass('fa-chevron-circle-down')
-            .toggleClass('fa-chevron-circle-up');
-        $('#search-tool').collapse('toggle');
-    })
+        if ($(this).find('[data-fa-i2svg]').hasClass('fa-chevron-circle-down')) {
+            $(this).find('[data-fa-i2svg]').removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up');
+            $('#search-tool').collapse('toggle');
+            get_search_tool_status(true);
+        } else {
+            $(this).find('[data-fa-i2svg]').removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down');
+            $('#search-tool').collapse('toggle');
+            get_search_tool_status(false);
+        }
+    });
+}
+
+/**
+ * for search page
+ * change search tool based on status from session
+ * call this function all the time
+ */
+function change_search_tool_base_status() {
+    get_search_tool_status().then(function (status) {
+        if ((status === true && $('#p-search-tool').find('[data-fa-i2svg]').hasClass('fa-chevron-circle-up')) || (status === false && $('#p-search-tool').find('[data-fa-i2svg]').hasClass('fa-chevron-circle-down'))) {
+        } else {
+            if (status === true) {
+                $('#search-tool').collapse('show');
+                $('#p-search-tool').find('[data-fa-i2svg]').removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up');
+            } else {
+                $('#search-tool').collapse('hide');
+                $('#p-search-tool').find('[data-fa-i2svg]').addClass('fa-chevron-circle-down').removeClass('fa-chevron-circle-up');
+            }
+        }
+    });
+}
+
+/**
+ * for search page
+ * get and change the search tool status from session
+ * @param status
+ * @returns {Promise<any>}
+ */
+function get_search_tool_status(status) {
+    if (typeof (status) == "undefined") {
+        return fetch(`/get_put_search_tool_status`)
+            .then(data => {
+                return data.json()
+            })
+            .then(data => {
+                return data["status"];
+            })
+            .catch(error => {
+                console.log(`There is a error ${error}`)
+            });
+    } else {
+        fetch(`/get_put_search_tool_status/${status}`)
+            .then(data => {
+                return data.json()
+            })
+            .then(data => {
+                console.log("put search tool status")
+            })
+            .catch(error => {
+                console.log(`There is a error ${error}`)
+            })
+    }
 }
 
 

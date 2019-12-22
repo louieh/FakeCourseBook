@@ -38,6 +38,19 @@ def getRateId(name):
         return None, 'parsefail'
 
 
+@main.route('/get_put_search_tool_status/<status>')
+@main.route('/get_put_search_tool_status')
+def get_put_search_tool_status(status=None):
+    if status is not None:
+        if status == "false":
+            session['search_tool'] = False
+        else:
+            session['search_tool'] = True
+        return jsonify("ok")
+    else:
+        return jsonify({"status": session['search_tool']})
+
+
 @main.route('/custom_search_fun/<professor_name>')
 def custom_search_fun(professor_name):
     # https://personal.utdallas.edu/~jcobb/
@@ -101,6 +114,7 @@ def before_first_request():
     TIMEDELTA = current_app.config.get('TIMEDELTA')
     TERM_LIST = current_app.config.get('TERM_LIST')
     session['DATA_SOURCE'] = TERM_LIST[0]  # first term
+    session['search_tool'] = False  # search tool status marker True: hide False: not hide
     REDIS_UPDATE_TIME_KEY = current_app.config.get('REDIS_UPDATE_TIME_KEY')
     REDIS_UPDATE_NEXT_TIME_KEY = current_app.config.get('REDIS_UPDATE_NEXT_TIME_KEY')
     MONGO_HOST = current_app.config.get('MONGO_HOST')
