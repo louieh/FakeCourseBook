@@ -437,7 +437,7 @@ def course(coursesection=None, professor=None):
     elif professor:
         # TODO 改变闭眼位置
         # TODO 增加课程名称
-        # TODO 将 search 页展开状态存到session中
+        # TODO professor link 404
         coursesection_list, professor_json = get_professor_graph_data(professor)
         speed_data_dict = {each_section: get_speed_graph_data(class_section=each_section, class_instructor=professor)
                            for each_section in coursesection_list}
