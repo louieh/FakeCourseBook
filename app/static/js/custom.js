@@ -672,42 +672,39 @@ function side_nav_init() {
  * course grade icon init function
  * bind click event: change icon and collapse status
  * course grade collapse close function: close some sections
- * @param grade_data_dict
+ * @param data_dict
  */
-function course_grade_icon_init_collapse_close(grade_data_dict) {
-    for (var each_professor in grade_data_dict) {
-        var term_section_dict_list = grade_data_dict[each_professor];
-        term_section_dict_list.forEach(function (item) {
-            var each_term_section = Object.keys(item)[0];
-            var graph_id = (each_professor + each_term_section)
-                .replace(/\s+/g, "")
-                .replace(/-/g, "")
-                .split('|').join('')
-                .split(',').join('');
-            $('#p-' + graph_id).on('click', {graph_id: graph_id}, function (event) { //循环绑定事件传参
-                $(this)
-                    .find('[data-fa-i2svg]')
-                    .toggleClass('fa-eye')
-                    .toggleClass('fa-eye-slash');
-                $('#' + event.data.graph_id).collapse('toggle');
-            });
-        });
+function course_grade_icon_init_collapse_close(data_dict) {
+    for (var each_professor_section in data_dict) {
+        // var term_section_dict_list = grade_data_dict[each_professor];
+        // term_section_dict_list.forEach(function (item) {
+        //     var each_term_section = Object.keys(item)[0];
+        //     var graph_id = (each_professor + each_term_section)
+        //         .replace(/\s+/g, "")
+        //         .replace(/-/g, "")
+        //         .split('|').join('')
+        //         .split(',').join('');
+        //     $('#p-' + graph_id).on('click', {graph_id: graph_id}, function (event) {
+        //         $(this)
+        //             .find('[data-fa-i2svg]')
+        //             .toggleClass('fa-eye')
+        //             .toggleClass('fa-eye-slash');
+        //         $('#' + event.data.graph_id).collapse('toggle');
+        //     });
+        // });
+        var hide_id = each_professor_section
+            .replace(/\s+/g, "")
+            .replace(/-/g, "")
+            .split('|').join('')
+            .split(',').join('');
+        $('#p-' + hide_id).on('click', {hide_id: hide_id}, function (event) { //循环绑定事件传参
+            $(this)
+                .find('[data-fa-i2svg]')
+                .toggleClass('fa-eye')
+                .toggleClass('fa-eye-slash');
+            $('#' + event.data.hide_id).collapse('toggle');
+        })
     }
-
-    // for (var each_professor in grade_data_dict) {
-    //     var term_section_dict_list = grade_data_dict[each_professor];
-    //     if (term_section_dict_list.length > 1) {
-    //         for (var i = 1; i < term_section_dict_list.length; i++) {
-    //             var each_term_section = Object.keys(term_section_dict_list[i]);
-    //             var graph_id = (each_professor + each_term_section)
-    //                 .replace(/\s+/g, "")
-    //                 .replace(/-/g, "")
-    //                 .split('|').join('')
-    //                 .split(',').join('');
-    //             $('#' + graph_id).collapse('toggle');
-    //         }
-    //     }
-    // }
 }
 
 /**

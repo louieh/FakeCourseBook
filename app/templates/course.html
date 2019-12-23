@@ -28,9 +28,10 @@
                     <div class="container">
                         {% for each_term in speed_data_dict %}
                             <div class="row">
-                                <h4>{{ each_term }}</h4>
+                                <h4 class="cour-prof-page-hide" id="p-{{ each_term }}">{{ each_term }} <i
+                                        class="fas fa-eye"></i></h4>
                             </div>
-                            <div class="row">
+                            <div class="row collapse show" id="{{ each_term }}">
                                 {% set speed_data_each_term=speed_data_dict.get(each_term) %}
                                 {% for each_section in speed_data_each_term %}
                                     <div class="col-lg-6">
@@ -44,6 +45,7 @@
                                 {% endfor %}
                             </div>
                         {% endfor %}
+                        <script>course_grade_icon_init_collapse_close({{ speed_data_dict|tojson }})</script>
                     </div>
                 {% endif %}
 
@@ -52,34 +54,28 @@
                     <div class="bd-callout bd-callout-info">
                         <p>Data comes from the UTD GRADES website. You can visit <a href="https://utdgrades.com/"
                                                                                     target="_blank">utdgrades.com</a> to
-                            get
-                            more information. Click section to show more.</p>
+                            get more information.</p>
                     </div>
                     <div class="container">
                         {% for each_professor in grade_data_dict %}
                             {% set term_section_dict_list=grade_data_dict.get(each_professor) %}
+                            {% set hide_id=each_professor.replace(" ","").replace("|","").replace(",","").replace("-","") %}
                             <div class="row">
-                                <h4>{{ each_professor }}</h4>
+                                <h4 class="cour-prof-page-hide" id="p-{{ hide_id }}">{{ each_professor }} <i
+                                        class="fas fa-eye"></i></h4>
                             </div>
-                            <div class="row">
+                            <div class="row collapse show" id="{{ hide_id }}">
                                 {% for each_term_section_dict in term_section_dict_list %}
-                                    {% set outer_loop=loop %}
                                     <div class="col-lg-6">
                                         {% for each_term_section in each_term_section_dict %}
-                                            {% set graph_id=(each_professor+each_term_section).replace(" ","").replace("|","").replace(",","").replace("-","") %}
-                                            <p id="p-{{ graph_id }}" class="cour-prof-page-section">{{ each_term_section }}
-                                                <img id="people-fill-icon"
-                                                     src="{{ url_for('static', filename='people-fill.svg') }}" alt=""
-                                                     width="25" height="25"
-                                                     title="people-fill">{{ each_term_section_dict.get(each_term_section).values()|sum() }}
-                                                {% if outer_loop.first %}
-                                                    <i class="fas fa-eye"></i>
-                                                {% else %}
-                                                    <i class="fas fa-eye"></i>
-                                                {% endif %}
+                                            {% set graph_id=(each_professor+each_term_section).replace(" ","") %}
+                                            <p>{{ each_term_section }} <img id="people-fill-icon"
+                                                                            src="{{ url_for('static', filename='people-fill.svg') }}"
+                                                                            alt=""
+                                                                            width="25" height="25"
+                                                                            title="people-fill">{{ each_term_section_dict.get(each_term_section).values()|sum() }}
                                             </p>
-                                            <div id="{{ graph_id }}" class="collapse show"
-                                                 style="width:100%;height:250px;"></div>
+                                            <div id="{{ graph_id }}" style="width:100%;height:250px;"></div>
                                             <script>pie_doughnut_chart({{ each_term_section_dict.get(each_term_section)|tojson }}, "{{ graph_id }}")</script>
                                         {% endfor %}
                                     </div>
