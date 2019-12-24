@@ -80,17 +80,23 @@ def custom_search_fun(professor_name):
     if resp_items:
         for resp_item in resp_items:
             link = resp_item.get("link")
-            if not "personal" in links_dict["links"] and (
-                    re.search("^https://personal.utdallas.edu/~", link) or re.search(
-                    "^https://utdallas.edu/~") or re.search("^https://www.utdallas.edu/~")):
+            title = resp_item.get("title")
+            professor_last_name = professor_name.split(" ", 1)[-1]
+            if not "personal" in links_dict["links"] and \
+                    (re.search("^https://personal.utdallas.edu/~", link) or
+                     re.search("^https://utdallas.edu/~", link) or
+                     re.search("^https://www.utdallas.edu/~", link)) and \
+                    (professor_last_name.lower() in link.split("~")[-1] or professor_last_name in title):
                 links_dict["links"]["personal"] = link
                 if not res_link:
                     res_link = link
-            if not "faculty" in links_dict["links"] and re.search("/people/faculty/", link):
+            if not "faculty" in links_dict["links"] and re.search("/people/faculty/",
+                                                                  link) and professor_last_name.lower() in link:
                 links_dict["links"]["faculty"] = link
                 if not res_link:
                     res_link = link
-            if not "profiles" in links_dict["links"] and re.search("^https://profiles.utdallas.edu/", link):
+            if not "profiles" in links_dict["links"] and re.search("^https://profiles.utdallas.edu/",
+                                                                   link) and professor_last_name.lower() in link:
                 links_dict["links"]["profiles"] = link
                 if not res_link:
                     res_link = link

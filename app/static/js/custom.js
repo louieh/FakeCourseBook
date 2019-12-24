@@ -724,7 +724,7 @@ function custom_search_button(professor_name) {
                     window.open(link);
                 } else {
                     console.log(data["error"]);
-                    window.open("https://www.google.com/search?q=" + professor_name);
+                    window.open("https://www.google.com/search?q=site:utdallas.edu " + professor_name);
                 }
             })
             .catch(error => {
