@@ -58,8 +58,7 @@
                     <h2 id="grades">Grades</h2>
                     <div class="bd-callout bd-callout-info">
                         <p>Data comes from the UTD GRADES website. You can visit <a href="https://utdgrades.com/"
-                                                                                    target="_blank">utdgrades.com</a> to
-                            get more information.</p>
+                                                                                    target="_blank">utdgrades.com</a> for more information.</p>
                     </div>
                     <div class="container">
                         {% for each_section in grade_data_dict %}
@@ -94,7 +93,7 @@
                     </div>
                 {% endif %}
 
-                <h2 id="comments">Comments</h2>
+{#                <h2 id="comments">Comments</h2>#}
             </main>
             <nav class="d-none d-xl-block bd-toc" aria-label="Secondary navigation">
                 <ul class="section-nav">
@@ -106,7 +105,7 @@
                     {% if grade_data_dict %}
                         <li class="toc-entry toc-h2" id="nav-grades">Grades</li>
                     {% endif %}
-                    <li class="toc-entry toc-h2" id="nav-comments">Comments</li>
+{#                    <li class="toc-entry toc-h2" id="nav-comments">Comments</li>#}
                 </ul>
                 <script>side_nav_init()</script>
             </nav>
