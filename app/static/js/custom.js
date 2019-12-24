@@ -526,6 +526,8 @@ function pie_doughnut_chart(grades, graph_id) {
         "F": "#cc0000",
         "W": "#BDBDBD",
     };
+
+
     var series_data = new Array();
     for (var key in grades) {
         var temp = {
@@ -536,6 +538,13 @@ function pie_doughnut_chart(grades, graph_id) {
         series_data.push(temp);
     }
 
+    legend_label_all = ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "F", "W"];
+    legend_label = [];
+    for (var i = 0; i < legend_label_all.length; i++) {
+        if (Object.keys(grades).indexOf(legend_label_all[i]) !== -1)
+            legend_label.push(legend_label_all[i])
+    }
+
     option = {
         tooltip: {
             trigger: 'item',
@@ -544,7 +553,7 @@ function pie_doughnut_chart(grades, graph_id) {
         legend: {
             orient: 'vertical',
             x: 'left',
-            data: Object.keys(grades)
+            data: legend_label,
         },
         series: [
             {
@@ -571,8 +580,8 @@ function pie_doughnut_chart(grades, graph_id) {
                     }
                 },
                 data: series_data
-                //     [
-                //     {value: 335, name: '直接访问'},
+                // [
+                // {value: 335, name: '直接访问'},
                 //     {value: 310, name: '邮件营销'},
                 //     {value: 234, name: '联盟广告'},
                 //     {value: 135, name: '视频广告'},
