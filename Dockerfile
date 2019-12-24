@@ -4,8 +4,7 @@ WORKDIR /Course-Search
 
 COPY requirements.txt .
 
-RUN apt-get update && apt-get install -y vim
- && pip install -r requirements.txt
+RUN apt-get update && apt-get install -y vim && pip install -r requirements.txt
 
 COPY app app
 COPY config.py course_search.py ./
