@@ -210,6 +210,7 @@ class DB(object):
             except Exception as e:
                 logger.error('insert redis {0} failed: {0}'.format(self.redis_key_for_speed, str(e)))
 
+    # TODO redis next time key 增加超时时间
     def update_next_time_search(self, method='add'):
         if not self.redis_client:
             self.init_redis()
