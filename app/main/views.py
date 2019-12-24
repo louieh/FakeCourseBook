@@ -56,6 +56,8 @@ def custom_search_fun(professor_name):
     # https://personal.utdallas.edu/~jcobb/
     # https://cs.utdallas.edu/people/faculty/cobb-jorge/
     # https://profiles.utdallas.edu/cobb
+    # https://utdallas.edu/~kyle.fox/
+    # https://www.utdallas.edu/~bhavani.thuraisingham/
     prof_link_url = list(db.profIntroLinks.find({"prof": professor_name}, {"_id": 0}))
     if prof_link_url:
         links = prof_link_url[0].get("links")
@@ -78,7 +80,9 @@ def custom_search_fun(professor_name):
     if resp_items:
         for resp_item in resp_items:
             link = resp_item.get("link")
-            if not "personal" in links_dict["links"] and re.search("^https://personal.utdallas.edu/~", link):
+            if not "personal" in links_dict["links"] and (
+                    re.search("^https://personal.utdallas.edu/~", link) or re.search(
+                    "^https://utdallas.edu/~") or re.search("^https://www.utdallas.edu/~")):
                 links_dict["links"]["personal"] = link
                 if not res_link:
                     res_link = link
@@ -437,9 +441,6 @@ def course(coursesection=None, professor=None):
     elif professor:
         # TODO 增加课程名称
         # TODO professor link 404
-        # TODO https://utdallas.edu/~kyle.fox/
-        # TODO https://www.utdallas.edu/~bhavani.thuraisingham/
-        # https://personal.utdallas.edu/~chandra/
         coursesection_list, professor_json = get_professor_graph_data(professor)
         speed_data_dict = {each_section: get_speed_graph_data(class_section=each_section, class_instructor=professor)
                            for each_section in coursesection_list}
