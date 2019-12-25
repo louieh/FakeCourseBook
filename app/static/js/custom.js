@@ -527,23 +527,22 @@ function pie_doughnut_chart(grades, graph_id) {
         "W": "#BDBDBD",
     };
 
-
-    var series_data = new Array();
-    for (var key in grades) {
-        var temp = {
-            value: grades[key], name: key, itemStyle: {
-                color: grade_color[key]
-            }
-        };
-        series_data.push(temp);
-    }
-
     legend_label_all = ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "F", "W"];
     legend_label = [];
-    for (var i = 0; i < legend_label_all.length; i++) {
-        if (Object.keys(grades).indexOf(legend_label_all[i]) !== -1)
-            legend_label.push(legend_label_all[i])
-    }
+    series_data = [];
+    legend_label_all.forEach(function (item) {
+        if (grades.hasOwnProperty(item)) {
+            legend_label.push(item);
+            var temp = {
+                value: grades[item],
+                name: item,
+                itemStyle: {
+                    color: grade_color[item]
+                }
+            };
+            series_data.push(temp);
+        }
+    });
 
     option = {
         tooltip: {
