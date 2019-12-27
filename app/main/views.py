@@ -447,6 +447,7 @@ def course(coursesection=None, professor=None):
     elif professor:
         # TODO 增加课程名称
         # TODO professor link 404
+        # TODO grade 中教授添加排序并标注教授此门课程学期与本学期是否教授该门课程
         coursesection_list, professor_json = get_professor_graph_data(professor)
         speed_data_dict = {each_section: get_speed_graph_data(class_section=each_section, class_instructor=professor)
                            for each_section in coursesection_list}
