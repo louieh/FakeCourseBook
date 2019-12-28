@@ -16,8 +16,12 @@ table {
     margin-bottom: 20px;
 }
 
-/* course page: people-fill icon */
+/* course page: people-fill icon and semester badge*/
 #people-fill-icon {
+    vertical-align: bottom;
+}
+
+#semester-badge {
     vertical-align: bottom;
 }
 
