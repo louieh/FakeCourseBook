@@ -318,7 +318,7 @@ def get_professor_graph_data(professor):
                 course_dict["name"] = eachcourse.get("class_title")
                 class_section = eachcourse.get("class_section")
                 coursesection_list.add(class_section.split(".")[0])
-                course_dict["value"] = class_section.split(" ")[-1].split(".")[0]
+                course_dict["value"] = class_section.split(".")[0]
                 course_dict_list.append(course_dict)
         term_dict["name"] = eachterm
         term_dict["children"] = course_dict_list
@@ -434,20 +434,79 @@ def get_grade_graph_data(course_section, **kwargs):
 @main.route('/course/<coursesection>')
 @main.route('/professor/<professor>')
 def course(coursesection=None, professor=None):
+    def grade_in(one_name, one_list, sec_or_prof):
+        if sec_or_prof == "sec":
+            for one in one_list:
+                temp_list = one.split(" ", 1)
+                if len(temp_list) == 2:
+                    new_key = temp_list[1] + ", " + temp_list[0]
+                else:
+                    new_key = one
+                if new_key in one_name:
+                    return True
+            return False
+        else:
+            return one_name in one_list
+
+    def get_grade_dict_list(grade_data_dict, sem_dict_dict, mark):
+        sem_dict = [
+            {"semester": each.get('name'),
+             "sections_or_profs": [each_each.get('value') for each_each in each.get('children')]} for
+            each in sem_dict_dict.get("children")]
+
+        prior_dict = dict()
+        for sec_or_prof, grade in grade_data_dict.items():
+            for sem in sem_dict:
+                if grade_in(sec_or_prof, sem.get("sections_or_profs"), mark):
+                    if sem.get("semester") in TERM_LIST[:2]:
+                        if sec_or_prof not in prior_dict:
+                            prior_dict[sec_or_prof] = {
+                                "prof": sec_or_prof,
+                                "grade": grade,
+                                "badges": [sem.get("semester")],
+                                "priority": int(sem.get("semester")[:2])
+                            } if mark == "sec" else {
+                                "section": sec_or_prof,
+                                "prof": list(grade.keys())[0],
+                                "grade": list(grade.values())[0],
+                                "badges": [sem.get("semester")],
+                                "priority": int(sem.get("semester")[:2])
+                            }
+                        else:
+                            prior_dict[sec_or_prof]["badges"].append(sem.get("semester"))
+                            prior_dict[sec_or_prof]["priority"] += int(sem.get("semester")[:2])
+                        prior_dict[sec_or_prof]["priority"] += 2 if TERM_LIST.index(sem.get("semester")) == 0 else 1
+                    else:
+                        if sec_or_prof not in prior_dict:
+                            prior_dict[sec_or_prof] = {
+                                "prof": sec_or_prof,
+                                "grade": grade,
+                                "badges": [],
+                                "priority": int(sem.get("semester")[:2])
+                            } if mark == "sec" else {
+                                "section": sec_or_prof,
+                                "prof": list(grade.keys())[0],
+                                "grade": list(grade.values())[0],
+                                "badges": [],
+                                "priority": int(sem.get("semester")[:2])
+                            }
+                        break
+        return sorted(list(prior_dict.values()), key=lambda each: each.get("priority"), reverse=True)
+
     if coursesection:
         course_section, course_name, final_dict, professor_list = get_course_graph_data(coursesection)
         speed_data_dict = get_speed_graph_data(class_section=coursesection)
         grade_data_dict = get_grade_graph_data(coursesection)
+        grade_dict_list = get_grade_dict_list(grade_data_dict, final_dict, "sec")
         return render_template("course.html",
                                course_section=course_section,
                                course_name=course_name,
                                course_json=final_dict,
                                speed_data_dict=speed_data_dict,
-                               grade_data_dict=grade_data_dict)
+                               grade_dict_list=grade_dict_list)
     elif professor:
         # TODO 增加课程名称
         # TODO professor link 404
-        # TODO grade 中教授添加排序并标注教授此门课程学期与本学期是否教授该门课程
         coursesection_list, professor_json = get_professor_graph_data(professor)
         speed_data_dict = {each_section: get_speed_graph_data(class_section=each_section, class_instructor=professor)
                            for each_section in coursesection_list}
@@ -455,12 +514,13 @@ def course(coursesection=None, professor=None):
         grade_data_dict = {each_section: get_grade_graph_data(each_section, prof=professor) for each_section in
                            coursesection_list}
         grade_data_dict = {k: v for k, v in grade_data_dict.items() if v}
+        grade_dict_list = get_grade_dict_list(grade_data_dict, professor_json, "prof")
         return render_template("professor.html",
                                professor_name=professor,
                                coursesection_list=coursesection_list,
                                professor_json=professor_json,
                                speed_data_dict=speed_data_dict,
-                               grade_data_dict=grade_data_dict)
+                               grade_dict_list=grade_dict_list)
     else:
         abort(404)
 

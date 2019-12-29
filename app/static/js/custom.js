@@ -460,7 +460,7 @@ function from_left_to_right_tree(datasource, ifprofessor, graph_id) {
     myChart.on('click', function (params) {
         if (ifprofessor === 1) {
             if (params.value)
-                window.open('/graph/course/CS ' + encodeURIComponent(params.value));
+                window.open('/graph/course/' + encodeURIComponent(params.value));
         } else if (ifprofessor === 0) {
             if (params.value)
                 window.open('/graph/professor/' + encodeURIComponent(params.value));
@@ -677,29 +677,11 @@ function side_nav_init() {
 
 /**
  * For course page
- * course grade icon init function
- * bind click event: change icon and collapse status
- * course grade collapse close function: close some sections
+ * speed eye icon init function
  * @param data_dict
  */
-function course_grade_icon_init_collapse_close(data_dict) {
+function speed_icon_init_collapse_close(data_dict) {
     for (var each_professor_section in data_dict) {
-        // var term_section_dict_list = grade_data_dict[each_professor];
-        // term_section_dict_list.forEach(function (item) {
-        //     var each_term_section = Object.keys(item)[0];
-        //     var graph_id = (each_professor + each_term_section)
-        //         .replace(/\s+/g, "")
-        //         .replace(/-/g, "")
-        //         .split('|').join('')
-        //         .split(',').join('');
-        //     $('#p-' + graph_id).on('click', {graph_id: graph_id}, function (event) {
-        //         $(this)
-        //             .find('[data-fa-i2svg]')
-        //             .toggleClass('fa-eye')
-        //             .toggleClass('fa-eye-slash');
-        //         $('#' + event.data.graph_id).collapse('toggle');
-        //     });
-        // });
         var hide_id = each_professor_section
             .replace(/\s+/g, "")
             .replace(/-/g, "")
@@ -713,6 +695,30 @@ function course_grade_icon_init_collapse_close(data_dict) {
             $('#' + event.data.hide_id).collapse('toggle');
         })
     }
+}
+
+/**
+ * For course page
+ * course grade icon init function
+ * bind click event: change icon and collapse status
+ * course grade collapse close function: close some sections
+ * @param data_dict_list
+ */
+function course_grade_icon_init_collapse_close(data_dict_list, hide_obj) {
+    data_dict_list.forEach(function (item) {
+        var hide_id = item[hide_obj]
+            .replace(/\s+/g, "")
+            .replace(/-/g, "")
+            .split('|').join('')
+            .split(',').join('');
+        $('#p-' + hide_id).on('click', {hide_id: hide_id}, function (event) {
+            $(this)
+                .find('[data-fa-i2svg]')
+                .toggleClass('fa-eye')
+                .toggleClass('fa-eye-slash');
+            $('#' + event.data.hide_id).collapse('toggle');
+        })
+    });
 }
 
 /**

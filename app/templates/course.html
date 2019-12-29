@@ -45,11 +45,11 @@
                                 {% endfor %}
                             </div>
                         {% endfor %}
-                        <script>course_grade_icon_init_collapse_close({{ speed_data_dict|tojson }})</script>
+                        <script>speed_icon_init_collapse_close({{ speed_data_dict|tojson }})</script>
                     </div>
                 {% endif %}
 
-                {% if grade_data_dict %}
+                {% if grade_dict_list %}
                     <h2 id="grades">Grades</h2>
                     <div class="bd-callout bd-callout-info">
                         <p>Data comes from the UTD GRADES website. You can visit <a href="https://utdgrades.com/"
@@ -57,18 +57,24 @@
                             for more information.</p>
                     </div>
                     <div class="container">
-                        {% for each_professor in grade_data_dict %}
-                            {% set term_section_dict_list=grade_data_dict.get(each_professor) %}
-                            {% set hide_id=each_professor.replace(" ","").replace("|","").replace(",","").replace("-","") %}
+                        {% for each_dict in grade_dict_list %}
+                            {% set hide_id=each_dict.get("prof").replace(" ","").replace("|","").replace(",","").replace("-","") %}
                             <div class="row">
-                                <h4 class="cour-prof-page-hide" id="p-{{ hide_id }}">{{ each_professor }} <i
-                                        class="fas fa-eye"></i></h4>
+                                <h4 class="cour-prof-page-hide" id="p-{{ hide_id }}">{{ each_dict.get("prof") }}
+                                    {% if each_dict.get("badges") %}
+                                        {% for badge in each_dict.get("badges") %}
+                                            <span class="badge badge-pill badge-light"
+                                                  id="semester-badge">{{ badge }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                    <i class="fas fa-eye"></i>
+                                </h4>
                             </div>
                             <div class="row collapse show" id="{{ hide_id }}">
-                                {% for each_term_section_dict in term_section_dict_list %}
+                                {% for each_term_section_dict in each_dict.get("grade") %}
                                     <div class="col-lg-6">
                                         {% for each_term_section in each_term_section_dict %}
-                                            {% set graph_id=(each_professor+each_term_section).replace(" ","") %}
+                                            {% set graph_id=(each_dict.get("prof")+each_term_section).replace(" ","") %}
                                             <p>{{ each_term_section }} <img id="people-fill-icon"
                                                                             src="{{ url_for('static', filename='people-fill.svg') }}"
                                                                             alt=""
@@ -83,7 +89,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <script>course_grade_icon_init_collapse_close({{ grade_data_dict|tojson }})</script>
+                    <script>course_grade_icon_init_collapse_close({{ grade_dict_list|tojson }}, "prof")</script>
                 {% endif %}
 
                 {#                <h2 id="comments">Comments</h2>#}
@@ -95,7 +101,7 @@
                     {% if speed_data_dict %}
                         <li class="toc-entry toc-h2" id="nav-status">Status</li>
                     {% endif %}
-                    {% if grade_data_dict %}
+                    {% if grade_dict_list %}
                         <li class="toc-entry toc-h2" id="nav-grades">Grades</li>
                     {% endif %}
                     {#                    <li class="toc-entry toc-h2" id="nav-comments">Comments</li>#}
