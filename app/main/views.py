@@ -77,26 +77,31 @@ def custom_search_fun(professor_name):
     resp_json = json.loads(resp.text)
     resp_items = resp_json.get("items")
     res_link = None
+
+    def name_in_something(something, name_list=professor_name.split(" ")):
+        for name in name_list:
+            if name.lower() in something:
+                return True
+        return False
+
     if resp_items:
         for resp_item in resp_items:
             link = resp_item.get("link")
             title = resp_item.get("title")
-            professor_last_name = professor_name.split(" ", 1)[-1]
             if not "personal" in links_dict["links"] and \
                     (re.search("^https://personal.utdallas.edu/~", link) or
                      re.search("^https://utdallas.edu/~", link) or
                      re.search("^https://www.utdallas.edu/~", link)) and \
-                    (professor_last_name.lower() in link.split("~")[-1] or professor_last_name in title):
+                    (name_in_something(link.split("~")[-1]) or name_in_something(title)):
                 links_dict["links"]["personal"] = link
                 if not res_link:
                     res_link = link
-            if not "faculty" in links_dict["links"] and re.search("/people/faculty/",
-                                                                  link) and professor_last_name.lower() in link:
+            if not "faculty" in links_dict["links"] and re.search("/people/faculty/", link) and name_in_something(link):
                 links_dict["links"]["faculty"] = link
                 if not res_link:
                     res_link = link
             if not "profiles" in links_dict["links"] and re.search("^https://profiles.utdallas.edu/",
-                                                                   link) and professor_last_name.lower() in link:
+                                                                   link) and name_in_something(link):
                 links_dict["links"]["profiles"] = link
                 if not res_link:
                     res_link = link
@@ -358,7 +363,7 @@ def get_course_graph_data(coursesection):
 
 
 def get_speed_graph_data(**kwargs):
-    # TODO sort dict
+    # TODO think the structure of speed data
     if "class_number" in kwargs:
         if "class_term" in kwargs:
             speed_data = list(
