@@ -25,11 +25,10 @@ if len(sys.argv) > 1:
     if '-m' in sys.argv[1:] or '-M' in sys.argv[1:]:
         logger.info("Main scheduler started...")
         scheduler.add_job(Spider.update_data, 'interval', minutes=setting.UPDATE_INTERVAL)
-        Spider.init_next_update_search('add')
+        Spider.init_next_update_search()
         scheduler.start()
     elif '-s' in sys.argv[1:] or '-S' in sys.argv[1:]:
         logger.info("Skip scheduler started...")
-        Spider.init_next_update_search('delete')
         scheduler.add_job(skip, 'interval', minutes=setting.UPDATE_INTERVAL)
         scheduler.start()
 else:

@@ -19,6 +19,7 @@ class DB(object):
                  redis_key_for_graph=setting.REDIS_KEY_FOR_GRAPH,
                  redis_key_for_speed=setting.REDIS_KEY_FOR_SPEED,
                  redis_key_for_search_next=setting.REDIS_KEY_FOR_SEARCH_NEXT,
+                 UPDATE_INTERVAL=setting.UPDATE_INTERVAL,
                  ):
         self.mongo_host = mongo_host
         self.redis_host = redis_host
@@ -32,9 +33,11 @@ class DB(object):
         self.redis_key_for_search_next = redis_key_for_search_next
         self.redis_key_for_graph = redis_key_for_graph
         self.redis_key_for_speed = redis_key_for_speed
+        self.UPDATE_INTERVAL = UPDATE_INTERVAL
 
     def init_redis(self):
-        self.redis_client = redis.StrictRedis(host=self.redis_host, port=self.redis_port, decode_responses=True)
+        pool = redis.ConnectionPool(host=self.redis_host, port=self.redis_port, decode_responses=True)
+        self.redis_client = redis.Redis(connection_pool=pool)
         try:
             self.redis_client.keys()
             return True
@@ -210,11 +213,8 @@ class DB(object):
             except Exception as e:
                 logger.error('insert redis {0} failed: {0}'.format(self.redis_key_for_speed, str(e)))
 
-    # TODO redis next time key 增加超时时间
-    def update_next_time_search(self, method='add'):
+    def update_next_time_search(self):
         if not self.redis_client:
             self.init_redis()
-        if method == 'delete':
-            self.redis_client.delete(self.redis_key_for_search_next)
-        elif method == 'add':
-            self.redis_client.set(self.redis_key_for_search_next, setting.TIMENOW_UTC_NEXT())
+        self.redis_client.set(self.redis_key_for_search_next, setting.TIMENOW_UTC_NEXT(),
+                              ex=self.UPDATE_INTERVAL * 60)  # minute
