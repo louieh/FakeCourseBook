@@ -7,28 +7,26 @@
                 <p>Charts on this page show what courses the professor has taught in past semesters.
                     You can view the chart of that course by clicking on the leaf node.</p>
             </div>
-            {% if professor_list_list|length%6!=0 %}
-                {% set rownumber = (professor_list_list|length/6)|int+1 %}
+            {% if professor_list_list|length%5!=0 %}
+                {% set rownumber = (professor_list_list|length/5)|int+1 %}
             {% else %}
-                {% set rownumber = (professor_list_list|length/6)|int %}
+                {% set rownumber = (professor_list_list|length/5)|int %}
             {% endif %}
             {% for i in range(rownumber) %}
                 <div class="row">
-                    {% if professor_list_list|length >= 6 %}
-                        {% set colnumber = 6 %}
-                    {% else %}
-                        {% set colnumber = professor_list_list|length %}
-                    {% endif %}
-                    {% for j in range(colnumber) %}
+                    {% for j in range(5) %}
                         <div class="col">
                             <ul>
-                                {% for eachprofessor in professor_list_list.pop(0) %}
-                                    {% if eachprofessor|length == 1 %}
-                                        <li>{{ eachprofessor }}</li>
-                                    {% else %}
-                                        <li><a href="/graph/professor/{{ eachprofessor }}">{{ eachprofessor }}</a></li>
-                                    {% endif %}
-                                {% endfor %}
+                                {% if professor_list_list %}
+                                    {% for eachprofessor in professor_list_list.pop(0) %}
+                                        {% if loop.first %}
+                                            <li>{{ eachprofessor }}</li>
+                                        {% else %}
+                                            <li><a href="/graph/professor/{{ eachprofessor }}">{{ eachprofessor }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
                             </ul>
                         </div>
                     {% endfor %}

@@ -249,7 +249,7 @@ def search():
 @main.route('/graph/speed/<term_num>')
 def graph_pro(professor=None, coursesection=None, term_num=None):
     if not professor and not coursesection and not term_num:
-        # TODO Sort by last name
+        # TODO add global function to switch professor name to last name - first name or first name - last name
         if "graph/professor" in request.url:
             professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1, "_id": 0}))
             if not professor_dict_list:
