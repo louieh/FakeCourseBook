@@ -251,21 +251,24 @@ def graph_pro(professor=None, coursesection=None, term_num=None):
     if not professor and not coursesection and not term_num:
         # TODO Sort by last name
         if "graph/professor" in request.url:
-            professor_set = set()
             professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1, "_id": 0}))
-            for eachdict in professor_dict_list:
-                for each in eachdict.get("class_instructor"):
-                    if "Staff" not in each:
-                        professor_set.add(each)
-            professor_char_dict = {}
-            for i in range(65, 91):  # use alphabet as key
-                professor_char_dict[chr(i)] = []
-            for each_professor_name in professor_set:  # insert professor name to professor_char_dict based on the first letter of their name
-                professor_char_dict[each_professor_name[0]].append(each_professor_name)
-            professor_list_list = []
-            for eachkey in professor_char_dict.keys():  # insert the key_value of professor_char_dict to a new list
-                if professor_char_dict.get(eachkey):
-                    professor_list_list.append([eachkey] + professor_char_dict.get(eachkey))
+            if not professor_dict_list:
+                return render_template("graph.html")
+
+            def split_name(name):
+                name_list = name.split(" ", 1)
+                if len(name_list) == 1:
+                    return name_list[0]
+                else:
+                    return name_list[1] + ", " + name_list[0]
+
+            professor_set = set()
+            [professor_set.add(split_name(name)) for prof_dict in professor_dict_list for name in
+             prof_dict.get("class_instructor")
+             if "Staff" not in name]
+            professor_char_dict = defaultdict(list)
+            [professor_char_dict[name[0]].append(name) for name in professor_set]
+            professor_list_list = sorted([[k] + v for k, v in professor_char_dict.items()], key=lambda k: k[0])
             return render_template("graph.html", professor_list_list=professor_list_list)
         elif "graph/course" in request.url:
             cou_set = set()
