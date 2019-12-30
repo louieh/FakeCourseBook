@@ -217,4 +217,4 @@ class DB(object):
         if not self.redis_client:
             self.init_redis()
         self.redis_client.set(self.redis_key_for_search_next, setting.TIMENOW_UTC_NEXT(),
-                              ex=self.UPDATE_INTERVAL * 60)  # minute
+                              ex=(self.UPDATE_INTERVAL + 5) * 60)  # minute
