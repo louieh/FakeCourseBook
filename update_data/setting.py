@@ -68,10 +68,10 @@ class ProductionConfig(Config):
     REDIS_KEY_FOR_GRAPH = 'graph_data_update_time'
     REDIS_KEY_FOR_SPEED = 'speed_data_update_time'
     # switch of update object
-    UPDATE_FOR_SEARCH = bool(os.getenv('UPDATE_FOR_SEARCH', True))
-    UPDATE_FOR_GRAPH = bool(os.getenv('UPDATE_FOR_GRAPH', False))
-    UPDATE_FOR_SPEED = bool(os.getenv('UPDATE_FOR_SPEED', False))
-    GRADUATE_LEVEL = bool(os.getenv('GRADUATE_LEVEL', True))
+    UPDATE_FOR_SEARCH = True if os.getenv('UPDATE_FOR_SEARCH', True) in [True, 'True'] else False
+    UPDATE_FOR_GRAPH = True if os.getenv('UPDATE_FOR_GRAPH', False) in [True, 'True'] else False
+    UPDATE_FOR_SPEED = True if os.getenv('UPDATE_FOR_SPEED', False) in [True, 'True'] else False
+    GRADUATE_LEVEL = True if os.getenv('GRADUATE_LEVEL', True) in [True, 'True'] else False
 
 
 class DevelopmentConfig(Config):
