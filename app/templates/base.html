@@ -58,20 +58,19 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item" id="nav-item-home">
-                <a class="nav-link" href="/"><i class="fas fa-home"></i> Home </a>
+                <a class="nav-link" href="/"><i class="fas fa-home"></i> This semester </a>
             </li>
 {#            <li class="nav-item" id="nav-item-comment">#}
 {#                <a class="nav-link" href="/comment"><i class="fas fa-comment"></i> Comment</a>#}
 {#            </li>#}
-            <li class="nav-item dropdown" id="nav-item-graph">
+            <li class="nav-item dropdown" id="nav-item-list">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-chart-bar"></i> Graph
+                    <i class="fas fa-chart-bar"></i> Professors & Courses
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="/graph/professor">Professor</a>
-                    <a class="dropdown-item" href="/graph/course">Course</a>
-                    <a class="dropdown-item" href="/graph/speed">Speed</a>
+                    <a class="dropdown-item" href="/list/professor">Professors</a>
+                    <a class="dropdown-item" href="/list/course">Courses</a>
                 </div>
             </li>
             <!--
@@ -97,17 +96,17 @@
 
 
 <script>
-    if (self.location.href.indexOf("graph") != -1) {
-        document.getElementById("nav-item-graph").classList.add("active");
+    if (self.location.href.indexOf("list") != -1) {
+        document.getElementById("nav-item-list").classList.add("active");
         document.getElementById("nav-item-home").classList.remove("active");
         document.getElementById("nav-item-comment").classList.remove("active")
     } else if (self.location.href.indexOf("comment") != -1) {
         document.getElementById("nav-item-comment").classList.add("active");
         document.getElementById("nav-item-home").classList.remove("active");
-        document.getElementById("nav-item-graph").classList.remove("active")
+        document.getElementById("nav-item-list").classList.remove("active")
     } else {
         document.getElementById("nav-item-home").classList.add("active");
-        document.getElementById("nav-item-graph").classList.remove("active");
+        document.getElementById("nav-item-list").classList.remove("active");
         document.getElementById("nav-item-comment").classList.remove("active")
     }
 </script>

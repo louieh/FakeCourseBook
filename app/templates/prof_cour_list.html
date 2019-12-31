@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if professor_list_list %}
+        <div class="container">
+            <div class="bd-callout bd-callout-info">
+                <h5>Professors <i class="fas fa-project-diagram"></i></h5>
+                <p>Click on a professor's name to see his details..</p>
+            </div>
+            {% if professor_list_list|length%5!=0 %}
+                {% set rownumber = (professor_list_list|length/5)|int+1 %}
+            {% else %}
+                {% set rownumber = (professor_list_list|length/5)|int %}
+            {% endif %}
+            {% for i in range(rownumber) %}
+                <div class="row">
+                    {% for j in range(5) %}
+                        <div class="col">
+                            <ul>
+                                {% if professor_list_list %}
+                                    {% for eachprofessor in professor_list_list.pop(0) %}
+                                        {% if loop.first %}
+                                            <li>{{ eachprofessor }}</li>
+                                        {% else %}
+                                            <li><a href="/professor/{{ eachprofessor }}">{{ eachprofessor }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    {% elif cou_dict_list %}
+        <div class="container">
+            <div class="bd-callout bd-callout-info">
+                <h5>Courses <i class="fas fa-project-diagram"></i></h5>
+                <p>Charts on this page show which professors have taught the course in past semesters.
+                    You can view the professor's chart by clicking on the leaf node.</p>
+            </div>
+            <table class="table table-sm table-hover">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">class section</th>
+                    <th scope="col">detail</th>
+                    <th scope="col">class title</th>
+                </tr>
+                </thead>
+                {% for eachdict in cou_dict_list %}
+                    <tr>
+                        <td>{{ eachdict.get("class_section") }}</td>
+                        <td><a href="/course/{{ eachdict.get("class_section") }}">detail</a></td>
+                        <td>{{ eachdict.get("class_title") }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

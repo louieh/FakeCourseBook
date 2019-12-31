@@ -78,6 +78,7 @@ def custom_search_fun(professor_name):
     resp_items = resp_json.get("items")
     res_link = None
 
+    # TODO 字符串匹配
     def name_in_something(something, name_list=professor_name.split(" ")):
         for name in name_list:
             if name.lower() in something:
@@ -241,67 +242,48 @@ def search():
                            data_update_time=data_update_time, data_update_next_time=data_update_next_time)
 
 
-@main.route('/graph/professor')
-@main.route('/graph/professor/<professor>')
-@main.route('/graph/course')
-@main.route('/graph/course/<coursesection>')
-@main.route('/graph/speed')
-@main.route('/graph/speed/<term_num>')
-def graph_pro(professor=None, coursesection=None, term_num=None):
-    if not professor and not coursesection and not term_num:
-        # TODO add global function to switch professor name to last name - first name or first name - last name
-        if "graph/professor" in request.url:
-            professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1, "_id": 0}))
-            if not professor_dict_list:
-                return render_template("graph.html")
+def switch_name(name):  # switch name to last name - first name or first name - last name
+    if " " not in name:
+        return name
+    if ", " in name:
+        name_list = name.split(", ", 1)
+        return name_list[1] + " " + name_list[0]
+    else:
+        name_list = name.split(" ", 1)
+        if len(name_list) == 1:
+            return name_list[0]
+        else:
+            return name_list[1] + ", " + name_list[0]
 
-            def split_name(name):
-                name_list = name.split(" ", 1)
-                if len(name_list) == 1:
-                    return name_list[0]
-                else:
-                    return name_list[1] + ", " + name_list[0]
 
-            professor_set = set()
-            [professor_set.add(split_name(name)) for prof_dict in professor_dict_list for name in
-             prof_dict.get("class_instructor")
-             if "Staff" not in name]
-            professor_char_dict = defaultdict(list)
-            [professor_char_dict[name[0]].append(name) for name in professor_set]
-            professor_list_list = sorted([[k] + v for k, v in professor_char_dict.items()], key=lambda k: k[0])
-            return render_template("graph.html", professor_list_list=professor_list_list)
-        elif "graph/course" in request.url:
-            cou_set = set()
-            cou_dict_list_fin = []
-            cou_dict_list = list(
-                db.CourseForGraph.find({}, {"class_title": 1, "class_section": 1, "_id": 0}))
-            for eachcou_dict in cou_dict_list:
-                eachcou_dict["class_section"] = eachcou_dict.get("class_section").split(".")[0]
-                if eachcou_dict["class_section"] not in cou_set:
-                    cou_set.add(eachcou_dict["class_section"])
-                    cou_dict_list_fin.append(eachcou_dict)
-            return render_template("graph.html", cou_dict_list=cou_dict_list_fin)
-        elif "graph/speed" in request.url:
-            speed_dict_list = list(
-                db.CourseForSpeed.find({}, {"_id": 0, "class_day": 0, "class_start_time": 0, "update_data": 0}))
-            return render_template("graph.html", speed_dict_list=speed_dict_list)
+@main.route('/list/professor')
+@main.route('/list/course')
+def list_pro():
+    # TODO add global function to switch professor name to last name - first name or first name - last name
+    if "list/professor" in request.url:
+        professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1, "_id": 0}))
+        if not professor_dict_list:
+            return render_template("prof_cour_list.html")
 
-    if term_num:
-        term, num = term_num.split("_")
-        speed_data_dict = get_speed_graph_data(class_term=term, class_number=num)
-        return render_template('graph.html', speed_data_dict=speed_data_dict)
-
-    if professor:
-        coursesection_list, professor_json = get_professor_graph_data(professor)
-        return render_template('graph.html',
-                               professor_name=professor,
-                               professor_json=professor_json)
-    if coursesection:
-        course_section, course_name, final_dict, professor_list = get_course_graph_data(coursesection)
-        return render_template('graph.html',
-                               course_section=course_section,
-                               course_name=course_name,
-                               course_json=final_dict)
+        professor_set = set()
+        [professor_set.add(switch_name(name)) for prof_dict in professor_dict_list for name in
+         prof_dict.get("class_instructor")
+         if "Staff" not in name]
+        professor_char_dict = defaultdict(list)
+        [professor_char_dict[name[0]].append(name) for name in professor_set]
+        professor_list_list = sorted([[k] + v for k, v in professor_char_dict.items()], key=lambda k: k[0])
+        return render_template("prof_cour_list.html", professor_list_list=professor_list_list)
+    elif "list/course" in request.url:
+        cou_set = set()
+        cou_dict_list_fin = []
+        cou_dict_list = list(
+            db.CourseForGraph.find({}, {"class_title": 1, "class_section": 1, "_id": 0}))
+        for eachcou_dict in cou_dict_list:
+            eachcou_dict["class_section"] = eachcou_dict.get("class_section").split(".")[0]
+            if eachcou_dict["class_section"] not in cou_set:
+                cou_set.add(eachcou_dict["class_section"])
+                cou_dict_list_fin.append(eachcou_dict)
+        return render_template("prof_cour_list.html", cou_dict_list=cou_dict_list_fin)
 
 
 def trans_utd(timestamp):
@@ -515,6 +497,8 @@ def course(coursesection=None, professor=None):
     elif professor:
         # TODO 增加课程名称
         # TODO professor link 404
+        if ", " in professor:
+            professor = switch_name(professor)
         coursesection_list, professor_json = get_professor_graph_data(professor)
         speed_data_dict = {each_section: get_speed_graph_data(class_section=each_section, class_instructor=professor)
                            for each_section in coursesection_list}
