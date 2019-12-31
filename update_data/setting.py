@@ -16,8 +16,8 @@ class Config(object):
                      '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
                      '10U', '10S']
     CURRENT_TERM_LIST = ['20S', '19F']
-    ALL_PREFIX_LIST = ['CS']
-    CURRENT_PREFIX_LIST = ['CS']
+    ALL_PREFIX_LIST = ['CS', 'CE', 'EE']
+    CURRENT_PREFIX_LIST = ['CS', 'CE', 'EE']
 
     # data structure
     For_Speed_struc = ['class_title', 'class_term', 'class_number', 'class_section', 'class_instructor',
