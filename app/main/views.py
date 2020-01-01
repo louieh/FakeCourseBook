@@ -259,7 +259,6 @@ def switch_name(name):  # switch name to last name - first name or first name - 
 @main.route('/list/professor')
 @main.route('/list/course')
 def list_pro():
-    # TODO add global function to switch professor name to last name - first name or first name - last name
     if "list/professor" in request.url:
         professor_dict_list = list(db.CourseForGraph.find({}, {"class_instructor": 1, "_id": 0}))
         if not professor_dict_list:
