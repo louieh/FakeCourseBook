@@ -14,7 +14,7 @@ function google_search_init() {
         }
     });
     google_search_button.on('click', function () {
-        if (google_search_button.val() !== "") {
+        if (google_search_box.val() !== "") {
             window.open('/search?q=' + google_search_box.val());
             google_search_box.val("");
         }
