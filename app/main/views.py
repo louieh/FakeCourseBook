@@ -541,6 +541,10 @@ def comment(professor=None):
                 section_title_set.add(section + "-" + title)
         return render_template('comment.html', professor_name=professor, section_title_list=list(section_title_set))
 
+
+@main.route('/search')
+def search_reslut():
+    return render_template("search_result.html")
 # @main.route('/jobinfo')
 # def jobinfo():
 #     job_filter, num = get_jobinfo_args()

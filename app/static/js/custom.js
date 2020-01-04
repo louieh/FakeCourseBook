@@ -1,3 +1,27 @@
+function google_search_init() {
+    // $(document).keydown(function (event) {
+    //     switch (event.keyCode) {
+    //         case 13:
+    //             return false;
+    //     }
+    // });
+    $('#google-search-button').on('click', function () {
+        var search_box = $('#google-search-box');
+        if (search_box.val() !== "") {
+            window.open('/search?q=' + search_box.val());
+            search_box.val("");
+        }
+
+    });
+    $('#google-search-box').keydown(function (event) {
+        if (event.which === 13) {
+            var q = $('#google-search-box').val();
+            if (q !== "")
+                window.open('/search?q=' + q);
+        }
+    })
+}
+
 /**
  * search page init function
  */

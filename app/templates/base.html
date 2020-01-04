@@ -60,9 +60,9 @@
             <li class="nav-item" id="nav-item-home">
                 <a class="nav-link" href="/"><i class="fas fa-home"></i> This semester </a>
             </li>
-{#            <li class="nav-item" id="nav-item-comment">#}
-{#                <a class="nav-link" href="/comment"><i class="fas fa-comment"></i> Comment</a>#}
-{#            </li>#}
+            {#            <li class="nav-item" id="nav-item-comment">#}
+            {#                <a class="nav-link" href="/comment"><i class="fas fa-comment"></i> Comment</a>#}
+            {#            </li>#}
             <li class="nav-item dropdown" id="nav-item-list">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
@@ -80,22 +80,18 @@
             -->
         </ul>
         <form class="form-inline my-2 my-lg-0">
-            <!--
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            -->
-            <a href="https://github.com/louieh/FakeCourseBook" target="_blank" id="githubicon"><i
-                    class="fab fa-github fa-2x"></i></a>
+            <input class="form-control mr-sm-2" id="google-search-box">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="button" id="google-search-button">Search</button>
+{#            <a href="https://github.com/louieh/FakeCourseBook" target="_blank" id="githubicon"><i#}
+            {#                    class="fab fa-github fa-2x"></i></a>#}
         </form>
 
     </div>
 </nav>
 
-
 {% block content %}{% endblock %}
-
-
 <script>
+    google_search_init();
     if (self.location.href.indexOf("list") != -1) {
         document.getElementById("nav-item-list").classList.add("active");
         document.getElementById("nav-item-home").classList.remove("active");
