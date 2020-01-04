@@ -1,23 +1,30 @@
 function google_search_init() {
-    // $(document).keydown(function (event) {
-    //     switch (event.keyCode) {
-    //         case 13:
-    //             return false;
-    //     }
-    // });
-    $('#google-search-button').on('click', function () {
-        var search_box = $('#google-search-box');
-        if (search_box.val() !== "") {
-            window.open('/search?q=' + search_box.val());
-            search_box.val("");
+    var google_search_button = $('#google-search-button');
+    var google_search_box = $('#google-search-box');
+    $(document).keydown(function (event) {
+        switch (event.keyCode) {
+            case 13:
+                return false;
         }
-
     });
-    $('#google-search-box').keydown(function (event) {
+    google_search_box.keydown(function (event) {
+        switch (event.keyCode) {
+            case 13:
+                return true;
+        }
+    });
+    google_search_button.on('click', function () {
+        if (google_search_button.val() !== "") {
+            window.open('/search?q=' + google_search_box.val());
+            google_search_box.val("");
+        }
+    });
+    google_search_box.keydown(function (event) {
         if (event.which === 13) {
-            var q = $('#google-search-box').val();
-            if (q !== "")
-                window.open('/search?q=' + q);
+            if (google_search_box.val() !== "") {
+                window.open('/search?q=' + google_search_box.val());
+                google_search_box.val("");
+            }
         }
     })
 }
