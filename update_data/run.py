@@ -19,13 +19,19 @@ executors = {
 }
 scheduler = BlockingScheduler()
 
-Spider = spider.Spider(update_method=1)
+
+def run_spider():
+    Spider = spider.Spider(update_method=1)
+    Spider.update_data()
+    Spider.init_next_update_search()
+    del Spider
+
+
 if len(sys.argv) > 1:
     logger.info("You may not want to add -m or -s")
     if '-m' in sys.argv[1:] or '-M' in sys.argv[1:]:
         logger.info("Main scheduler started...")
-        scheduler.add_job(Spider.update_data, 'interval', minutes=setting.UPDATE_INTERVAL)
-        Spider.init_next_update_search()
+        scheduler.add_job(run_spider, 'interval', minutes=setting.UPDATE_INTERVAL)
         scheduler.start()
     elif '-s' in sys.argv[1:] or '-S' in sys.argv[1:]:
         logger.info("Skip scheduler started...")
@@ -33,5 +39,7 @@ if len(sys.argv) > 1:
         scheduler.start()
 else:
     setting.UPDATE_NEXT_TIME_KEY = False
+    Spider = spider.Spider(update_method=1)
     Spider.update_data()
+    del Spider
     setting.UPDATE_NEXT_TIME_KEY = True

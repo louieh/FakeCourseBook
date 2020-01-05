@@ -18,7 +18,6 @@ class Downloader(object):
     def download_tool(self, url):
         if not url:
             return
-
         try:
             logger.info('download url: {0}'.format(url))
             resp = self.session.get(url, headers=self.header)
