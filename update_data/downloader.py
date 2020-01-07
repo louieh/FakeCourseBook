@@ -15,7 +15,7 @@ class Downloader(object):
         self.session = requests.Session()
         self.resps = []
 
-    def download_tool(self, url):
+    def download_tool(self, url, res):
         if not url:
             return
         try:
@@ -28,16 +28,16 @@ class Downloader(object):
             logger.error('other error: {0}'.format(str(e)))
             return
         if resp.status_code == 200:
-            self.resps.append(resp)
+            res.append(resp)
         else:
             logger.error('the status_code:{0}'.format(resp.status_code))
             return
 
     def download(self, urls, **kwargs):
-        self.resps = []
+        res = []
         header = kwargs.get('header', {})
         self.header.update(header)
         workers = min(MAX_WORKERS, len(urls))
         with futures.ThreadPoolExecutor(workers) as executor:
-            executor.map(self.download_tool, urls)
-        return self.resps
+            executor.map(self.download_tool, urls, res)
+        return res
