@@ -14,7 +14,7 @@ class Downloader(object):
         self.proxy = ''
         self.session = requests.Session()
 
-    def download_tool(self, url, res):
+    def download_tool(self, url):
         if not url:
             return
         try:
