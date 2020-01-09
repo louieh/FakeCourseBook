@@ -491,10 +491,10 @@ function from_left_to_right_tree(datasource, ifprofessor, graph_id) {
     myChart.on('click', function (params) {
         if (ifprofessor === 1) {
             if (params.value)
-                window.open('/graph/course/' + encodeURIComponent(params.value));
+                window.open('/course/' + encodeURIComponent(params.value));
         } else if (ifprofessor === 0) {
             if (params.value)
-                window.open('/graph/professor/' + encodeURIComponent(params.value));
+                window.open('/professor/' + encodeURIComponent(params.value));
         }
     });
 }
