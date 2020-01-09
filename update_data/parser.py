@@ -34,9 +34,7 @@ class Parser(object):
             logger.error("parser: etree failed: {0},{1}".format(repr(e), resp_url))
             return
 
-    def parse_coursebook(self, resps, **kwargs):
-        # parse data
-        temp_dict_list = []
+    def parse_coursebook_tool(self, resps):
         for resp in resps:
             selector = self.get_selector(resp)
             courses = selector.xpath('''.//div[@class="section-list"]//tbody/tr''')
@@ -140,44 +138,56 @@ class Parser(object):
                 except Exception as e:
                     logger.error("parser failed: {0}".format(str(e)))
                     continue
-                temp_dict_list.append(each_course_dict)
+                yield each_course_dict
 
-        # classify
-        For_Speed_struc = setting.For_Speed_struc
-        # class time may change
+    def get_update_for_search_it(self, resps):
+        course_iter = self.parse_coursebook_tool(resps)
+        for course_dict in course_iter:
+            if course_dict.get('class_term') in setting.CURRENT_TERM_LIST:
+                yield course_dict
+
+    def get_update_for_graph_it(self, resps):
+        course_iter = self.parse_coursebook_tool(resps)
         For_Graph_struc = setting.For_Graph_struc
+        for course_dict in course_iter:
+            temp_dict = dict()
+            [temp_dict.update({each_key: course_dict.get(each_key)}) for each_key in For_Graph_struc]
+            yield temp_dict
+
+    def get_update_for_speed_it(self, resps):
+        course_iter = self.parse_coursebook_tool(resps)
+        For_Speed_struc = setting.For_Speed_struc
         timestamp = int(time.time())
-        UPDATE_FOR_SEARCH_dict_list = []
-        UPDATE_FOR_GRAPH_dict_list = []
-        UPDATE_FOR_SPEED_dict_list = []
-        for each_dict in temp_dict_list:
-            if self.update_for_search:
-                if each_dict.get('class_term') in setting.CURRENT_TERM_LIST:
-                    UPDATE_FOR_SEARCH_dict_list.append(each_dict)
-            if self.update_for_graph:
-                temp_dict = dict()
-                for each_key in For_Graph_struc:
-                    temp_dict[each_key] = each_dict[each_key]
-                UPDATE_FOR_GRAPH_dict_list.append(temp_dict)
-            if setting.UPDATE_FOR_SPEED:
-                if each_dict['class_term'] != setting.CURRENT_TERM_LIST[0]:
-                    continue
-                temp_dict = dict()
-                for each_key in For_Speed_struc:
-                    temp_dict[each_key] = int(
-                        each_dict[each_key].split('%')[0]) / 100 if each_key == 'class_isFull' else each_dict[each_key]
-                temp_dict['timestamp'] = timestamp
-                UPDATE_FOR_SPEED_dict_list.append(temp_dict)
-        if not UPDATE_FOR_SPEED_dict_list and not UPDATE_FOR_GRAPH_dict_list and not UPDATE_FOR_SEARCH_dict_list:
-            return None
+        for course_dict in course_iter:
+            if course_dict['class_term'] != setting.CURRENT_TERM_LIST[0]:
+                continue
+            temp_dict = dict()
+            for each_key in For_Speed_struc:
+                temp_dict[each_key] = int(
+                    course_dict[each_key].split('%')[0]) / 100 if each_key == 'class_isFull' else course_dict[each_key]
+            temp_dict['timestamp'] = timestamp
+            yield temp_dict
+
+    def parse_coursebook(self, resps, **kwargs):
+
+        update_for_search_it = update_for_speed_it = update_for_graph_it = None
+
+        if self.update_for_search:
+            update_for_search_it = self.get_update_for_search_it(resps)
+        if self.update_for_speed:
+            update_for_speed_it = self.get_update_for_speed_it(resps)
+        if self.update_for_graph:
+            update_for_graph_it = self.get_update_for_graph_it(resps)
+
         final_dict = dict()
-        if UPDATE_FOR_SEARCH_dict_list:
-            final_dict[self.col_name_search] = UPDATE_FOR_SEARCH_dict_list
-        if UPDATE_FOR_GRAPH_dict_list:
-            final_dict[self.col_name_graph] = UPDATE_FOR_GRAPH_dict_list
-        if UPDATE_FOR_SPEED_dict_list:
-            final_dict[self.col_name_speed] = UPDATE_FOR_SPEED_dict_list
-        return final_dict
+        if update_for_search_it:
+            final_dict[self.col_name_search] = update_for_search_it
+        if update_for_speed_it:
+            final_dict[self.col_name_speed] = update_for_speed_it
+        if update_for_graph_it:
+            final_dict[self.col_name_graph] = update_for_graph_it
+
+        return final_dict if final_dict else None
 
     def parse_prefix(self):
         all_prefix = []

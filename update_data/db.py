@@ -77,7 +77,8 @@ class DB(object):
         if self.col_name_search in data:
             logger.info('inserting for {0}'.format(self.col_name_search))
             try:
-                self.db.temp.insert_many(data.get(self.col_name_search))
+                for each_update_for_seasrch in data.get(self.col_name_search):
+                    self.db.temp.insert_one(each_update_for_seasrch)
             except Exception as e:
                 logger.error('insert temp collection failed: {0}'.format(str(e)))
                 self.db.temp.drop()
@@ -121,7 +122,8 @@ class DB(object):
         if self.col_name_graph in data:
             logger.info('inserting for {0}'.format(self.col_name_graph))
             try:
-                self.db.temp.insert_many(data.get(self.col_name_graph))
+                for each_update_for_graph in data.get(self.col_name_graph):
+                    self.db.temp.insert_one(each_update_for_graph)
             except Exception as e:
                 logger.error('insert temp collection failed: {0}'.format(str(e)))
                 self.db.temp.drop()

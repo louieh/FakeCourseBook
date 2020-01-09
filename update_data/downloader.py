@@ -13,6 +13,7 @@ class Downloader(object):
         self.header = header
         self.proxy = ''
         self.session = requests.Session()
+        self.resps = []
 
     def download_tool(self, url):
         if not url:
@@ -27,18 +28,16 @@ class Downloader(object):
             logger.error('other error: {0}'.format(str(e)))
             return
         if resp.status_code == 200:
-            return resp
+            self.resps.append(resp)
         else:
             logger.error('the status_code:{0}'.format(resp.status_code))
             return
 
     def download(self, urls, **kwargs):
-        res = []
+        self.resps = []
         header = kwargs.get('header', {})
         self.header.update(header)
-        # workers = min(MAX_WORKERS, len(urls))
-        # with futures.ThreadPoolExecutor(workers) as executor:
-        #     executor.map(self.download_tool, urls)
-        for url in urls:
-            res.append(self.download_tool(url))
-        return res
+        workers = min(MAX_WORKERS, len(urls))
+        with futures.ThreadPoolExecutor(workers) as executor:
+            executor.map(self.download_tool, urls)
+        return self.resps
