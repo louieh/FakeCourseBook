@@ -367,7 +367,7 @@ function setdataForSearch(newData) {
  */
 function setdataForGraph(newData) {
     var trs = document.querySelector(".table").lastElementChild.children;
-    htmlTemplate = '<a href="/graph/course/%tempInnerHTML%">%tempInnerHTML%</a>';
+    htmlTemplate = '<a href="/course/%tempInnerHTML%">%tempInnerHTML%</a>';
 
     for (var i = 0; i < trs.length; i++) {
         for (var j = 0; j < trs[0].children.length; j++) {
