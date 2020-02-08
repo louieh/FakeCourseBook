@@ -72,7 +72,7 @@ class ProductionConfig(Config):
     UPDATE_FOR_GRAPH = True if os.getenv('UPDATE_FOR_GRAPH', False) in [True, 'True'] else False
     UPDATE_FOR_SPEED = True if os.getenv('UPDATE_FOR_SPEED', False) in [True, 'True'] else False
     GRADUATE_LEVEL = True if os.getenv('GRADUATE_LEVEL', True) in [True, 'True'] else False
-
+    SKIP = True if os.getenv('SKIP', True) in [True, 'True'] else False
 
 class DevelopmentConfig(Config):
     # db
