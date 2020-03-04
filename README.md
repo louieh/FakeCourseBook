@@ -10,18 +10,18 @@
 
 #### There are two main kind of pages:
 
-* [Course page]([http://fakecoursebook.info/course/CS%205333](http://fakecoursebook.info/course/CS 5333))
+* [Course page](http://fakecoursebook.info/course/CS%205333)
   * Course description
   * Professors graph for each semester
   * Election status graph
   * Grades distribution graph
-* [Professor page]([http://fakecoursebook.info/professor/Jorge%20Cobb](http://fakecoursebook.info/professor/Jorge Cobb))
+* [Professor page](http://fakecoursebook.info/professor/Jorge%20Cobb)
   * Links about the professor
   * Courses graph for each semester
   * Election status graph
   * Grades distribution graph
 
-
+
 
 #### TODO
 
