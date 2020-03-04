@@ -8,24 +8,24 @@
 
 
 
-#### There are two main kind of pages:
+#### Two main kinds of pages:
 
 * [Course page](http://fakecoursebook.info/course/CS%205333)
   * Course description
-  * Professors graph for each semester
-  * Election status graph
-  * Grades distribution graph
+  * Professors charts for each semester
+  * Elective status charts
+  * Grade distribution charts
 * [Professor page](http://fakecoursebook.info/professor/Jorge%20Cobb)
   * Links about the professor
-  * Courses graph for each semester
-  * Election status graph
-  * Grades distribution graph
+  * Courses charts for each semester
+  * Elective status charts
+  * Grade distribution charts
 
 
 
 #### TODO
 
-[ ] Comment System
+- [ ] Comment System
 
-[ ] Course status monitor tool
+- [ ] Course status monitor tool
 
