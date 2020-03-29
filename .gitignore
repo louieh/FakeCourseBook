@@ -7,3 +7,4 @@ util/__pycache__
 deploy/
 *.app
 *.pyc
+note.md

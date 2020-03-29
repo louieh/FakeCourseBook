@@ -45,11 +45,11 @@ function search_page_init() {
  * semester switcher event
  */
 function semester_switcher() {
-    $('#20S').on('click', function () {
-        changesource('20S')
+    $('#20U').on('click', function () {
+        changesource('20U')
     });
-    $('#19F').on('click', function () {
-        changesource('19F')
+    $('#20F').on('click', function () {
+        changesource('20F')
     });
 }
 
@@ -94,8 +94,8 @@ function add_shadow() {
  * switch active of each label
  */
 function labelSwitcher() {
-    var term1 = '20S';
-    var term2 = '19F';
+    var term1 = '20U';
+    var term2 = '20F';
     var data_source_now = document.querySelector(".table").children[1];
     if (typeof (data_source_now) !== "undefined") {
         if (data_source_now.children[0].children[1].textContent === term1) {
