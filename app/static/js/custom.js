@@ -119,7 +119,7 @@ function setOpenStatus() {
         if (table[i].children[2].innerHTML === "Open") {
             table[i].children[2].className = 'classOpen';
             // table[i].children[2].classList.add('classOpen')
-        } else if (table[i].children[2].innerHTML === "Closed") {
+        } else if (table[i].children[2].innerHTML === "Closed" || table[i].children[2].innerHTML === "Full" || table[i].children[2].innerHTML === "Cancelled") {
             table[i].children[2].className = 'classClosed';
             // table[i].children[2].classList.add('classClosed')
         }
