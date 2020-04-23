@@ -21,31 +21,60 @@ def getDataupdatetime():
     return data_update_time, data_update_next_time
 
 
-def getRateId(name):
-    rateuri = "https://search-production.ratemyprofessors.com/solr/rmp/select/?rows=20&wt=json&q=" + name + "&defType=edismax&qf=teacherfirstname_t%5E2000+teacherlastname_t%5E2000+teacherfullname_t%5E2000+autosuggest&group.limit=50"
-    try:
-        resp = requests.get(rateuri)
-    except:
-        return None, 'downloadfail'
-    try:
-        resp_parse = json.loads(resp.text)
-        resp_parse_list = resp_parse.get('response').get('docs')
-        for each_resp in resp_parse_list:
-            if 'University of Texas at Dallas' in each_resp.get("schoolname_s"):
-                return each_resp.get('pk_id'), 'ok'
-        return None, 'notfound'
-    except:
-        return None, 'parsefail'
+@main.route('/getRateIdValue/<name>')
+def getRateIdValue(name, value=True):
+    def getValue(pk_id):
+        resp = requests.get('https://www.ratemyprofessors.com/ShowRatings.jsp?tid=%s' % pk_id)
+        selector = html.etree.HTML(resp.text)
+        value = selector.xpath('''.//div[starts-with(@class,"RatingValue__Numerator")]/text()''')
+        return value[0] if value else None
+
+    def getId():
+        rateuri = "https://search-production.ratemyprofessors.com/solr/rmp/select/?rows=20&wt=json&q=" + name + "&defType=edismax&qf=teacherfirstname_t%5E2000+teacherlastname_t%5E2000+teacherfullname_t%5E2000+autosuggest&group.limit=50"
+        try:
+            resp = requests.get(rateuri)
+        except:
+            session["rate_id"] = [None, 'downloadfail']
+            return None, 'downloadfail'
+        try:
+            resp_parse = json.loads(resp.text)
+            resp_parse_list = resp_parse.get('response').get('docs')
+            for each_resp in resp_parse_list:
+                if 'University of Texas at Dallas' in each_resp.get("schoolname_s"):
+                    session["rate_id"] = [each_resp.get('pk_id'), 'ok']
+                    return each_resp.get('pk_id'), 'ok'
+            session["rate_id"] = [None, 'notfound']
+            return None, 'notfound'
+        except:
+            session["rate_id"] = [None, 'parsefail']
+            return None, 'parsefail'
+
+    pk_id, reason = getId()
+    if not value:
+        return pk_id, reason
+    else:
+        return jsonify(getValue(pk_id))
+
+
+@main.route('/findrate/<name>')
+def findrate(name):
+    if session['rate_id'] is not None:
+        pk_id, reason = session['rate_id']
+    else:
+        pk_id, reason = getRateIdValue(name, False)
+    # pk_id, reason = session["rate_id"] if session['rate_id'] is not None else getRateIdValue(name, False)
+    if pk_id is None:
+        session['rate_id'] = None
+        # logging.INFO(reason)
+        return redirect('https://www.ratemyprofessors.com/search.jsp?query=%s' % name)
+    return redirect('https://www.ratemyprofessors.com/ShowRatings.jsp?tid=%s' % pk_id)
 
 
 @main.route('/get_put_search_tool_status/<status>')
 @main.route('/get_put_search_tool_status')
 def get_put_search_tool_status(status=None):
     if status is not None:
-        if status == "false":
-            session['search_tool'] = False
-        else:
-            session['search_tool'] = True
+        session['search_tool'] = False if status == "false" else True
         return jsonify("ok")
     else:
         return jsonify({"status": session['search_tool']})
@@ -131,6 +160,7 @@ def before_first_request():
     TERM_LIST = current_app.config.get('TERM_LIST')
     session['DATA_SOURCE'] = TERM_LIST[0]  # first term
     session['search_tool'] = False  # search tool status marker True: hide False: not hide
+    session['rate_id'] = None
     REDIS_UPDATE_TIME_KEY = current_app.config.get('REDIS_UPDATE_TIME_KEY')
     REDIS_UPDATE_NEXT_TIME_KEY = current_app.config.get('REDIS_UPDATE_NEXT_TIME_KEY')
     MONGO_HOST = current_app.config.get('MONGO_HOST')
@@ -145,16 +175,6 @@ def before_first_request():
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     return render_template('login.html')
-
-
-@main.route('/findrate/<name>')
-def findrate(name):
-    pk_id, reason = getRateId(name)
-    if not pk_id:
-        # logging.INFO(reason)
-        return redirect('https://www.ratemyprofessors.com/search.jsp?query=%s' % name)
-
-    return redirect('https://www.ratemyprofessors.com/ShowRatings.jsp?tid=%s' % pk_id)
 
 
 @main.route('/changesource/<source>')

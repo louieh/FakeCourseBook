@@ -5,12 +5,19 @@
             <main class="bd-content" role="main">
                 <p><h4 class="display-4">{{ professor_name }}</h4></p>
                 <h2 id="links">Links</h2>
-                <button type="button" class="btn btn-info" onclick="custom_search_button('{{ professor_name }}')">
+                <button type="button" class="btn btn-info"
+                        onclick="custom_search_button('{{ professor_name }}')">
                     Introduction
                 </button>
-                <a href={{ url_for('main.findrate', name=professor_name) }} target="_blank" name="ratemyprofessors">
+                <a href={{ url_for('main.findrate', name=professor_name) }} target="_blank"
+                   name="ratemyprofessors">
                     <button type="button" class="btn btn-info">Ratemyprofessor</button>
                 </a>
+                <div class="spinner-grow" role="status" id="spinner-grow">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <b id="rate-value"></b>
+                <script>fill_rate_value("{{ professor_name }}");</script>
 
                 <h2 id="courses">Courses</h2>
                 <div class="bd-callout bd-callout-info">

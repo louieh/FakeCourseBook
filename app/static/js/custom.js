@@ -678,6 +678,26 @@ function fill_course_description(course_section) {
     }
 }
 
+function fill_rate_value(professor_name) {
+    if (professor_name != null) {
+        fetch(`/getRateIdValue/${professor_name}`)
+            .then(data => {
+                return data.json()
+            })
+            .then(data => {
+                if (data != null) {
+                    var rate_value_ele = document.getElementById("rate-value");
+                    rate_value_ele.innerText = data + '/5';
+                }
+                var spinner = document.getElementById("spinner-grow");
+                spinner.setAttribute("hidden", "");
+            })
+            .catch(error => {
+                console.log(`There is a error ${error}`)
+            })
+    }
+}
+
 /**
  * For course page and professor page
  * sroll for side navbar
