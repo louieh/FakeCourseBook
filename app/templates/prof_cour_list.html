@@ -49,7 +49,11 @@
                 {% for eachdict in cou_dict_list %}
                     <tr>
                         <td>{{ eachdict.get("class_section") }}</td>
-                        <td><a href="/course/{{ eachdict.get("class_section") }}">detail</a></td>
+                        {% if "6301" in eachdict.get("class_section") or "7301" in eachdict.get("class_section") %}
+                            <td><a href="/course/{{ eachdict.get("class_title") }}">detail</a></td>
+                        {% else %}
+                            <td><a href="/course/{{ eachdict.get("class_section") }}">detail</a></td>
+                        {% endif %}
                         <td>{{ eachdict.get("class_title") }}</td>
                     </tr>
                 {% endfor %}

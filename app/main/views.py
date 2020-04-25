@@ -293,10 +293,23 @@ def list_pro():
         cou_dict_list = list(
             db.CourseForGraph.find({}, {"class_title": 1, "class_section": 1, "_id": 0}))
         for eachcou_dict in cou_dict_list:
-            eachcou_dict["class_section"] = eachcou_dict.get("class_section").split(".")[0]
-            if eachcou_dict["class_section"] not in cou_set:
-                cou_set.add(eachcou_dict["class_section"])
-                cou_dict_list_fin.append(eachcou_dict)
+            temp_class_section = eachcou_dict.get("class_section").split(".")[0]
+            temp_class_title = eachcou_dict.get("class_title").replace("SPECIAL TOPICS IN COMPUTER SCIENCE",
+                                                                       "Special Topics in Computer Science")
+            if not temp_class_title.replace("Special Topics in Computer Science", "") or not temp_class_title.replace(
+                    "Recent Advances in Computing", ""):
+                continue
+            eachcou_dict["class_section"] = temp_class_section
+            eachcou_dict["class_title"] = temp_class_title
+            if "6301" not in temp_class_section and "7301" not in temp_class_section:
+                if temp_class_section not in cou_set:
+                    cou_set.add(temp_class_section)
+                    cou_dict_list_fin.append(eachcou_dict)
+            else:
+                if temp_class_title not in cou_set:
+                    cou_set.add(temp_class_title)
+                    cou_dict_list_fin.append(eachcou_dict)
+        cou_dict_list_fin.sort(key=lambda k: k.get("class_section"))
         return render_template("prof_cour_list.html", cou_dict_list=cou_dict_list_fin)
 
 
@@ -340,7 +353,7 @@ def get_course_graph_data(coursesection, _6301_7301=False):
     else:
         course_name = all_course_list[0].get("class_title")
         course_section = coursesection.lower().replace(' ', '') if not _6301_7301 else \
-        all_course_list[0].get("class_section").split(".")[0].lower().replace(' ', '')
+            all_course_list[0].get("class_section").split(".")[0].lower().replace(' ', '')
 
     term_dict = {}
     professor_list = []
@@ -516,24 +529,13 @@ def course(coursesection=None, professor=None):
     if coursesection:
         if "Recent Advances" in coursesection or "Special Topics" in coursesection:
             course_section, course_name, final_dict, professor_list = get_course_graph_data(coursesection, True)
-            print(course_section)
-            print(course_name)
-            print(final_dict)
-            print(professor_list)
             speed_data_dict = get_speed_graph_data(class_title=coursesection)
             grade_data_dict = get_grade_graph_data(coursesection, professor_list=professor_list)
-            #defaultdict(<class 'list'>, {'Zhang, Kang': [{'2019 Summer | Special Topics in Computer Science - Visual Lang & Visualization | 0U2': {'A': 10, 'W': 0}}]})
         else:
             course_section, course_name, final_dict, professor_list = get_course_graph_data(coursesection)
-            print(course_section)
-            print(course_name)
-            print(final_dict)
-            print(professor_list)
             speed_data_dict = get_speed_graph_data(class_section=coursesection)
             grade_data_dict = get_grade_graph_data(coursesection)
         grade_dict_list = get_grade_dict_list(grade_data_dict, final_dict, "sec")
-        print("====")
-        print(grade_dict_list)
         return render_template("course.html",
                                course_section=course_section,
                                course_name=course_name,
