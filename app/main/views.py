@@ -70,6 +70,18 @@ def findrate(name):
     return redirect('https://www.ratemyprofessors.com/ShowRatings.jsp?tid=%s' % pk_id)
 
 
+@main.route('/get_course_description/<course_section>')
+def get_course_description(course_section):
+    description_url = "https://catalog.utdallas.edu/2019/graduate/courses/" + course_section
+    try:
+        resp = requests.get(description_url)
+        selector = html.etree.HTML(resp.text)
+        text_list = selector.xpath('''.//div[@id="bukku-page"]/p//text()''')
+    except:
+        return None
+    return jsonify("".join(text_list))
+
+
 @main.route('/get_put_search_tool_status/<status>')
 @main.route('/get_put_search_tool_status')
 def get_put_search_tool_status(status=None):
@@ -141,18 +153,6 @@ def custom_search_fun(professor_name):
     return jsonify({"error": None})
 
 
-@main.route('/get_course_description/<course_section>')
-def get_course_description(course_section):
-    description_url = "https://catalog.utdallas.edu/2019/graduate/courses/" + course_section
-    try:
-        resp = requests.get(description_url)
-        selector = html.etree.HTML(resp.text)
-        text_list = selector.xpath('''.//div[@id="bukku-page"]/p//text()''')
-    except:
-        return None
-    return jsonify("".join(text_list))
-
-
 @main.before_app_first_request
 def before_first_request():
     global TIMEDELTA, collection, db, REDIS_HOST, REDIS_PORT, REDIS_UPDATE_TIME_KEY, REDIS_UPDATE_NEXT_TIME_KEY, TERM_LIST
@@ -170,11 +170,6 @@ def before_first_request():
     client = MongoClient(MONGO_HOST, MONGO_PORT)
     db = client.Coursebook
     collection = db.CourseForSearch
-
-
-@main.route('/login', methods=['GET', 'POST'])
-def login():
-    return render_template('login.html')
 
 
 @main.route('/changesource/<source>')
@@ -336,13 +331,16 @@ def get_professor_graph_data(professor):
     return list(coursesection_list), professor_json
 
 
-def get_course_graph_data(coursesection):
-    all_course_list = list(db.CourseForGraph.find({"class_section": {"$regex": coursesection}}, {"_id": 0}))
+def get_course_graph_data(coursesection, _6301_7301=False):
+    all_course_list = list(
+        db.CourseForGraph.find({"class_section": {"$regex": coursesection}}, {"_id": 0})) if not _6301_7301 else list(
+        db.CourseForGraph.find({"class_title": {"$regex": coursesection}}, {"_id": 0}))
     if not all_course_list:
         abort(404)
     else:
         course_name = all_course_list[0].get("class_title")
-        course_section = coursesection.lower().replace(' ', '')
+        course_section = coursesection.lower().replace(' ', '') if not _6301_7301 else \
+        all_course_list[0].get("class_section").split(".")[0].lower().replace(' ', '')
 
     term_dict = {}
     professor_list = []
@@ -368,7 +366,9 @@ def get_course_graph_data(coursesection):
 
 def get_speed_graph_data(**kwargs):
     # TODO think the structure of speed data
-    if "class_number" in kwargs:
+    if "class_title" in kwargs:
+        speed_data = list(db.CourseForSpeed.find({"class_title": {"$regex": kwargs.get("class_title")}}, {"_id": 0}))
+    elif "class_number" in kwargs:
         if "class_term" in kwargs:
             speed_data = list(
                 db.CourseForSpeed.find(
@@ -413,7 +413,15 @@ def get_speed_graph_data(**kwargs):
 
 
 def get_grade_graph_data(course_section, **kwargs):
-    prefix, section_num = course_section.split(" ")
+    if "Recent Advances" in course_section:
+        if6301_7301 = True
+        prefix, section_num = 'CS', '7301'
+    elif "Special Topics" in course_section:
+        if6301_7301 = True
+        prefix, section_num = 'CS', '6301'
+    else:
+        if6301_7301 = False
+        prefix, section_num = course_section.split(" ")
     grade_graph_data_dict = defaultdict(list)
     if "prof" in kwargs:
         prof_list = kwargs.get("prof").split(" ", 1)
@@ -425,8 +433,11 @@ def get_grade_graph_data(course_section, **kwargs):
             db.utdgrades.find({"subj": prefix, "num": section_num, "prof": {"$regex": prof}}, {"_id": 0}))
     else:
         grade_graph_data = list(db.utdgrades.find({"subj": prefix, "num": section_num}, {"_id": 0}))
+    professor_list = set([switch_name(prof) for prof in kwargs["professor_list"]]) if "professor_list" in kwargs else []
     for each_grade_graph_data in grade_graph_data:
         professor = each_grade_graph_data.get("prof")
+        if if6301_7301 and professor not in professor_list:
+            continue
         term = each_grade_graph_data.get("term")
         section = each_grade_graph_data.get("sect")
         grades = each_grade_graph_data.get("grades")
@@ -503,10 +514,26 @@ def course(coursesection=None, professor=None):
         return sorted(list(prior_dict.values()), key=lambda each: each.get("priority"), reverse=True)
 
     if coursesection:
-        course_section, course_name, final_dict, professor_list = get_course_graph_data(coursesection)
-        speed_data_dict = get_speed_graph_data(class_section=coursesection)
-        grade_data_dict = get_grade_graph_data(coursesection)
+        if "Recent Advances" in coursesection or "Special Topics" in coursesection:
+            course_section, course_name, final_dict, professor_list = get_course_graph_data(coursesection, True)
+            print(course_section)
+            print(course_name)
+            print(final_dict)
+            print(professor_list)
+            speed_data_dict = get_speed_graph_data(class_title=coursesection)
+            grade_data_dict = get_grade_graph_data(coursesection, professor_list=professor_list)
+            #defaultdict(<class 'list'>, {'Zhang, Kang': [{'2019 Summer | Special Topics in Computer Science - Visual Lang & Visualization | 0U2': {'A': 10, 'W': 0}}]})
+        else:
+            course_section, course_name, final_dict, professor_list = get_course_graph_data(coursesection)
+            print(course_section)
+            print(course_name)
+            print(final_dict)
+            print(professor_list)
+            speed_data_dict = get_speed_graph_data(class_section=coursesection)
+            grade_data_dict = get_grade_graph_data(coursesection)
         grade_dict_list = get_grade_dict_list(grade_data_dict, final_dict, "sec")
+        print("====")
+        print(grade_dict_list)
         return render_template("course.html",
                                course_section=course_section,
                                course_name=course_name,
@@ -565,6 +592,12 @@ def comment(professor=None):
 @main.route('/search')
 def search_reslut():
     return render_template("search_result.html")
+
+# @main.route('/login', methods=['GET', 'POST'])
+# def login():
+#     return render_template('login.html')
+
+
 # @main.route('/jobinfo')
 # def jobinfo():
 #     job_filter, num = get_jobinfo_args()

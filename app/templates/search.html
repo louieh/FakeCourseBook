@@ -193,7 +193,11 @@
                                 <td>{{ course['class_title'] }}</td>
                                 <td>{{ course['class_number'] }}</td>
                                 <td>
-                                    <a href={{ "/course/{0}".format(course['class_section'].replace(' ','%20').split('.')[0]) }} target="_blank">{{ course['class_section'] }}</a>
+                                    {% if '6301' in course['class_section'] or '7301' in course['class_section'] %}
+                                        <a href={{ "/course/{0}".format(course['class_title'].replace(" ", "%20")) }} target="_blank">{{ course['class_section'] }}</a>
+                                    {% else %}
+                                        <a href={{ "/course/{0}".format(course['class_section'].replace(' ','%20').split('.')[0]) }} target="_blank">{{ course['class_section'] }}</a>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     {% if course['class_instructor']|length > 1 %}

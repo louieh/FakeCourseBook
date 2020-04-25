@@ -334,8 +334,11 @@ function setdataForSearch(newData) {
             if (j === 5) {
                 var tempInnerHTML = newData[i][tabHeadDictForSearch[j]];
                 var tempInnerHTML_ = tempInnerHTML.split('.')[0];
-                trs[i].children[j].innerHTML = htmlTemplate1.replace('%section_%', tempInnerHTML_).replace('%section%', tempInnerHTML)
-
+                var tempInnerHTML_301 = newData[i][tabHeadDictForSearch[3]];
+                if (tempInnerHTML_.includes('CS 6301') || tempInnerHTML_.includes('CS 7301'))
+                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%section_%', tempInnerHTML_301).replace('%section%', tempInnerHTML)
+                else
+                    trs[i].children[j].innerHTML = htmlTemplate1.replace('%section_%', tempInnerHTML_).replace('%section%', tempInnerHTML)
             } else if (j === 6) {
                 var instructorNum = newData[i][tabHeadDictForSearch[j]].length, text;
                 trs[i].children[j].innerHTML = "";
