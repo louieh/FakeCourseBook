@@ -345,6 +345,7 @@ def get_professor_graph_data(professor):
 
 
 def get_course_graph_data(coursesection, _6301_7301=False):
+    # TODO 相同的课程 class_title 会不同: Impl of Data Strc & Algorithms | Impl of Data Str & Algorithms
     all_course_list = list(
         db.CourseForGraph.find({"class_section": {"$regex": coursesection}}, {"_id": 0})) if not _6301_7301 else list(
         db.CourseForGraph.find({"class_title": {"$regex": coursesection}}, {"_id": 0}))
@@ -355,11 +356,8 @@ def get_course_graph_data(coursesection, _6301_7301=False):
         course_section = coursesection.lower().replace(' ', '') if not _6301_7301 else \
             all_course_list[0].get("class_section").split(".")[0].lower().replace(' ', '')
 
-    term_dict = {}
     professor_list = []
-    for eachterm in TERM_LIST:
-        term_dict[eachterm] = []
-
+    term_dict = {eachterm: [] for eachterm in TERM_LIST}
     for eachcourse_dict in all_course_list:
         professorname_list = eachcourse_dict.get("class_instructor")
         professor_list += professorname_list
