@@ -9,3 +9,4 @@ deploy/
 *.pyc
 note.md
 dump.rdb
+test.py
