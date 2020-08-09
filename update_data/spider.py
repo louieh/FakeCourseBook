@@ -12,6 +12,7 @@ class Spider(object):
                  update_for_search=setting.UPDATE_FOR_SEARCH,
                  update_for_speed=setting.UPDATE_FOR_SPEED,
                  base_uri=setting.BASE_URI,
+                 post_data=setting.POST_DATA,
                  all_term=setting.ALL_TERM_LIST,
                  current_term=setting.CURRENT_TERM_LIST,
                  current_prefix=setting.CURRENT_PREFIX_LIST,
@@ -21,6 +22,7 @@ class Spider(object):
         self.__db = None
         self.__parser = None
         self.base_uri = base_uri
+        self.post_data = post_data
         self.all_term = all_term
         self.all_prefix = all_prefix
         self.current_term = current_term
@@ -45,8 +47,8 @@ class Spider(object):
     def __init_parser(self):
         self.__parser = parser.Parser()
 
-    def __download(self, urls=None, **kwargs):
-        if not urls:
+    def __download(self, datas=None, **kwargs):
+        if not datas:
             logger.info('no urls...')
             return
         kwargs.update(self.header)
@@ -54,7 +56,7 @@ class Spider(object):
             self.__init_downloader()
         if self.__downloader:
             logger.info('download start...')
-            resps = self.__downloader.download(urls, **kwargs)
+            resps = self.__downloader.download(datas, **kwargs)
             return resps
         else:
             logger.error('init downloader failed.')
@@ -100,7 +102,8 @@ class Spider(object):
                 return
         if self.update_method == 1:
             logger.info('update_method == 1')
-            urls = []
+            # urls = []
+            datas = []
             if self.update_for_graph:
                 prefix, term = (self.all_prefix, self.all_term)
             elif self.update_for_search:
@@ -113,12 +116,14 @@ class Spider(object):
             logger.info("term, prefix: {0},{1}".format(term, prefix))
             for each_term in term:
                 for each_prefix in prefix:
-                    url = self.base_uri.format(each_prefix, each_term)
-                    urls.append(url)
+                    # url = self.base_uri.format(each_prefix, each_term)
+                    # urls.append(url)
+                    data = self.post_data.format(each_prefix, each_term)
+                    datas.append(data)
         else:
             logger.error('cannot find the update method')
             return
-        resps = self.__download(urls)
+        resps = self.__download(datas)
         final_dict = self.__parse(resps)
         self.__insert_db(final_dict)
 

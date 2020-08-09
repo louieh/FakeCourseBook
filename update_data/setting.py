@@ -7,11 +7,15 @@ import datetime
 class Config(object):
     # base uri
     # BASE_URI = 'https://coursebook.utdallas.edu/{0}/term_{1}'
-    BASE_URI = 'https://coursebook.utdallas.edu/term_{1}/cp_{0}'
+    # BASE_URI = 'https://coursebook.utdallas.edu/term_{1}/cp_{0}'
+    BASE_URI = 'https://coursebook.utdallas.edu/clips/clip-coursebook.zog'
     BASE_URL_FOR_PREFIX = 'https://coursebook.utdallas.edu/guidedsearch'
 
+    POST_DATA = 'action=search&s%5B%5D=term_{1}&s%5B%5D=cp_{0}'
+
     # term and prefix
-    ALL_TERM_LIST = ['20F', '20U', '20S', '19F', '19U', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U', '16S', '15F', '15U',
+    ALL_TERM_LIST = ['20F', '20U', '20S', '19F', '19U', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U',
+                     '16S', '15F', '15U',
                      '15S',
                      '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
                      '10U', '10S']
@@ -29,6 +33,8 @@ class Config(object):
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,ja;q=0.6",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "Cookie": "PTGSESSID=eb1261ec3abe7be9e4fd98a5a30ddc69",
         "DNT": "1",
         "Connection": "keep-alive",
         "Host": "coursebook.utdallas.edu",
@@ -73,6 +79,7 @@ class ProductionConfig(Config):
     UPDATE_FOR_SPEED = True if os.getenv('UPDATE_FOR_SPEED', False) in [True, 'True'] else False
     GRADUATE_LEVEL = True if os.getenv('GRADUATE_LEVEL', True) in [True, 'True'] else False
     SKIP = True if os.getenv('SKIP', True) in [True, 'True'] else False
+
 
 class DevelopmentConfig(Config):
     # db

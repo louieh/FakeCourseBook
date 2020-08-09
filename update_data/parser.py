@@ -4,6 +4,7 @@ from __init__ import config as setting
 from lxml import html
 from log import logger
 import time
+import json
 
 
 class Parser(object):
@@ -27,11 +28,13 @@ class Parser(object):
         try:
             resp.encoding = self.encoding
             resp_text = resp.text
+            resp_text = json.loads(resp_text).get("sethtml").get("#sr")
+            resp_text = resp_text.replace("\n", "").replace("\\", "")
             resp_url = resp.url
             resp_selector = html.etree.HTML(resp_text)
             return resp_selector
         except Exception as e:
-            logger.error("parser: etree failed: {0},{1}".format(repr(e), resp_url))
+            logger.error("parser: etree failed: {0}".format(repr(e)))
             return
 
     def parse_coursebook_tool(self, resps):
@@ -49,6 +52,7 @@ class Parser(object):
                         'class_status': '',
                         'class_prefix': '',
                         'class_section': '',
+                        'class_method': '',
                         'class_number': '',
                         'class_title': '',
                         'class_instructor': '',
@@ -79,7 +83,9 @@ class Parser(object):
                     # class_prefix class_section class_number
                     each_course_dict['class_prefix'] = eachclass_section_number[0].split(" ")[0]
                     each_course_dict['class_section'] = eachclass_section_number[0]
-                    each_course_dict['class_number'] = eachclass_section_number[-1]
+                    # each_course_dict['class_number'] = eachclass_section_number[-1]
+                    if len(eachclass_section_number) >= 2:
+                        each_course_dict['class_method'] = eachclass_section_number[1]
                     # TODO each_course_dict['_id'] = eachclass_section_number[-1]
 
                     # class_title
@@ -135,6 +141,13 @@ class Parser(object):
                     class_ifFull = each_course_selector.xpath('''//td[6]/div/@title''')
                     if class_ifFull:
                         each_course_dict['class_isFull'] = class_ifFull[0]
+                    else:
+                        class_ifFull = each_course_selector.xpath('''//td[6]/div/@style''')
+                        if class_ifFull:
+                            class_ifFull = round(abs(int(class_ifFull[0].split(" ")[-2].replace("px", ""))) / 320 * 100,
+                                                 2)
+                            each_course_dict['class_isFull'] = str(class_ifFull) + "%"
+
                 except Exception as e:
                     logger.error("parser failed: {0}".format(str(e)))
                     continue

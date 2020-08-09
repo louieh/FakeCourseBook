@@ -9,20 +9,23 @@ MAX_WORKERS = 20
 
 
 class Downloader(object):
-    def __init__(self, header=setting.FAKE_HEADER):
+    def __init__(self, header=setting.FAKE_HEADER,
+                 url=setting.BASE_URI):
         self.header = header
         self.proxy = ''
         self.session = requests.Session()
         self.resps = []
+        self.base_uri = url
 
-    def download_tool(self, url):
-        if not url:
+    def download_tool(self, data):
+        if not data:
             return
         try:
-            logger.info('download url: {0}'.format(url))
-            resp = self.session.get(url, headers=self.header)
+            logger.info('download data: {0}'.format(data))
+            # resp = self.session.get(url, headers=self.header)
+            resp = self.session.post(self.base_uri, headers=self.header, data=data)
         except requests.exceptions.ConnectionError as e:
-            logger.error('Unable to download the webpage: {0}'.format(url))
+            logger.error('Unable to download the webpage: {0}'.format(data))
             return
         except Exception as e:
             logger.error('other error: {0}'.format(str(e)))
@@ -33,11 +36,11 @@ class Downloader(object):
             logger.error('the status_code:{0}'.format(resp.status_code))
             return
 
-    def download(self, urls, **kwargs):
+    def download(self, datas, **kwargs):
         self.resps = []
         header = kwargs.get('header', {})
         self.header.update(header)
-        workers = min(MAX_WORKERS, len(urls))
+        workers = min(MAX_WORKERS, len(datas))
         with futures.ThreadPoolExecutor(workers) as executor:
-            executor.map(self.download_tool, urls)
+            executor.map(self.download_tool, datas)
         return self.resps
