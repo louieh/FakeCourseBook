@@ -34,13 +34,20 @@
             <div class="row">
                 <div class="col">
                     {% if section_title_list %}
-                        <div class="list-group">
-                            {% for section_title in section_title_list %}
-                                <button type="button" class="list-group-item list-group-item-action" data-toggle="list"
-                                        onclick="comment_section('{{ section_title }}','{{ professor_name }}')">
-                                    {{ section_title }}
-                                </button>
-                            {% endfor %}
+                        {#                        <div class="list-group">#}
+                        {#                            {% for section_title in section_title_list %}#}
+                        {#                                <button type="button" class="list-group-item list-group-item-action" data-toggle="list"#}
+                        {#                                        onclick="comment_section('{{ section_title }}','{{ professor_name }}')">#}
+                        {#                                    {{ section_title }}#}
+                        {#                                </button>#}
+                        {#                            {% endfor %}#}
+                        {#                        </div>#}
+                        <div>
+                            <ul class="list-group">
+                                {% for section_title in section_title_list %}
+                                    <li class="list-group-item">{{ section_title }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% endif %}
                 </div>
@@ -53,6 +60,8 @@
         </div>
         <script data-isso="//localhost:8080" src="//localhost:8080/js/embed.min.js"
                 data-isso-reply-to-self="false"
-                data-isso-lang="en"></script>
+                data-isso-lang="en"
+                data-isso-vote="true">
+        </script>
     {% endif %}
 {% endblock %}

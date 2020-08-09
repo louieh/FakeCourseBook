@@ -568,11 +568,8 @@ def course(coursesection=None, professor=None):
 def comment(professor=None):
     if not professor:
         courses = list(db.CourseForGraph.find({}, {"_id": 0, "class_title": 0, "class_section": 0, "class_term": 0}))
-        professor_set = set()
-        for course in courses:
-            for each_professor in course.get("class_instructor"):
-                professor_set.add(each_professor)
-        return render_template('comment.html', professor_list=list(professor_set))
+        professor_list = list(set([professor for course in courses for professor in course.get("class_instructor")]))
+        return render_template('comment.html', professor_list=professor_list)
     else:
         courses = list(
             db.CourseForGraph.find({"class_instructor": professor}, {"_id": 0, "class_term": 0, "class_instructor": 0}))
