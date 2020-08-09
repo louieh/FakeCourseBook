@@ -10,7 +10,7 @@ class Config(object):
     CUSTOM_SEARCH_KEY = os.environ.get('CUSTOM_SEARCH_KEY')
     CUSTOM_SEARCH_UTD_ID = os.environ.get('CUSTOM_SEARCH_UTD_ID')
     CUSTOM_SEARCH_FAKECOURSEBOOK_ID = os.environ.get('CUSTOM_SEARCH_FAKECOURSEBOOK_ID')
-    TERM_LIST = ['20U', '20F', '20S', '19F', '19U', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U',
+    TERM_LIST = ['20F', '20U', '20S', '19F', '19U', '19S', '18F', '18U', '18S', '17F', '17U', '17S', '16F', '16U',
                  '16S', '15F', '15U',
                  '15S', '14F', '14U', '14S', '13F', '13U', '13S', '12F', '12U', '12S', '11F', '11U', '11S', '10F',
                  '10U', '10S']
