@@ -200,14 +200,15 @@ function get_search_tool_status(status) {
 var tabHeadDictForSearch = {
     1: "class_term",
     2: "class_status",
-    3: "class_title",
-    4: "class_number",
-    5: "class_section",
-    6: "class_instructor",
-    7: "class_day",
-    8: "class_time",
-    9: "class_location",
-    10: "class_isFull",
+    3: "class_method",
+    4: "class_title",
+    5: "class_number",
+    6: "class_section",
+    7: "class_instructor",
+    8: "class_day",
+    9: "class_time",
+    10: "class_location",
+    11: "class_isFull",
 };
 
 var tabHeadDictForGraph = {
@@ -307,7 +308,6 @@ function getSortedData(propertyOrder, dataOrig, tabledict) {
  * @param newData
  */
 function setdataForSearch(newData) {
-
     // adjust the number of td
     var table = document.querySelector(".table");
     var i, j, n;
@@ -318,7 +318,7 @@ function setdataForSearch(newData) {
         }
     } else if (newData.length > table.children[1].childElementCount) {
         var numOfAdd = newData.length - table.children[1].childElementCount;
-        var el = '<tr><th></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        var el = '<tr><th></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
         for (i = 0; i < numOfAdd; i++) {
             table.children[1].insertAdjacentHTML('beforeend', el)
         }
@@ -331,7 +331,7 @@ function setdataForSearch(newData) {
     for (i = 0; i < trs.length; i++) {
         trs[i].children[0].innerHTML = i + 1;
         for (j = 1; j < trs[0].children.length; j++) {
-            if (j === 5) {
+            if (j === 6) {
                 var tempInnerHTML = newData[i][tabHeadDictForSearch[j]];
                 var tempInnerHTML_ = tempInnerHTML.split('.')[0];
                 var tempInnerHTML_301 = newData[i][tabHeadDictForSearch[3]];
@@ -339,7 +339,7 @@ function setdataForSearch(newData) {
                     trs[i].children[j].innerHTML = htmlTemplate1.replace('%section_%', tempInnerHTML_301).replace('%section%', tempInnerHTML)
                 else
                     trs[i].children[j].innerHTML = htmlTemplate1.replace('%section_%', tempInnerHTML_).replace('%section%', tempInnerHTML)
-            } else if (j === 6) {
+            } else if (j === 7) {
                 var instructorNum = newData[i][tabHeadDictForSearch[j]].length, text;
                 trs[i].children[j].innerHTML = "";
                 for (n = 0; n < instructorNum; n++) {
@@ -388,6 +388,7 @@ function setdataForGraph(newData) {
  * reset new sorted data for the search page
  * @param propertyOrder
  * @param obj
+ * @param dataOrig
  */
 function sortForSearchGraph(propertyOrder, obj, dataOrig = null) {
     var newData;
@@ -647,7 +648,7 @@ function comment_section(data_title, data_isso_id) {
     var attr_id = document.createAttribute("id");
     attr_id.value = "isso-thread";
     var attr_data_title = document.createAttribute("data-title");
-    attr_data_title.value = data_title;
+    attr_data_title.value = data_title.replace("-", "");
     var attr_data_isso_id = document.createAttribute("data-isso-id");
     attr_data_isso_id.value = data_isso_id;
     section.setAttributeNode(attr_id);
