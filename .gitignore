@@ -8,3 +8,4 @@ deploy/
 *.app
 *.pyc
 note.md
+dump.rdb
