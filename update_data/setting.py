@@ -34,7 +34,7 @@ class Config(object):
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,ja;q=0.6",
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "Cookie": "PTGSESSID=eb1261ec3abe7be9e4fd98a5a30ddc69",
+        "Cookie": "PTGSESSID=ea4b94ab4a78e222b9a630184771bba4",
         "DNT": "1",
         "Connection": "keep-alive",
         "Host": "coursebook.utdallas.edu",
