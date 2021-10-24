@@ -4,7 +4,6 @@ __pycache__/
 classnumbers.xlsx
 update_data/logs/
 update_data/courses.json
-update_data/temp_download.py
 util/__pycache__
 deploy/
 *.app
