@@ -174,7 +174,7 @@ class CouseBookSpider(object):
                                              2)
                         each_course_dict['class_isFull'] = str(class_ifFull) + "%"
                 if res_filter:
-                    res.append({each: each_course_dict.get(each) for each in res_struc})
+                    res.append({each: each_course_dict.get(each) for each in res_filter})
                 else:
                     res.append(each_course_dict)
         return res
