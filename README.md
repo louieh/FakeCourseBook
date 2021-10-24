@@ -28,6 +28,6 @@
 #### TODO
 
 - [x] Comment System
-
 - [ ] ~~Course status monitor tool~~
+- [ ] Refactoring the entire site to separate the front and back ends
 
