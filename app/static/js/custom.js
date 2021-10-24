@@ -1,3 +1,11 @@
+(function () {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://fakecoursebook.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+
+
 function google_search_init() {
     var google_search_button = $('#google-search-button');
     var google_search_box = $('#google-search-box');
@@ -45,11 +53,11 @@ function search_page_init() {
  * semester switcher event
  */
 function semester_switcher() {
-    $('#20U').on('click', function () {
-        changesource('20U')
+    $('#22S').on('click', function () {
+        changesource('22S')
     });
-    $('#20F').on('click', function () {
-        changesource('20F')
+    $('#21F').on('click', function () {
+        changesource('21F')
     });
 }
 
@@ -94,8 +102,8 @@ function add_shadow() {
  * switch active of each label
  */
 function labelSwitcher() {
-    var term1 = '20U';
-    var term2 = '20F';
+    var term1 = '22S';
+    var term2 = '21F';
     var data_source_now = document.querySelector(".table").children[1];
     if (typeof (data_source_now) !== "undefined") {
         if (data_source_now.children[0].children[1].textContent === term1) {
