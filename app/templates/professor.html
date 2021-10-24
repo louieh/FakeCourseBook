@@ -103,7 +103,8 @@
                     </div>
                 {% endif %}
 
-{#                <h2 id="comments">Comments</h2>#}
+                <h2 id="comments">Comments</h2>
+                <div class="row" id="disqus_thread"></div>
             </main>
             <nav class="d-none d-xl-block bd-toc" aria-label="Secondary navigation">
                 <ul class="section-nav">
@@ -115,10 +116,18 @@
                     {% if grade_dict_list %}
                         <li class="toc-entry toc-h2" id="nav-grades">Grades</li>
                     {% endif %}
-{#                    <li class="toc-entry toc-h2" id="nav-comments">Comments</li>#}
+                    <li class="toc-entry toc-h2" id="nav-comments">Comments</li>
                 </ul>
                 <script>side_nav_init()</script>
             </nav>
         </div>
     </div>
+    <script>
+        var disqus_config = function (identifier) {
+            return function () {
+                {#this.page.url = '/comment/' + identifier;#}
+                this.page.identifier = identifier; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+            }
+        }('{{ professor_name }}')
+    </script>
 {% endblock %}

@@ -18,12 +18,14 @@
                         <td>
                             <a href="/comment/{{ eachprofessor }}"> {{ eachprofessor }}</a>
                         </td>
-                        <td><a href="#isso-thread" data-isso-id="{{ eachprofessor }}" id="comNumber"></a></td>
+                        <td class="disqus-comment-count" data-disqus-identifier="{{ eachprofessor }}"></td>
+                        {#                        <td><a href="#isso-thread" data-isso-id="{{ eachprofessor }}" id="comNumber"></a></td>#}
                     </tr>
                 {% endfor %}
             </table>
         </div>
-        <script data-isso="//localhost:8080" src="//localhost:8080/js/count.min.js" data-isso-lang="en"></script>
+        {#        <script data-isso="//localhost:8080" src="//localhost:8080/js/count.min.js" data-isso-lang="en"></script>#}
+        <script id="dsq-count-scr" src="//fakecoursebook.disqus.com/count.js" async></script>
     {% else %}
         <div class="container">
             <div class="row">
@@ -52,16 +54,26 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="row">
-                <div class="col" id="comment-section">
-                    <section id="isso-thread" data-isso-id="{{ professor_name }}"></section>
-                </div>
-            </div>
+            {#            <div class="row">#}
+            {#                <div class="col" id="comment-section">#}
+            {#                    <section id="isso-thread" data-isso-id="{{ professor_name }}"></section>#}
+            {#                </div>#}
+            {#            </div>#}
+            <div class="row" id="disqus_thread"></div>
+            <script>
+                var disqus_config = function (identifier) {
+                    return function () {
+                        {#this.page.url = '/comment/' + identifier;#}
+                        this.page.identifier = identifier; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+                    }
+                }('{{ professor_name }}')
+            </script>
         </div>
-        <script data-isso="//localhost:8080" src="//localhost:8080/js/embed.min.js"
-                data-isso-reply-to-self="false"
-                data-isso-lang="en"
-                data-isso-vote="true">
-        </script>
+        {#                <script data-isso="//localhost:8080" src="//localhost:8080/js/embed.min.js"#}
+        {#                        data-isso-reply-to-self="false"#}
+        {#                        data-isso-lang="en"#}
+        {#                        data-isso-vote="true">#}
+        {#                </script>#}
+
     {% endif %}
 {% endblock %}
