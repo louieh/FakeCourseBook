@@ -5,7 +5,10 @@ classnumbers.xlsx
 update_data/logs/
 update_data/courses.json
 util/__pycache__
-deploy/
+deploy/config/
+deploy/db/
+deploy/mongo/
+deploy/redis/
 *.app
 *.pyc
 note.md

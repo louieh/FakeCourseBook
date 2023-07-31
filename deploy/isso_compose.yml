@@ -1,0 +1,12 @@
+version: '2'
+services:
+        isso:
+                image: wonderfall/isso
+                environment:
+                        - GID=1000
+                        - UID=1000
+                volumes:
+                        - ./config:/config
+                        - ./db:/db
+                ports:
+                        - "8080:8080"
