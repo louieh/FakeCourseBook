@@ -1,76 +1,217 @@
 package main
 
 import (
-    "net/http"
-    "context"
-    "log"
-    "time"
-    "fmt"
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"reflect"
+	"strconv"
+	"time"
 
-    "github.com/gin-gonic/gin"
-    "go.mongodb.org/mongo-driver/bson"
-    "go.mongodb.org/mongo-driver/mongo"
-    "go.mongodb.org/mongo-driver/mongo/options"
-//     "go.mongodb.org/mongo-driver/mongo/readpref"
-    "go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/gin-gonic/gin"
+	"github.com/louieh/FakeCourseBook/models"
+	"github.com/louieh/FakeCourseBook/models/params"
+	"github.com/spf13/viper"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type album struct {
-    ID     string  `json:"id"`
-    Title  string  `json:"title"`
-    Artist string  `json:"artist"`
-    Price  float64 `json:"price"`
+var AppConfig struct {
+	AppHost              string
+	AppPort              int
+	DBMongoHost          string
+	DBMongoPort          int
+	DBMongoDB            string
+	SearchOptionOrderBy  string
+	SearchOptionOrder    string
+	SearchOptionPageSize int
 }
 
-var albums = []album{
-    {ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-    {ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-    {ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+// InitConfig 用于加载配置文件和解析配置参数
+func InitConfig() error {
+	// 初始化 viper
+	viper.SetConfigName("config") // 指定配置文件的名称（config.json）
+	viper.AddConfigPath(".")      // 指定配置文件的路径（当前目录）
+
+	// 读取配置文件
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+
+	// 从配置文件中获取配置参数并存储到 AppConfig 中
+	AppConfig.AppHost = viper.GetString("app.host")
+	AppConfig.AppPort = viper.GetInt("app.port")
+	AppConfig.DBMongoHost = viper.GetString("database.mongodb.host")
+	AppConfig.DBMongoPort = viper.GetInt("database.mongodb.port")
+	AppConfig.DBMongoDB = viper.GetString("database.mongodb.db")
+	AppConfig.SearchOptionOrderBy = viper.GetString("searchOption.OrderBy")
+	AppConfig.SearchOptionOrder = viper.GetString("searchOption.Order")
+	AppConfig.SearchOptionPageSize = viper.GetInt("searchOption.pageSize")
+
+	return nil
 }
 
 func getAlbums(c *gin.Context) {
-    c.IndentedJSON(http.StatusOK, albums)
+	var albums = []models.Album{
+		{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
+		{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
+		{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+	}
+
+	c.IndentedJSON(http.StatusOK, albums)
 }
 
-func testMongo(c *gin.Context) {
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer cancel()
-    client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
-    defer func() {
-    if err = client.Disconnect(ctx); err != nil {
-        panic(err)
-        }
-    }()
-    collection := client.Database("Coursebook").Collection("test")
+func StructToBSONM(data interface{}) (bson.M, error) {
+	document, err := bson.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
 
-    cur, err := collection.Find(context.Background(), bson.D{})
-    if err != nil { log.Fatal(err) }
-    defer cur.Close(context.Background())
-    for cur.Next(context.Background()) {
-        // To decode into a struct, use cursor.Decode()
-        result := struct {
-            ID   primitive.ObjectID `bson:"_id"`
-            KeyA string            `bson:"key_a"`
-            KeyB string            `bson:"key_b"`
-        }{}
-        err := cur.Decode(&result)
-        if err != nil { log.Fatal(err) }
-        // do something with result...
-        fmt.Println("result.KeyA: ", result.KeyA)
-        // To get the raw bson bytes use cursor.Current
-        raw := cur.Current
-        // do something with raw...
-        fmt.Println("row: ", raw)
-        }
-        if err := cur.Err(); err != nil {
-            log.Fatal(err)
-        }
+	var result bson.M
+	err = bson.Unmarshal(document, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// StructToBSONMWithTags 将结构体转换为 bson.M，使用结构体字段的 JSON 标签作为键
+func StructToBSONMWithTags(data interface{}) (bson.M, error) {
+	// 使用反射获取结构体字段的 JSON 标签
+	value := reflect.ValueOf(data)
+	if value.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("Input is not a struct")
+	}
+
+	document := bson.M{}
+	typ := reflect.TypeOf(data)
+
+	for i := 0; i < value.NumField(); i++ {
+		field := value.Field(i)
+		key := typ.Field(i).Tag.Get("json") // 获取字段的 JSON 标签
+
+		if key == "" {
+			key = typ.Field(i).Name // 如果没有 JSON 标签，使用字段名称作为键
+		}
+
+		// 将字段值添加到 bson.M
+		document[key] = field.Interface()
+	}
+
+	return document, nil
+}
+
+func setSearchOptions(filter params.SearchOptions, bsonMFilter *bson.M) {
+	defaults := map[string]interface{}{
+		"class_term":   "",
+		"class_status": "",
+		"class_day":    "",
+		"class_title":  "",
+	}
+
+	v := reflect.ValueOf(filter)
+	t := reflect.TypeOf(filter)
+
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		key := t.Field(i).Tag.Get("json")
+		defaultValue := defaults[key]
+
+		if key != "" && field.Interface() != defaultValue {
+			(*bsonMFilter)[key] = field.Interface()
+		}
+	}
+}
+
+func search(c *gin.Context) {
+	// connection
+	// TODO 链接写成单例
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", AppConfig.DBMongoHost, AppConfig.DBMongoPort))) // "mongodb://localhost:27017"
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			panic(err)
+		}
+	}()
+	collection := client.Database(AppConfig.DBMongoDB).Collection("CourseForSearch")
+
+	// get query
+	pageNumber := c.DefaultQuery("pageNumber", "1")
+	pageNumberInt, err := strconv.Atoi(pageNumber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pageSizeInt := AppConfig.SearchOptionPageSize
+	pageSize := c.Query("pageSize")
+	if pageSize != "" {
+		pageSizeInt, err = strconv.Atoi(pageSize)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	skip := (pageNumberInt - 1) * pageSizeInt
+	sortBy := c.DefaultQuery("orderBy", AppConfig.SearchOptionOrderBy)
+	order := c.DefaultQuery("order", AppConfig.SearchOptionOrder)
+	// set default sort
+	orderInt := 1
+	if order == "des" {
+		orderInt = -1
+	}
+	sort := bson.D{{sortBy, orderInt}}
+
+	// get params and set filter
+	filter := params.SearchOptions{}
+	if err := c.ShouldBindJSON(&filter); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("filter: ", filter)
+	bsonMFilter := bson.M{}
+	setSearchOptions(filter, &bsonMFilter)
+	fmt.Println("bsonMFilter: ", bsonMFilter)
+
+	// search
+	options := options.Find().
+		SetSkip(int64(skip)).
+		SetLimit(int64(pageSizeInt)).
+		SetSort(sort)
+
+	cur, err := collection.Find(context.Background(), bsonMFilter, options)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cur.Close(context.Background())
+	var res []models.CourseForSearch
+	for cur.Next(context.Background()) {
+		// To decode into a struct, use cursor.Decode()
+		// var result bson.M
+		result := models.CourseForSearch{}
+		err := cur.Decode(&result)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// do something with result...
+		// fmt.Println("result: ", result)
+		res = append(res, result)
+	}
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	c.JSON(http.StatusOK, res)
 }
 
 func main() {
-    router := gin.Default()
-    router.GET("/albums", getAlbums)
-    router.GET("/testMongo", testMongo)
+	// 初始化配置
+	if err := InitConfig(); err != nil {
+		log.Fatalf("初始化配置失败: %v", err)
+	}
+	router := gin.Default()
+	router.GET("/albums", getAlbums)
+	router.POST("/search", search)
 
-    router.Run("localhost:8080")
+	router.Run(fmt.Sprintf("%s:%d", AppConfig.AppHost, AppConfig.AppPort))
 }

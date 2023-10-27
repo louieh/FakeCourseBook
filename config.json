@@ -1,0 +1,19 @@
+{
+    "app": {
+        "host": "localhost",
+        "port": 8080
+    },
+    "database": {
+        "mongodb": {
+            "host": "localhost",
+            "port": 27017,
+            "db": "Coursebook"
+        }
+    },
+    "searchOption": {
+        "orderBy": "class_title",
+        "order": "asc",
+        "pageSize": 10
+    }
+
+}

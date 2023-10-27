@@ -13,3 +13,5 @@ deploy/redis/
 *.pyc
 note.md
 dump.rdb
+.DS_Store
+mongodump

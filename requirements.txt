@@ -1,8 +1,0 @@
-Flask_Moment==0.7.0
-pymongo==3.7.2
-Flask==1.0.2
-telepot==12.7
-redis==3.3.0
-gunicorn==19.9.0
-Requests==2.22.0
-lxml==4.6.3
