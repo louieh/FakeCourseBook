@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -54,14 +55,36 @@ func InitConfig() error {
 	return nil
 }
 
-func getAlbums(c *gin.Context) {
-	var albums = []models.Album{
-		{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-		{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-		{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
-	}
+var (
+	mongoClient *mongo.Client
+	once        sync.Once
+)
 
-	c.IndentedJSON(http.StatusOK, albums)
+// func getAlbums(c *gin.Context) {
+// 	var albums = []models.Album{
+// 		{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
+// 		{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
+// 		{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+// 	}
+
+// 	c.IndentedJSON(http.StatusOK, albums)
+// }
+
+func createMongoClient() *mongo.Client {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", AppConfig.DBMongoHost, AppConfig.DBMongoPort))) // "mongodb://localhost:27017"
+	if err != nil {
+		panic(err)
+	}
+	return client
+}
+
+func getMongoClient() *mongo.Client {
+	once.Do(func() {
+		mongoClient = createMongoClient()
+	})
+	return mongoClient
 }
 
 func StructToBSONM(data interface{}) (bson.M, error) {
@@ -128,13 +151,9 @@ func setSearchOptions(filter params.SearchOptions, bsonMFilter *bson.M) {
 }
 
 func search(c *gin.Context) {
-	// connection
-	// TODO 链接写成单例
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", AppConfig.DBMongoHost, AppConfig.DBMongoPort))) // "mongodb://localhost:27017"
+	client := getMongoClient()
 	defer func() {
-		if err = client.Disconnect(ctx); err != nil {
+		if err := client.Disconnect(c); err != nil {
 			panic(err)
 		}
 	}()
@@ -210,7 +229,7 @@ func main() {
 		log.Fatalf("初始化配置失败: %v", err)
 	}
 	router := gin.Default()
-	router.GET("/albums", getAlbums)
+	// router.GET("/albums", getAlbums)
 	router.POST("/search", search)
 
 	router.Run(fmt.Sprintf("%s:%d", AppConfig.AppHost, AppConfig.AppPort))
