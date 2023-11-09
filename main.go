@@ -150,6 +150,49 @@ func setSearchOptions(filter params.SearchOptions, bsonMFilter *bson.M) {
 	}
 }
 
+func listCourses(c *gin.Context) {
+	client := getMongoClient()
+	defer func() {
+		if err := client.Disconnect(c); err != nil {
+			panic(err)
+		}
+	}()
+	collection := client.Database(AppConfig.DBMongoDB).Collection("CourseForSearch")
+
+	projection := bson.M{"class_instructor": 1, "_id": 0}
+
+	// search
+	options := options.Find().
+		SetProjection(projection)
+
+	cur, err := collection.Find(context.Background(), bson.M{}, options)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cur.Close(context.Background())
+	var res []models.CoursesList
+	for cur.Next(context.Background()) {
+		// To decode into a struct, use cursor.Decode()
+		// var result bson.M
+		result := models.CoursesList{}
+		err := cur.Decode(&result)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// do something with result...
+		// fmt.Println("result: ", result)
+		res = append(res, result)
+	}
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+// func listProfessors(c *gin.Context) {
+
+// }
+
 func search(c *gin.Context) {
 	client := getMongoClient()
 	defer func() {
@@ -231,6 +274,7 @@ func main() {
 	router := gin.Default()
 	// router.GET("/albums", getAlbums)
 	router.POST("/search", search)
+	router.GET("/listCourses", listCourses)
 
 	router.Run(fmt.Sprintf("%s:%d", AppConfig.AppHost, AppConfig.AppPort))
 }

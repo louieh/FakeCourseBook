@@ -23,3 +23,7 @@ type CourseForSearch struct {
 	ClassLocation   string   `bson:"class_location"`
 	ClassIsFull     string   `bson:"class_isFull"`
 }
+
+type CoursesList struct {
+	ClassInstructor []string `bson:"class_instructor"`
+}
