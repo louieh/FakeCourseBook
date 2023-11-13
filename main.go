@@ -150,7 +150,7 @@ func setSearchOptions(filter params.SearchOptions, bsonMFilter *bson.M) {
 	}
 }
 
-func listCourses(c *gin.Context) {
+func listProfessors(c *gin.Context) {
 	client := getMongoClient()
 	defer func() {
 		if err := client.Disconnect(c); err != nil {
@@ -170,11 +170,11 @@ func listCourses(c *gin.Context) {
 		log.Fatal(err)
 	}
 	defer cur.Close(context.Background())
-	var res []models.CoursesList
+	var res []models.ProfessorsList
 	for cur.Next(context.Background()) {
 		// To decode into a struct, use cursor.Decode()
 		// var result bson.M
-		result := models.CoursesList{}
+		result := models.ProfessorsList{}
 		err := cur.Decode(&result)
 		if err != nil {
 			log.Fatal(err)
@@ -189,9 +189,40 @@ func listCourses(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// func listProfessors(c *gin.Context) {
+func listCourses(c *gin.Context) {
+	client := getMongoClient()
+	defer func() {
+		if err := client.Disconnect(c); err != nil {
+			panic(err)
+		}
+	}()
+	collection := client.Database(AppConfig.DBMongoDB).Collection("CourseForSearch")
 
-// }
+	projection := bson.M{"class_section":1,
+						"class_number":1,
+						"class_title":1,
+						"_id":0}
+	options := options.Find().SetProjection(projection)
+
+	cur, err := collection.Find(context.Background(), bson.M{}, options)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cur.Close(context.Background())
+	var res []models.CoursesList
+	for cur.Next(context.Background()) {
+		result := models.CoursesList{}
+		err := cur.Decode(&result)
+		if err != nil {
+			log.Fatal(err)
+		}
+		res = append(res, result)
+	}
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	c.JSON(http.StatusOK, res)
+}
 
 func search(c *gin.Context) {
 	client := getMongoClient()
@@ -274,6 +305,7 @@ func main() {
 	router := gin.Default()
 	// router.GET("/albums", getAlbums)
 	router.POST("/search", search)
+	router.GET("/listProfessors", listProfessors)
 	router.GET("/listCourses", listCourses)
 
 	router.Run(fmt.Sprintf("%s:%d", AppConfig.AppHost, AppConfig.AppPort))

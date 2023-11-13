@@ -25,5 +25,11 @@ type CourseForSearch struct {
 }
 
 type CoursesList struct {
+	ClassSection    string   `bson:"class_section"`
+	ClassNumber     string   `bson:"class_number"`
+	ClassTitle      string   `bson:"class_title"`
+}
+
+type ProfessorsList struct {
 	ClassInstructor []string `bson:"class_instructor"`
 }
