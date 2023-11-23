@@ -1,91 +1,22 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"reflect"
 	"strconv"
-	"sync"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/louieh/FakeCourseBook/config"
 	"github.com/louieh/FakeCourseBook/models"
 	"github.com/louieh/FakeCourseBook/models/params"
-	"github.com/spf13/viper"
+	"github.com/louieh/FakeCourseBook/utils"
+	"github.com/louieh/FakeCourseBook/utils/mongoUtils"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-var AppConfig struct {
-	AppHost              string
-	AppPort              int
-	DBMongoHost          string
-	DBMongoPort          int
-	DBMongoDB            string
-	SearchOptionOrderBy  string
-	SearchOptionOrder    string
-	SearchOptionPageSize int
-}
-
-// InitConfig 用于加载配置文件和解析配置参数
-func InitConfig() error {
-	// 初始化 viper
-	viper.SetConfigName("config") // 指定配置文件的名称（config.json）
-	viper.AddConfigPath(".")      // 指定配置文件的路径（当前目录）
-
-	// 读取配置文件
-	if err := viper.ReadInConfig(); err != nil {
-		return err
-	}
-
-	// 从配置文件中获取配置参数并存储到 AppConfig 中
-	AppConfig.AppHost = viper.GetString("app.host")
-	AppConfig.AppPort = viper.GetInt("app.port")
-	AppConfig.DBMongoHost = viper.GetString("database.mongodb.host")
-	AppConfig.DBMongoPort = viper.GetInt("database.mongodb.port")
-	AppConfig.DBMongoDB = viper.GetString("database.mongodb.db")
-	AppConfig.SearchOptionOrderBy = viper.GetString("searchOption.OrderBy")
-	AppConfig.SearchOptionOrder = viper.GetString("searchOption.Order")
-	AppConfig.SearchOptionPageSize = viper.GetInt("searchOption.pageSize")
-
-	return nil
-}
-
-var (
-	mongoClient *mongo.Client
-	once        sync.Once
-)
-
-// func getAlbums(c *gin.Context) {
-// 	var albums = []models.Album{
-// 		{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-// 		{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-// 		{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
-// 	}
-
-// 	c.IndentedJSON(http.StatusOK, albums)
-// }
-
-func createMongoClient() *mongo.Client {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", AppConfig.DBMongoHost, AppConfig.DBMongoPort))) // "mongodb://localhost:27017"
-	if err != nil {
-		panic(err)
-	}
-	return client
-}
-
-func getMongoClient() *mongo.Client {
-	once.Do(func() {
-		mongoClient = createMongoClient()
-	})
-	return mongoClient
-}
 
 func StructToBSONM(data interface{}) (bson.M, error) {
 	document, err := bson.Marshal(data)
@@ -150,96 +81,14 @@ func setSearchOptions(filter params.SearchOptions, bsonMFilter *bson.M) {
 	}
 }
 
-func listProfessors(c *gin.Context) {
-	client := getMongoClient()
-	defer func() {
-		if err := client.Disconnect(c); err != nil {
-			panic(err)
-		}
-	}()
-	collection := client.Database(AppConfig.DBMongoDB).Collection("CourseForSearch")
-
-	projection := bson.M{"class_instructor": 1, "_id": 0}
-
-	// search
-	options := options.Find().
-		SetProjection(projection)
-
-	cur, err := collection.Find(context.Background(), bson.M{}, options)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer cur.Close(context.Background())
-	var res []models.ProfessorsList
-	for cur.Next(context.Background()) {
-		// To decode into a struct, use cursor.Decode()
-		// var result bson.M
-		result := models.ProfessorsList{}
-		err := cur.Decode(&result)
-		if err != nil {
-			log.Fatal(err)
-		}
-		// do something with result...
-		// fmt.Println("result: ", result)
-		res = append(res, result)
-	}
-	if err := cur.Err(); err != nil {
-		log.Fatal(err)
-	}
-	c.JSON(http.StatusOK, res)
-}
-
-func listCourses(c *gin.Context) {
-	client := getMongoClient()
-	defer func() {
-		if err := client.Disconnect(c); err != nil {
-			panic(err)
-		}
-	}()
-	collection := client.Database(AppConfig.DBMongoDB).Collection("CourseForSearch")
-
-	projection := bson.M{"class_section":1,
-						"class_number":1,
-						"class_title":1,
-						"_id":0}
-	options := options.Find().SetProjection(projection)
-
-	cur, err := collection.Find(context.Background(), bson.M{}, options)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer cur.Close(context.Background())
-	var res []models.CoursesList
-	for cur.Next(context.Background()) {
-		result := models.CoursesList{}
-		err := cur.Decode(&result)
-		if err != nil {
-			log.Fatal(err)
-		}
-		res = append(res, result)
-	}
-	if err := cur.Err(); err != nil {
-		log.Fatal(err)
-	}
-	c.JSON(http.StatusOK, res)
-}
-
 func search(c *gin.Context) {
-	client := getMongoClient()
-	defer func() {
-		if err := client.Disconnect(c); err != nil {
-			panic(err)
-		}
-	}()
-	collection := client.Database(AppConfig.DBMongoDB).Collection("CourseForSearch")
-
 	// get query
 	pageNumber := c.DefaultQuery("pageNumber", "1")
 	pageNumberInt, err := strconv.Atoi(pageNumber)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pageSizeInt := AppConfig.SearchOptionPageSize
+	pageSizeInt := config.AppConfig.SearchOptionPageSize
 	pageSize := c.Query("pageSize")
 	if pageSize != "" {
 		pageSizeInt, err = strconv.Atoi(pageSize)
@@ -248,8 +97,8 @@ func search(c *gin.Context) {
 		}
 	}
 	skip := (pageNumberInt - 1) * pageSizeInt
-	sortBy := c.DefaultQuery("orderBy", AppConfig.SearchOptionOrderBy)
-	order := c.DefaultQuery("order", AppConfig.SearchOptionOrder)
+	sortBy := c.DefaultQuery("orderBy", config.AppConfig.SearchOptionOrderBy)
+	order := c.DefaultQuery("order", config.AppConfig.SearchOptionOrder)
 	// set default sort
 	orderInt := 1
 	if order == "des" {
@@ -272,41 +121,57 @@ func search(c *gin.Context) {
 		SetSkip(int64(skip)).
 		SetLimit(int64(pageSizeInt)).
 		SetSort(sort)
-
-	cur, err := collection.Find(context.Background(), bsonMFilter, options)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer cur.Close(context.Background())
+	// container
 	var res []models.CourseForSearch
-	for cur.Next(context.Background()) {
-		// To decode into a struct, use cursor.Decode()
-		// var result bson.M
-		result := models.CourseForSearch{}
-		err := cur.Decode(&result)
-		if err != nil {
-			log.Fatal(err)
-		}
-		// do something with result...
-		// fmt.Println("result: ", result)
-		res = append(res, result)
-	}
-	if err := cur.Err(); err != nil {
-		log.Fatal(err)
-	}
+	mongoUtils.DoFind(c, bsonMFilter, options, &res)
 	c.JSON(http.StatusOK, res)
+}
+
+func listProfessors(c *gin.Context) {
+	// option
+	projection := bson.M{"class_instructor": 1, "_id": 0}
+	options := options.Find().
+		SetProjection(projection)
+	// container
+	var res []models.ProfessorsList
+	mongoUtils.DoFind(c, bson.M{}, options, &res)
+	c.JSON(http.StatusOK, res)
+}
+
+func listCourses(c *gin.Context) {
+	// option
+	projection := bson.M{"class_section": 1,
+		"class_number": 1,
+		"class_title":  1,
+		"_id":          0}
+	options := options.Find().SetProjection(projection)
+	// container
+	var res []models.CoursesList
+	mongoUtils.DoFind(c, bson.M{}, options, &res)
+	c.JSON(http.StatusOK, res)
+}
+
+func fetchProfessorRate(c *gin.Context) {
+	name := c.Param("name")
+	c.JSON(http.StatusOK, utils.FetchRateMyProfessor(name))
+}
+
+func fetchCourseDiscreption(c *gin.Context) {
+	sectionNum := c.Param("secNum")
+	c.JSON(http.StatusOK, utils.FetchCourseDiscreption(sectionNum))
 }
 
 func main() {
 	// 初始化配置
-	if err := InitConfig(); err != nil {
+	if err := config.InitConfig(); err != nil {
 		log.Fatalf("初始化配置失败: %v", err)
 	}
 	router := gin.Default()
-	// router.GET("/albums", getAlbums)
 	router.POST("/search", search)
 	router.GET("/listProfessors", listProfessors)
 	router.GET("/listCourses", listCourses)
+	router.GET("/fetchProRate/:name", fetchProfessorRate)
+	router.GET("/fetchCourDisc/:secNum", fetchCourseDiscreption)
 
-	router.Run(fmt.Sprintf("%s:%d", AppConfig.AppHost, AppConfig.AppPort))
+	router.Run(fmt.Sprintf("%s:%d", config.AppConfig.AppHost, config.AppConfig.AppPort))
 }
