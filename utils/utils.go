@@ -2,12 +2,21 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"slices"
+	"strings"
 
 	"github.com/antchfx/htmlquery"
+	"github.com/louieh/FakeCourseBook/config"
+	"github.com/louieh/FakeCourseBook/models"
+	"github.com/louieh/FakeCourseBook/utils/mongoUtils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func FetchCourseDiscreption(sectionNum string) string {
@@ -98,4 +107,62 @@ func printResp(respBody io.ReadCloser) {
 
 	// 打印格式化后的 JSON 数据
 	fmt.Println("----------------resp: ", prettyJSON.String())
+}
+
+type tempProNameStruct struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+func GetCourseGraphData(courseSection string, _6301_7301 bool) map[string]any {
+	// filter
+	bsonMFilter := bson.M{}
+	if !_6301_7301 {
+		bsonMFilter["class_section"] = bson.M{"$regex": courseSection}
+	} else {
+		bsonMFilter["class_title"] = bson.M{"$regex": courseSection}
+	}
+	// option
+	projection := bson.M{"_id": 0}
+	options := options.Find().
+		SetProjection(projection)
+	var allCourseList []models.CourseForGrade
+	mongoUtils.DoFind(context.Background(), config.AppConfig.DBMongoCollectionGrade, bsonMFilter, options, &allCourseList)
+
+	if len(allCourseList) == 0 {
+		log.Fatal("allCourseList is empty")
+		// TODO abort 404
+	}
+
+	courseName := allCourseList[0].ClassTitle
+	var courseSectionRes string
+	if !_6301_7301 {
+		courseSectionRes = strings.ReplaceAll(strings.ToLower(courseSection), " ", "")
+	} else {
+		courseSectionRes = strings.ReplaceAll(strings.ToLower(strings.Split(allCourseList[0].ClassSection, ".")[0]), " ", "")
+	}
+
+	var professorList []string
+	termDict := make(map[string][]tempProNameStruct)
+
+	for _, courseStruct := range allCourseList {
+		professorNameList := courseStruct.ClassInstructor
+		professorList = append(professorList, professorNameList...)
+		term := courseStruct.ClassTerm
+		for _, eachProName := range professorNameList {
+			tempProNameDict := tempProNameStruct{eachProName, eachProName}
+			if !slices.Contains(termDict[term], tempProNameDict) {
+				termDict[term] = append(termDict[term], tempProNameDict)
+			}
+		}
+	}
+
+	var finalList []map[string]any
+	for _, term := range config.AppConfig.TermList {
+		tempFinalDict := map[string]any{"name": term, "children": termDict[term]}
+		finalList = append(finalList, tempFinalDict)
+	}
+	finalDict := map[string]any{"name": courseSection, "children": finalList}
+
+	return map[string]any{"courseSectionRes": courseSectionRes, "courseName": courseName, "finalDict": finalDict, "professorNameList": professorList}
 }

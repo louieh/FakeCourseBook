@@ -3,14 +3,19 @@ package config
 import "github.com/spf13/viper"
 
 var AppConfig struct {
-	AppHost              string
-	AppPort              int
-	DBMongoHost          string
-	DBMongoPort          int
-	DBMongoDB            string
-	SearchOptionOrderBy  string
-	SearchOptionOrder    string
-	SearchOptionPageSize int
+	AppHost                    string
+	AppPort                    int
+	DBMongoHost                string
+	DBMongoPort                int
+	DBMongoDB                  string
+	DBMongoCollectionSearch    string
+	DBMongoCollectionGrade     string
+	DBMongoCollectionSpeed     string
+	DBMongoCollectionUtdgrades string
+	SearchOptionOrderBy        string
+	SearchOptionOrder          string
+	SearchOptionPageSize       int
+	TermList                   []string
 }
 
 // InitConfig 用于加载配置文件和解析配置参数
@@ -30,9 +35,13 @@ func InitConfig() error {
 	AppConfig.DBMongoHost = viper.GetString("database.mongodb.host")
 	AppConfig.DBMongoPort = viper.GetInt("database.mongodb.port")
 	AppConfig.DBMongoDB = viper.GetString("database.mongodb.db")
+	AppConfig.DBMongoCollectionSearch = viper.GetString("database.mongodb.collections.search")
+	AppConfig.DBMongoCollectionGrade = viper.GetString("database.mongodb.collections.grade")
+	AppConfig.DBMongoCollectionSpeed = viper.GetString("database.mongodb.collections.speed")
+	AppConfig.DBMongoCollectionUtdgrades = viper.GetString("database.mongodb.collections.utdgrades")
 	AppConfig.SearchOptionOrderBy = viper.GetString("searchOption.OrderBy")
 	AppConfig.SearchOptionOrder = viper.GetString("searchOption.Order")
 	AppConfig.SearchOptionPageSize = viper.GetInt("searchOption.pageSize")
-
+	AppConfig.TermList = viper.GetStringSlice("termList")
 	return nil
 }

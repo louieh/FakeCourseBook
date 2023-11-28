@@ -1,0 +1,116 @@
+basePath: /api/v1
+info:
+  contact: {}
+paths:
+  /fetchCourDisc/{sectionNumber}:
+    get:
+      consumes:
+      - application/json
+      description: fetch course description
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: fetch course description
+      tags:
+      - search
+  /fetchProRate/{name}:
+    get:
+      consumes:
+      - application/json
+      description: fetch professor rate
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: fetch professor rate
+      tags:
+      - search
+  /listCourses:
+    get:
+      consumes:
+      - application/json
+      description: list all course
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: list all course
+      tags:
+      - search
+  /listProfessors:
+    get:
+      consumes:
+      - application/json
+      description: list all professor
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: list all professor
+      tags:
+      - search
+  /search:
+    post:
+      consumes:
+      - application/json
+      description: do search
+      parameters:
+      - default: 1
+        description: page number
+        in: query
+        name: pageNumber
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: order feild
+        in: query
+        name: orderBy
+        type: string
+      - description: order
+        enum:
+        - des
+        - asc
+        in: query
+        name: order
+        type: string
+      - description: message/rfc822
+        in: body
+        name: class_term
+        schema:
+          type: string
+      - description: message/rfc822
+        in: body
+        name: class_status
+        schema:
+          type: string
+      - description: message/rfc822
+        in: body
+        name: class_prefix
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: search
+      tags:
+      - search
+swagger: "2.0"

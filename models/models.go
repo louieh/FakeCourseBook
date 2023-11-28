@@ -24,10 +24,18 @@ type CourseForSearch struct {
 	ClassIsFull     string   `bson:"class_isFull"`
 }
 
-type CoursesList struct {
+type CourseForGrade struct {
+	ClassTerm       string   `bson:"class_term"`
 	ClassSection    string   `bson:"class_section"`
 	ClassNumber     string   `bson:"class_number"`
 	ClassTitle      string   `bson:"class_title"`
+	ClassInstructor []string `bson:"class_instructor"`
+}
+
+type CoursesList struct {
+	ClassSection string `bson:"class_section"`
+	ClassNumber  string `bson:"class_number"`
+	ClassTitle   string `bson:"class_title"`
 }
 
 type ProfessorsList struct {

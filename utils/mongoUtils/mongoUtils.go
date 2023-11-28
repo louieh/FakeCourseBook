@@ -36,10 +36,10 @@ func GetMongoClient() *mongo.Client {
 }
 
 type findType interface {
-	models.ProfessorsList | models.CoursesList | models.CourseForSearch
+	models.ProfessorsList | models.CoursesList | models.CourseForSearch | models.CourseForGrade
 }
 
-func DoFind[T findType](ctx context.Context, filter any, opts *options.FindOptions, container *[]T) {
+func DoFind[T findType](ctx context.Context, collName string, filter any, opts *options.FindOptions, container *[]T) {
 	client := GetMongoClient()
 	// TODO deal with that
 	// defer func() {
@@ -47,7 +47,7 @@ func DoFind[T findType](ctx context.Context, filter any, opts *options.FindOptio
 	// 		panic(err)
 	// 	}
 	// }()
-	collection := client.Database(config.AppConfig.DBMongoDB).Collection("CourseForSearch")
+	collection := client.Database(config.AppConfig.DBMongoDB).Collection(collName)
 	cur, err := collection.Find(context.Background(), filter, opts)
 	if err != nil {
 		log.Fatal(err)

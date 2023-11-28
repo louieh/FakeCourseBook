@@ -14,6 +14,9 @@ import (
 	"github.com/louieh/FakeCourseBook/utils"
 	"github.com/louieh/FakeCourseBook/utils/mongoUtils"
 
+	docs "github.com/louieh/FakeCourseBook/docs"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -81,6 +84,24 @@ func setSearchOptions(filter params.SearchOptions, bsonMFilter *bson.M) {
 	}
 }
 
+// @BasePath /api/v1
+
+// search godoc
+// @Summary search
+// @Schemes
+// @Description do search
+// @Tags search
+// @Accept json
+// @Produce json
+// @Success 200 {string} Search
+// @Router /search [POST]
+// @Param	pageNumber	query	int	false	"page number"	default(1)
+// @Param	pageSize	query	int	false	"page size" defualt(10)
+// @Param 	orderBy		query	string  false	"order feild" defualt(class_title)
+// @Param	order		query	string  false	"order" Enums(des, asc)
+// @Param 	class_term body string false "message/rfc822"
+// @Param 	class_status body string false "message/rfc822"
+// @Param 	class_prefix body string false "message/rfc822"
 func search(c *gin.Context) {
 	// get query
 	pageNumber := c.DefaultQuery("pageNumber", "1")
@@ -123,10 +144,21 @@ func search(c *gin.Context) {
 		SetSort(sort)
 	// container
 	var res []models.CourseForSearch
-	mongoUtils.DoFind(c, bsonMFilter, options, &res)
+	mongoUtils.DoFind(c, config.AppConfig.DBMongoCollectionSearch, bsonMFilter, options, &res)
 	c.JSON(http.StatusOK, res)
 }
 
+// @BasePath /api/v1
+
+// list all professor godoc
+// @Summary list all professor
+// @Schemes
+// @Description list all professor
+// @Tags search
+// @Accept json
+// @Produce json
+// @Success 200 {string} Search
+// @Router /listProfessors [GET]
 func listProfessors(c *gin.Context) {
 	// option
 	projection := bson.M{"class_instructor": 1, "_id": 0}
@@ -134,10 +166,21 @@ func listProfessors(c *gin.Context) {
 		SetProjection(projection)
 	// container
 	var res []models.ProfessorsList
-	mongoUtils.DoFind(c, bson.M{}, options, &res)
+	mongoUtils.DoFind(c, config.AppConfig.DBMongoCollectionSearch, bson.M{}, options, &res)
 	c.JSON(http.StatusOK, res)
 }
 
+// @BasePath /api/v1
+
+// list all course godoc
+// @Summary list all course
+// @Schemes
+// @Description list all course
+// @Tags search
+// @Accept json
+// @Produce json
+// @Success 200 {string} Search
+// @Router /listCourses [GET]
 func listCourses(c *gin.Context) {
 	// option
 	projection := bson.M{"class_section": 1,
@@ -147,19 +190,48 @@ func listCourses(c *gin.Context) {
 	options := options.Find().SetProjection(projection)
 	// container
 	var res []models.CoursesList
-	mongoUtils.DoFind(c, bson.M{}, options, &res)
+	mongoUtils.DoFind(c, config.AppConfig.DBMongoCollectionSearch, bson.M{}, options, &res)
 	c.JSON(http.StatusOK, res)
 }
 
+// @BasePath /api/v1
+
+// fetch professor rate godoc
+// @Summary fetch professor rate
+// @Schemes
+// @Description fetch professor rate
+// @Tags search
+// @Accept json
+// @Produce json
+// @Success 200 {string} Search
+// @Router /fetchProRate/{name} [GET]
 func fetchProfessorRate(c *gin.Context) {
 	name := c.Param("name")
 	c.JSON(http.StatusOK, utils.FetchRateMyProfessor(name))
 }
 
+// @BasePath /api/v1
+
+// fetch course description godoc
+// @Summary fetch course description
+// @Schemes
+// @Description fetch course description
+// @Tags search
+// @Accept json
+// @Produce json
+// @Success 200 {string} Search
+// @Router /fetchCourDisc/{sectionNumber} [GET]
 func fetchCourseDiscreption(c *gin.Context) {
 	sectionNum := c.Param("secNum")
 	c.JSON(http.StatusOK, utils.FetchCourseDiscreption(sectionNum))
 }
+
+func fetchCoursePage(c *gin.Context) {
+	courseSection := c.Param("secNum")
+	c.JSON(http.StatusOK, utils.GetCourseGraphData(courseSection, true))
+}
+
+func fetchProfessorPage(c *gin.Context) {}
 
 func main() {
 	// 初始化配置
@@ -167,11 +239,19 @@ func main() {
 		log.Fatalf("初始化配置失败: %v", err)
 	}
 	router := gin.Default()
-	router.POST("/search", search)
-	router.GET("/listProfessors", listProfessors)
-	router.GET("/listCourses", listCourses)
-	router.GET("/fetchProRate/:name", fetchProfessorRate)
-	router.GET("/fetchCourDisc/:secNum", fetchCourseDiscreption)
+	apiV1 := router.Group("api/v1")
+	{
+		apiV1.POST("/search", search)
+		apiV1.GET("/listProfessors", listProfessors)
+		apiV1.GET("/listCourses", listCourses)
+		apiV1.GET("/fetchProRate/:name", fetchProfessorRate)
+		apiV1.GET("/fetchCourDisc/:secNum", fetchCourseDiscreption)
+		apiV1.GET("/fetchCoursePage/:secNum", fetchCoursePage)
+		apiV1.GET("/fetchProfessorPage/:name", fetchProfessorPage)
+	}
+
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	router.Run(fmt.Sprintf("%s:%d", config.AppConfig.AppHost, config.AppConfig.AppPort))
 }
