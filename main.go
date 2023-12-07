@@ -9,9 +9,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/louieh/FakeCourseBook/config"
+	"github.com/louieh/FakeCourseBook/middleware"
 	"github.com/louieh/FakeCourseBook/models"
 	"github.com/louieh/FakeCourseBook/models/params"
 	"github.com/louieh/FakeCourseBook/utils"
+	"github.com/louieh/FakeCourseBook/utils/loginUtils"
 	"github.com/louieh/FakeCourseBook/utils/mongoUtils"
 
 	docs "github.com/louieh/FakeCourseBook/docs"
@@ -227,11 +229,23 @@ func fetchCourseDiscreption(c *gin.Context) {
 }
 
 func fetchCoursePage(c *gin.Context) {
-	courseSection := c.Param("secNum")
-	c.JSON(http.StatusOK, utils.GetCourseGraphData(courseSection, true))
+	// courseSection := c.Param("secNum")
+	// res1 := utils.GetCourseGraphData(courseSection, true)
+	req, _ := c.Get("request")
+	fmt.Println("-----------request:", req)
+	param := params.GetSpeedGraphDataParam{ClassNumber: "24043"}
+	res2 := utils.GetSpeedGraphData(param)
+	c.JSON(http.StatusOK, res2)
 }
 
 func fetchProfessorPage(c *gin.Context) {}
+
+func loginOAuth(c *gin.Context) {
+	authCode := c.Query("code")
+	fmt.Println("-=-=-=0=-0 code: ", authCode)
+	username, jwt := loginUtils.OAuthGithub(c, authCode)
+	c.JSON(http.StatusOK, map[string]string{"username": username, "jwt": jwt})
+}
 
 func main() {
 	// 初始化配置
@@ -239,7 +253,11 @@ func main() {
 		log.Fatalf("初始化配置失败: %v", err)
 	}
 	router := gin.Default()
+	router.Use(middleware.CommonMiddleWare())
+	// api/v1
 	apiV1 := router.Group("api/v1")
+
+	apiV1.Use(middleware.LoginCheck())
 	{
 		apiV1.POST("/search", search)
 		apiV1.GET("/listProfessors", listProfessors)
@@ -250,8 +268,10 @@ func main() {
 		apiV1.GET("/fetchProfessorPage/:name", fetchProfessorPage)
 	}
 
+	// login api
+	router.GET("/login/oauth", loginOAuth)
+
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-
 	router.Run(fmt.Sprintf("%s:%d", config.AppConfig.AppHost, config.AppConfig.AppPort))
 }

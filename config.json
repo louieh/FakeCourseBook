@@ -1,7 +1,9 @@
 {
     "app": {
         "host": "localhost",
-        "port": 8080
+        "port": 8080,
+        "secretKey": "",
+        "tokenExpire": 8
     },
     "database": {
         "mongodb": {
@@ -23,6 +25,16 @@
     },
     "termList": ["22S", "21F", "21U", "21S", "20F", "20U", "20S", "19F", "19U", "19S", "18F", "18U", "18S", "17F",
     "17U", "17S", "16F", "16U", "16S", "15F", "15U", "15S", "14F", "14U", "14S", "13F", "13U", "13S",
-    "12F", "12U", "12S", "11F", "11U", "11S", "10F", "10U", "10S"]
-
+    "12F", "12U", "12S", "11F", "11U", "11S", "10F", "10U", "10S"],
+    "timeDelta": 8,
+    "oauthLogin": {
+        "github": {
+            "tokenUrl": "https://github.com/login/oauth/access_token",
+            "userUrl": "https://api.github.com/user",
+            "clientId": "",
+            "clientSecret": ""
+        },
+        "header": "Authorization",
+        "tokenPrefix": "Bearer "
+    }
 }

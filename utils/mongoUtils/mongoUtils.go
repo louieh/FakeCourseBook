@@ -36,7 +36,7 @@ func GetMongoClient() *mongo.Client {
 }
 
 type findType interface {
-	models.ProfessorsList | models.CoursesList | models.CourseForSearch | models.CourseForGrade
+	models.ProfessorsList | models.CoursesList | models.CourseForSearch | models.CourseForGrade | models.CourseForSpeed
 }
 
 func DoFind[T findType](ctx context.Context, collName string, filter any, opts *options.FindOptions, container *[]T) {

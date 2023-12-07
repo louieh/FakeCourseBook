@@ -10,10 +10,12 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/antchfx/htmlquery"
 	"github.com/louieh/FakeCourseBook/config"
 	"github.com/louieh/FakeCourseBook/models"
+	"github.com/louieh/FakeCourseBook/models/params"
 	"github.com/louieh/FakeCourseBook/utils/mongoUtils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -21,7 +23,7 @@ import (
 
 func FetchCourseDiscreption(sectionNum string) string {
 	url := "https://catalog.utdallas.edu/2023/graduate/courses/" + sectionNum
-	respBody := downloador(url, "GET", nil, nil)
+	respBody := DoRequest(url, "GET", nil, nil)
 	doc, err := htmlquery.Parse(respBody)
 	if err != nil {
 		panic(err)
@@ -49,7 +51,7 @@ func FetchRateMyProfessor(name string) map[string]any {
 		},
 	}
 
-	respBody := downloador(url, "POST", map[string]string{"Authorization": "Basic dGVzdDp0ZXN0"}, data)
+	respBody := DoRequest(url, "POST", map[string]string{"Authorization": "Basic dGVzdDp0ZXN0"}, data)
 	defer respBody.Close()
 	// printResp(respBody)
 	var result map[string]interface{}
@@ -61,7 +63,7 @@ func FetchRateMyProfessor(name string) map[string]any {
 	return result
 }
 
-func downloador(url string, method string, header map[string]string, data any) io.ReadCloser {
+func DoRequest(url string, method string, header map[string]string, data any) io.ReadCloser {
 	// 创建包含 JSON 数据的请求体
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -91,7 +93,7 @@ func downloador(url string, method string, header map[string]string, data any) i
 	return response.Body
 }
 
-func printResp(respBody io.ReadCloser) {
+func PrintResp(respBody io.ReadCloser) {
 	// 读取响应体
 	body, err := io.ReadAll(respBody)
 	if err != nil {
@@ -165,4 +167,73 @@ func GetCourseGraphData(courseSection string, _6301_7301 bool) map[string]any {
 	finalDict := map[string]any{"name": courseSection, "children": finalList}
 
 	return map[string]any{"courseSectionRes": courseSectionRes, "courseName": courseName, "finalDict": finalDict, "professorNameList": professorList}
+}
+
+func buildFilterForSpeed(param params.GetSpeedGraphDataParam, filter bson.M) {
+	if param.ClassTerm != "" {
+		filter["class_term"] = param.ClassTerm
+	}
+	if param.ClassInstructor != "" {
+		filter["class_instructor"] = param.ClassInstructor
+	}
+}
+
+func transUTD(timestamp int64) string {
+	utcTime := time.Unix(timestamp, 0).UTC().Add(time.Hour * time.Duration(-config.AppConfig.TimeDelta)).Format("2006-01-02 15:04")
+	return utcTime
+}
+
+func GetSpeedGraphData(param params.GetSpeedGraphDataParam) map[string]map[string]map[string]any {
+	// option
+	projection := bson.M{"_id": 0}
+	options := options.Find().
+		SetProjection(projection)
+	// filter
+	bsonMFilter := bson.M{}
+	if param.ClassTitle != "" {
+		bsonMFilter["class_title"] = bson.M{"$regex": param.ClassTitle}
+	} else if param.ClassNumber != "" {
+		buildFilterForSpeed(param, bsonMFilter)
+		bsonMFilter["class_number"] = param.ClassNumber
+
+	} else if param.ClassSection != "" {
+		buildFilterForSpeed(param, bsonMFilter)
+		bsonMFilter["class_section"] = bson.M{"$regex": param.ClassSection}
+
+	}
+	var speedData []models.CourseForSpeed
+	mongoUtils.DoFind(context.Background(), config.AppConfig.DBMongoCollectionSpeed, bsonMFilter, options, &speedData)
+	speedDataDict := make(map[string]map[string]map[string]interface{})
+	for _, eachSpeedData := range speedData {
+		xData := make([]string, len(eachSpeedData.UpdateData))
+		yData := make([]float64, len(eachSpeedData.UpdateData))
+
+		for i, eachEachSpeedData := range eachSpeedData.UpdateData {
+			xData[i] = transUTD(eachEachSpeedData.Timestamp)
+			yData[i] = eachEachSpeedData.Percentage * 100
+		}
+		classSection := eachSpeedData.ClassSection
+		classTerm := eachSpeedData.ClassTerm
+		classInstructor := eachSpeedData.ClassInstructor
+		classTitle := eachSpeedData.ClassTitle
+
+		if _, ok := speedDataDict[classTerm]; !ok {
+			speedDataDict[classTerm] = make(map[string]map[string]any)
+			speedDataDict[classTerm][classSection] = map[string]interface{}{
+				"x_data":           xData,
+				"y_data":           yData,
+				"class_title":      classTitle,
+				"class_instructor": classInstructor,
+			}
+		} else {
+			speedDataDict[classTerm][classSection] = map[string]interface{}{
+				"x_data":           xData,
+				"y_data":           yData,
+				"class_title":      classTitle,
+				"class_instructor": classInstructor,
+			}
+		}
+
+	}
+	return speedDataDict
 }
