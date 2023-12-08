@@ -16,3 +16,4 @@ note.md
 dump.rdb
 .DS_Store
 mongodump
+config.json
