@@ -16,6 +16,13 @@ func CommonMiddleWare() gin.HandlerFunc {
 		t := time.Now()
 		fmt.Println("--------------CommonMiddleWare started")
 		// c.Set("request", "CommonMiddleWare")
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
 		c.Next()
 		status := c.Writer.Status()
 		fmt.Println("------------CommonMiddleWare end", status)

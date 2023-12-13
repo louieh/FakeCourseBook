@@ -6,7 +6,10 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"time"
 
+	cache "github.com/chenyahui/gin-cache"
+	"github.com/chenyahui/gin-cache/persist"
 	"github.com/gin-gonic/gin"
 	"github.com/louieh/FakeCourseBook/config"
 	"github.com/louieh/FakeCourseBook/middleware"
@@ -253,6 +256,7 @@ func main() {
 		log.Fatalf("初始化配置失败: %v", err)
 	}
 	router := gin.Default()
+	memoryStore := persist.NewMemoryStore(1 * time.Minute)
 	router.Use(middleware.CommonMiddleWare())
 	// api/v1
 	apiV1 := router.Group("api/v1")
@@ -264,7 +268,7 @@ func main() {
 		apiV1.GET("/listCourses", listCourses)
 		apiV1.GET("/fetchProRate/:name", fetchProfessorRate)
 		apiV1.GET("/fetchCourDisc/:secNum", fetchCourseDiscreption)
-		apiV1.GET("/fetchCoursePage/:secNum", fetchCoursePage)
+		apiV1.GET("/fetchCoursePage/:secNum", cache.CacheByRequestURI(memoryStore, 2*time.Second), fetchCoursePage)
 		apiV1.GET("/fetchProfessorPage/:name", fetchProfessorPage)
 	}
 
