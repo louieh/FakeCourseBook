@@ -1,13 +1,15 @@
-FROM python:3.6
+FROM golang:1.21.2-alpine AS build
 
-WORKDIR /Course-Search
+WORKDIR /app
+COPY . .
 
-COPY requirements.txt .
+RUN go mod download && go mod verify
+RUN go build -o FakeCourseBook
 
-RUN apt-get update && apt-get install -y vim && pip install -r requirements.txt
+FROM alpine:latest
 
-COPY app app
-COPY config.py course_search.py ./
+WORKDIR /app
+COPY --from=build /app/FakeCourseBook .
+COPY --from=build /app/config.json .
 
-EXPOSE 9000
-CMD ["gunicorn", "-w", "4", "-b", ":9000", "--log-level", "debug", "course_search:app"]
+CMD ["./FakeCourseBook"]
