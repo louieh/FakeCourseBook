@@ -1,4 +1,4 @@
-FROM golang:1.21.2-alpine AS build
+FROM --platform=$TARGETPLATFORM golang:1.21.2-alpine AS build
 
 WORKDIR /app
 COPY . .
@@ -6,7 +6,7 @@ COPY . .
 RUN go mod download && go mod verify
 RUN go build -o FakeCourseBook
 
-FROM alpine:latest
+FROM --platform=$TARGETPLATFORM alpine:latest
 
 WORKDIR /app
 COPY --from=build /app/FakeCourseBook .
